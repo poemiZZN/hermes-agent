@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "name": "storyboard-platform-hermes-integration",
+  "hermesVersion": "0.18.2",
+  "upstreamCommit": "2ea39daeb1f675d72e5c21c9400f2d58d7e6d71a",
+  "integrationBranch": "storyboard-integration",
+  "releaseTag": "storyboard-hermes-v0.18.2-1",
+  "preparedAt": "2026-07-17T13:04:22.619226+00:00",
+  "files": [
+    {
+      "path": "gateway/platforms/api_server.py",
+      "sha256": "793bca575c6626a3abee716e644ab1fa89317731b516bcb444ff7b68f592d50f"
+    },
+    {
+      "path": "gateway/session_context.py",
+      "sha256": "c9908702d8857109cfcc8633a5588cb8f5d254599cb5d7ece8b03d1918e0d3ad"
+    },
+    {
+      "path": "storyboard_integration/install_runtime.py",
+      "sha256": "4937d6cc5a689efa805689c38ded35c34bdfb73f99d2d4d387bff73e74c18b16"
+    },
+    {
+      "path": "storyboard_integration/skills/script-platform-api/DESCRIPTION.md",
+      "sha256": "b8d278c7656cf2723de84e76e296c8863a0cb058d7cff05a789695b3e2ef0cac"
+    },
+    {
+      "path": "storyboard_integration/skills/script-platform-api/script-upload/SKILL.md",
+      "sha256": "c6b0d1e80bc67263e1f8b8bdaa32313b109c4039e9926abd54307724eb8ff216"
+    },
+    {
+      "path": "storyboard_integration/skills/script-platform-api/storyboard-text/SKILL.md",
+      "sha256": "acca8f83c8e34d269ed11e3694e83c4ecb1ec0192ce65f7e2a7f684375516469"
+    },
+    {
+      "path": "tools/storyboard_api_tool.py",
+      "sha256": "64d647b6a37eb506d55bc2d871cebd2a74ad3ced1776e9227998694505d5f5bb"
+    },
+    {
+      "path": "tools/zenmux_video_analyze_tool.py",
+      "sha256": "bb52f1ed28c0d2d48542e954204062e4cae1c05a532cb3ed8701e68b73b53513"
+    }
+  ]
+}

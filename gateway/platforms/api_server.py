@@ -32,6 +32,7 @@ Requires:
 """
 
 import asyncio
+import base64
 import hashlib
 import hmac
 import json
@@ -1293,6 +1294,87 @@ class APIServerAdapter(BasePlatformAdapter):
 
         return raw, None
 
+    def _parse_storyboard_session_headers(
+        self, request: "web.Request"
+    ) -> tuple[Dict[str, str], Optional["web.Response"]]:
+        """Snapshot authenticated storyboard headers for one agent run."""
+        user_id = request.headers.get("X-Hermes-Session-User-Id", "").strip()
+        user_name = request.headers.get("X-Hermes-Session-User-Name", "").strip()
+        platform_token = request.headers.get("X-Platform-Token", "").strip()
+        encoded_script_name = request.headers.get(
+            "X-Hermes-Storyboard-Script-Name-B64", ""
+        ).strip()
+        encoded_cos_path = request.headers.get(
+            "X-Hermes-Storyboard-Cos-Path-B64", ""
+        ).strip()
+
+        for label, value, limit in (
+            ("session user ID", user_id, self._MAX_SESSION_HEADER_LEN),
+            ("session user name", user_name, self._MAX_SESSION_HEADER_LEN),
+            ("platform token", platform_token, 8192),
+            ("encoded script name", encoded_script_name, 4096),
+            ("encoded COS path", encoded_cos_path, 4096),
+        ):
+            if len(value) > limit or re.search(r"[\r\n\x00]", value):
+                return {}, web.json_response(
+                    _openai_error(f"Invalid {label}", code="invalid_session_context"),
+                    status=400,
+                )
+
+        script_name = ""
+        if encoded_script_name:
+            try:
+                script_name = base64.b64decode(
+                    encoded_script_name, validate=True
+                ).decode("utf-8").strip()
+            except (ValueError, UnicodeDecodeError):
+                return {}, web.json_response(
+                    _openai_error(
+                        "Invalid storyboard script name",
+                        code="invalid_session_context",
+                    ),
+                    status=400,
+                )
+            if len(script_name) > 512 or re.search(r"[\r\n\x00]", script_name):
+                return {}, web.json_response(
+                    _openai_error(
+                        "Invalid storyboard script name",
+                        code="invalid_session_context",
+                    ),
+                    status=400,
+                )
+
+        cos_path = ""
+        if encoded_cos_path:
+            try:
+                cos_path = base64.b64decode(
+                    encoded_cos_path, validate=True
+                ).decode("utf-8").strip()
+            except (ValueError, UnicodeDecodeError):
+                return {}, web.json_response(
+                    _openai_error(
+                        "Invalid storyboard COS path",
+                        code="invalid_session_context",
+                    ),
+                    status=400,
+                )
+            if len(cos_path) > 2048 or re.search(r"[\r\n\x00]", cos_path):
+                return {}, web.json_response(
+                    _openai_error(
+                        "Invalid storyboard COS path",
+                        code="invalid_session_context",
+                    ),
+                    status=400,
+                )
+
+        return {
+            "user_id": user_id,
+            "user_name": user_name,
+            "storyboard_platform_token": platform_token,
+            "storyboard_script_name": script_name,
+            "storyboard_cos_path": cos_path,
+        }, None
+
     # ------------------------------------------------------------------
     # Session DB helper
     # ------------------------------------------------------------------
@@ -2046,6 +2128,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        if context_err is not None:
+            return context_err
         session_id = request.match_info["session_id"]
         _, err = self._get_existing_session_or_404(session_id)
         if err:
@@ -2066,6 +2151,7 @@ class APIServerAdapter(BasePlatformAdapter):
             ephemeral_system_prompt=system_prompt,
             session_id=session_id,
             gateway_session_key=gateway_session_key,
+            api_session_context=api_session_context,
         )
         effective_session_id = result.get("session_id") if isinstance(result, dict) else session_id
         final_response = _resolve_media_to_data_urls(result.get("final_response", "") if isinstance(result, dict) else "")
@@ -2088,6 +2174,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        if context_err is not None:
+            return context_err
         session_id = request.match_info["session_id"]
         _, err = self._get_existing_session_or_404(session_id)
         if err:
@@ -2155,6 +2244,7 @@ class APIServerAdapter(BasePlatformAdapter):
                     stream_delta_callback=_delta,
                     tool_progress_callback=_tool_progress,
                     gateway_session_key=gateway_session_key,
+                    api_session_context=api_session_context,
                 )
                 final_response = _resolve_media_to_data_urls(result.get("final_response", "") if isinstance(result, dict) else "")
                 effective_session_id = result.get("session_id", session_id) if isinstance(result, dict) else session_id
@@ -2287,6 +2377,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        if context_err is not None:
+            return context_err
 
         # Allow caller to continue an existing session by passing X-Hermes-Session-Id.
         # When provided, history is loaded from state.db instead of from the request body.
@@ -2439,6 +2532,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 agent_ref=agent_ref,
                 gateway_session_key=gateway_session_key,
                 route=route,
+                api_session_context=api_session_context,
             ))
             # Ensure SSE drain loops can terminate without relying on polling
             # agent_task.done(), which can race with queue timeout checks.
@@ -2459,6 +2553,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 session_id=session_id,
                 gateway_session_key=gateway_session_key,
                 route=route,
+                api_session_context=api_session_context,
             )
 
         idempotency_key = request.headers.get("Idempotency-Key")
@@ -3366,6 +3461,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        if context_err is not None:
+            return context_err
 
         # Parse request body
         try:
@@ -3523,6 +3621,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 agent_ref=agent_ref,
                 gateway_session_key=gateway_session_key,
                 route=route,
+                api_session_context=api_session_context,
             ))
             # Ensure SSE drain loops can terminate without relying on polling
             # agent_task.done(), which can race with queue timeout checks.
@@ -3557,6 +3656,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 session_id=session_id,
                 gateway_session_key=gateway_session_key,
                 route=route,
+                api_session_context=api_session_context,
             )
 
         idempotency_key = request.headers.get("Idempotency-Key")
@@ -4167,6 +4267,11 @@ class APIServerAdapter(BasePlatformAdapter):
         chat_id: str = "",
         session_key: str = "",
         session_id: str = "",
+        user_id: str = "",
+        user_name: str = "",
+        storyboard_platform_token: str = "",
+        storyboard_script_name: str = "",
+        storyboard_cos_path: str = "",
     ) -> list:
         """Bind session contextvars for an API-server agent run.
 
@@ -4190,6 +4295,11 @@ class APIServerAdapter(BasePlatformAdapter):
             chat_id=chat_id,
             session_key=session_key,
             session_id=session_id,
+            user_id=user_id,
+            user_name=user_name,
+            storyboard_platform_token=storyboard_platform_token,
+            storyboard_script_name=storyboard_script_name,
+            storyboard_cos_path=storyboard_cos_path,
             async_delivery=False,
         )
 
@@ -4206,6 +4316,7 @@ class APIServerAdapter(BasePlatformAdapter):
         agent_ref: Optional[list] = None,
         gateway_session_key: Optional[str] = None,
         route: Optional[Dict[str, Any]] = None,
+        api_session_context: Optional[Dict[str, str]] = None,
     ) -> tuple:
         """
         Create an agent and run a conversation in a thread executor.
@@ -4227,10 +4338,16 @@ class APIServerAdapter(BasePlatformAdapter):
         def _run():
             from gateway.session_context import clear_session_vars
 
+            session_context = api_session_context or {}
             tokens = self._bind_api_server_session(
                 chat_id=session_id or "",
                 session_key=gateway_session_key or session_id or "",
                 session_id=session_id or "",
+                user_id=session_context.get("user_id", ""),
+                user_name=session_context.get("user_name", ""),
+                storyboard_platform_token=session_context.get("storyboard_platform_token", ""),
+                storyboard_script_name=session_context.get("storyboard_script_name", ""),
+                storyboard_cos_path=session_context.get("storyboard_cos_path", ""),
             )
             try:
                 agent = self._create_agent(
@@ -4348,6 +4465,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        if context_err is not None:
+            return context_err
 
         # Enforce concurrency limit (shared across all agent-serving
         # endpoints; configurable via gateway.api_server.max_concurrent_runs).
@@ -4536,8 +4656,14 @@ class APIServerAdapter(BasePlatformAdapter):
                         # contextvars so concurrent runs do not share process
                         # environment state.
                         approval_token = set_current_session_key(approval_session_key)
+                        session_context = api_session_context or {}
                         session_tokens = self._bind_api_server_session(
                             session_key=approval_session_key,
+                            user_id=session_context.get("user_id", ""),
+                            user_name=session_context.get("user_name", ""),
+                            storyboard_platform_token=session_context.get("storyboard_platform_token", ""),
+                            storyboard_script_name=session_context.get("storyboard_script_name", ""),
+                            storyboard_cos_path=session_context.get("storyboard_cos_path", ""),
                         )
                         register_gateway_notify(approval_session_key, _approval_notify)
                         r = agent.run_conversation(
