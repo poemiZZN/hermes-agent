@@ -101,6 +101,8 @@ class TestBuildOSSConfig:
         oss, env_writes = build_oss_config(flags)
         assert oss["llm"]["provider"] == "ollama"
         assert "model" in oss["llm"]["config"]
+        assert oss["llm"]["config"]["ollama_base_url"] == "http://localhost:11434"
+        assert oss["embedder"]["config"]["ollama_base_url"] == "http://localhost:11434"
         assert env_writes == {}
 
     def test_embedder_reuses_llm_key(self):
