@@ -2529,8 +2529,25 @@ class SessionStore:
                     timestamp=message.get("timestamp"),
                 )
             except Exception as e:
-                logger.debug("Session DB operation failed: %s", e)
-    
+                # WARNING, not debug: a failed transcript append means the
+                # in-memory session advances while disk falls behind, which
+                # resurfaces later as 'Persisted transcript lagged live
+                # cached history' amnesia (#50502/#65637). SessionDB already
+                # retries lock contention and self-heals FTS corruption via
+                # a one-shot in-place rebuild, so anything reaching here is
+                # a real, persistent write failure operators need to see.
+                self._transcript_append_failures = (
+                    getattr(self, "_transcript_append_failures", 0) + 1
+                )
+                logger.warning(
+                    "Transcript append failed for session %s (role=%s, "
+                    "failure #%d this store): %s",
+                    session_id,
+                    message.get("role", "unknown"),
+                    self._transcript_append_failures,
+                    e,
+                )
+
     def has_platform_message_id(
         self, session_id: str, platform_message_id: str
     ) -> bool:

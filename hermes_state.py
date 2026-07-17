@@ -1016,6 +1016,12 @@ class SessionDB:
 
         self._lock = threading.Lock()
         self._write_count = 0
+        # One-shot guard for the runtime FTS rebuild recovery. A corrupt FTS
+        # shadow table makes EVERY message write raise 'database disk image
+        # is malformed' via the sync triggers; we repair in place at most once
+        # per SessionDB instance so a genuinely unrecoverable database can't
+        # put writers into a rebuild loop.
+        self._fts_runtime_rebuild_attempted = False
         self._fts_enabled = False
         self._trigram_available = False
         self._fts_unavailable_warned = False
@@ -1297,10 +1303,70 @@ class SessionDB:
                         continue
                 # Non-lock error or retries exhausted — propagate.
                 raise
+            except sqlite3.DatabaseError as exc:
+                # Corrupt FTS shadow tables make every write raise
+                # 'database disk image is malformed' through the FTS sync
+                # triggers while the canonical messages table is intact.
+                # Historically this was swallowed at debug level by callers
+                # (gateway append_to_transcript), so the in-memory session
+                # advanced while disk silently fell behind — surfacing much
+                # later as 'Persisted transcript lagged live cached history'
+                # (#50502 / #65637). Rebuild the FTS index in place (once per
+                # instance) and retry the write immediately.
+                if not self._try_runtime_fts_rebuild(exc):
+                    raise
+                continue
         # Retries exhausted (shouldn't normally reach here).
         raise last_err or sqlite3.OperationalError(
             "database is locked after max retries"
         )
+
+    def _try_runtime_fts_rebuild(self, exc: sqlite3.DatabaseError) -> bool:
+        """Attempt a one-shot in-place FTS rebuild after a malformed-image error.
+
+        Returns True when a rebuild was performed and the failed write should
+        be retried; False when the error isn't the FTS-corruption class, FTS
+        is disabled, or a rebuild was already attempted for this instance.
+
+        The rebuild uses the FTS5 'rebuild' special command, which rewrites
+        the inverted index from the canonical messages table — no message
+        rows are touched. E2E-verified: a corrupted ``messages_fts_data``
+        shadow table rejects every append with ``DatabaseError: database disk
+        image is malformed``; after the in-place rebuild the same append
+        succeeds and search works again.
+        """
+        if self._fts_runtime_rebuild_attempted:
+            return False
+        if not self._fts_enabled:
+            return False
+        if not is_malformed_db_error(exc):
+            return False
+        self._fts_runtime_rebuild_attempted = True
+        logger.warning(
+            "state.db write failed with a malformed-image error (%s) — "
+            "attempting one-shot in-place FTS rebuild; canonical message "
+            "rows are preserved.", exc,
+        )
+        try:
+            with self._lock:
+                for table_name in ("messages_fts", "messages_fts_trigram"):
+                    try:
+                        self._conn.execute(
+                            f"INSERT INTO {table_name}({table_name}) VALUES('rebuild')"
+                        )
+                    except sqlite3.OperationalError:
+                        # Table absent (trigram off) — skip it.
+                        continue
+                self._conn.commit()
+        except sqlite3.DatabaseError as rebuild_exc:
+            logger.error(
+                "In-place FTS rebuild failed (%s); the database needs the "
+                "full offline repair path (repair_state_db_schema).",
+                rebuild_exc,
+            )
+            return False
+        logger.warning("state.db FTS indexes rebuilt in place; retrying the failed write.")
+        return True
 
     def _try_wal_checkpoint(self) -> None:
         """Best-effort PASSIVE WAL checkpoint.  Never raises.
