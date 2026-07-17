@@ -19,10 +19,15 @@ def fail(message: str) -> None:
 
 
 def sha256(path: Path) -> str:
+    data = path.read_bytes()
+    if path.suffix.lower() in {".json", ".md", ".py", ".toml", ".yaml", ".yml"}:
+        try:
+            text = data.decode("utf-8")
+            data = text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+        except UnicodeDecodeError:
+            pass
     digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
+    digest.update(data)
     return digest.hexdigest()
 
 
