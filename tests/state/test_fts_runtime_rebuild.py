@@ -46,6 +46,22 @@ def _message_contents(db_path):
 
 
 class TestRuntimeFtsRebuild:
+    def test_corruption_error_classification_covers_both_sqlite_messages(self):
+        """SQLite's message for a corrupt FTS index varies by version: older
+        builds raise the generic malformed-image error, newer builds raise an
+        FTS5-specific one. Both must trigger the self-heal."""
+        assert SessionDB._is_fts_write_corruption_error(
+            sqlite3.DatabaseError("database disk image is malformed")
+        )
+        assert SessionDB._is_fts_write_corruption_error(
+            sqlite3.DatabaseError(
+                'fts5: corrupt structure record for table "messages_fts"'
+            )
+        )
+        assert not SessionDB._is_fts_write_corruption_error(
+            sqlite3.DatabaseError("no such table: nothing_fts_related")
+        )
+
     def test_append_self_heals_after_fts_corruption(self, db, tmp_path):
         if not db._fts_enabled:
             pytest.skip("FTS5 unavailable in this build")

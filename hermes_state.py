@@ -1321,6 +1321,22 @@ class SessionDB:
             "database is locked after max retries"
         )
 
+    @staticmethod
+    def _is_fts_write_corruption_error(exc: sqlite3.DatabaseError) -> bool:
+        """True for the error class a corrupt FTS index raises on writes.
+
+        The message varies by SQLite version: older builds raise the generic
+        ``database disk image is malformed`` (covered by
+        ``is_malformed_db_error``); newer builds (e.g. ubuntu-latest CI)
+        raise the FTS5-specific ``fts5: corrupt structure record for table
+        "messages_fts"``. Both mean the same thing for the write path: the
+        canonical rows are fine, the FTS shadow tables are not.
+        """
+        if is_malformed_db_error(exc):
+            return True
+        msg = str(exc).lower()
+        return "fts5" in msg and "corrupt" in msg
+
     def _try_runtime_fts_rebuild(self, exc: sqlite3.DatabaseError) -> bool:
         """Attempt a one-shot in-place FTS rebuild after a malformed-image error.
 
@@ -1339,7 +1355,7 @@ class SessionDB:
             return False
         if not self._fts_enabled:
             return False
-        if not is_malformed_db_error(exc):
+        if not self._is_fts_write_corruption_error(exc):
             return False
         self._fts_runtime_rebuild_attempted = True
         logger.warning(
