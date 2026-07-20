@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
 import os
 import shutil
@@ -47,6 +48,8 @@ def assert_core_integration(fork_root: Path) -> None:
     checks = {
         fork_root / "gateway" / "session_context.py": "HERMES_STORYBOARD_PLATFORM_TOKEN",
         fork_root / "gateway" / "platforms" / "api_server.py": "X-Hermes-Storyboard-Script-Name-B64",
+        fork_root / "toolsets.py": '"storyboard": {',
+        fork_root / "hermes_cli" / "tools_config.py": '"storyboard",      "Storyboard Platform"',
         fork_root / "tools" / "storyboard_api_tool.py": 'name="canvas_image_generate"',
         fork_root / "tools" / "zenmux_video_analyze_tool.py": 'name="zenmux_video_analyze"',
     }
@@ -58,6 +61,43 @@ def assert_core_integration(fork_root: Path) -> None:
             fail(f"Storyboard integration marker is missing from {path}: {marker}")
         if path.suffix == ".py":
             compile(source, str(path), "exec")
+
+
+def assert_toolset_integration(fork_root: Path) -> None:
+    expected_tools = {
+        "storyboard_api",
+        "canvas_image_generate",
+        "zenmux_video_analyze",
+    }
+    sys.path.insert(0, str(fork_root))
+    try:
+        importlib.import_module("tools.storyboard_api_tool")
+        importlib.import_module("tools.zenmux_video_analyze_tool")
+        from hermes_cli.tools_config import CONFIGURABLE_TOOLSETS, _get_platform_tools
+        from tools.registry import registry
+        from toolsets import resolve_toolset
+
+        registered = set(registry.get_tool_names_for_toolset("storyboard"))
+        if not expected_tools.issubset(registered):
+            fail(f"Storyboard registry tools are missing: {', '.join(sorted(expected_tools - registered))}")
+
+        resolved = set(resolve_toolset("storyboard"))
+        if not expected_tools.issubset(resolved):
+            fail(f"Storyboard toolset resolution is incomplete: {', '.join(sorted(expected_tools - resolved))}")
+
+        configurable = {name for name, _label, _description in CONFIGURABLE_TOOLSETS}
+        if "storyboard" not in configurable:
+            fail("Storyboard toolset is missing from CONFIGURABLE_TOOLSETS")
+
+        for platform in ("api_server", "wecom", "wecom_callback"):
+            enabled = _get_platform_tools({}, platform, include_default_mcp_servers=False)
+            if "storyboard" not in enabled:
+                fail(f"Storyboard toolset is not enabled for platform: {platform}")
+    finally:
+        try:
+            sys.path.remove(str(fork_root))
+        except ValueError:
+            pass
 
 
 def verify_release_files(fork_root: Path, release: dict) -> None:
@@ -117,6 +157,7 @@ def main() -> int:
         fail(f"Fork release manifest is missing: {release_path}")
     release = json.loads(release_path.read_text(encoding="utf-8-sig"))
     assert_core_integration(fork_root)
+    assert_toolset_integration(fork_root)
     verify_release_files(fork_root, release)
 
     configured_home = args.hermes_home or os.getenv("HERMES_HOME") or (Path.home() / ".hermes")

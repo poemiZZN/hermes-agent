@@ -4,8 +4,8 @@
   "hermesVersion": "0.18.2",
   "upstreamCommit": "2ea39daeb1f675d72e5c21c9400f2d58d7e6d71a",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.18.2-2",
-  "preparedAt": "2026-07-17T18:21:57.267148+00:00",
+  "releaseTag": "storyboard-hermes-v0.18.2-3",
+  "preparedAt": "2026-07-20T05:55:10.240900+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -16,8 +16,12 @@
       "sha256": "018de1a23752caf6619fed1f2185fc94f8f76d11d1f8af1aaa2af167f1637deb"
     },
     {
+      "path": "hermes_cli/tools_config.py",
+      "sha256": "44908a4a0c92804361027d7a2d47d5021bbeae3c0456e91988c474d81ea6de71"
+    },
+    {
       "path": "storyboard_integration/install_runtime.py",
-      "sha256": "8fe59f0e6ccdae00d90c3ab545ef5a70d952b583a00cd08f9c2d6da840fc82dd"
+      "sha256": "0fc0f66b7df3ad2ca6ffa7dc0ad4a825799e9d5c5d3e588cec3078a7e423b70d"
     },
     {
       "path": "storyboard_integration/skills/script-platform-api/DESCRIPTION.md",
@@ -38,6 +42,10 @@
     {
       "path": "tools/zenmux_video_analyze_tool.py",
       "sha256": "bb52f1ed28c0d2d48542e954204062e4cae1c05a532cb3ed8701e68b73b53513"
+    },
+    {
+      "path": "toolsets.py",
+      "sha256": "3e83ba4dff1908a5e6866d5d0e572bf57ba4ec78219c04db81870249b953947f"
     }
   ]
 }
