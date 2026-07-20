@@ -112,6 +112,12 @@ def verify_release_files(fork_root: Path, release: dict) -> None:
             fail(f"Fork release file hash mismatch: {relative}")
 
 
+def remove_readonly(func, path: str, _error) -> None:
+    """Retry deletion after clearing Windows read-only attributes."""
+    os.chmod(path, 0o700)
+    func(path)
+
+
 def install_skill(source: Path, skills_root: Path, backup_root: Path) -> Path:
     destination = (skills_root / source.name).resolve()
     if destination.parent != skills_root.resolve():
@@ -119,7 +125,7 @@ def install_skill(source: Path, skills_root: Path, backup_root: Path) -> Path:
     if destination.exists():
         backup_root.mkdir(parents=True, exist_ok=True)
         shutil.copytree(destination, backup_root / source.name)
-        shutil.rmtree(destination)
+        shutil.rmtree(destination, onerror=remove_readonly)
     shutil.copytree(source, destination)
     return destination
 
