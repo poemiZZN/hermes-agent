@@ -4,8 +4,8 @@
   "hermesVersion": "0.18.2",
   "upstreamCommit": "2ea39daeb1f675d72e5c21c9400f2d58d7e6d71a",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.18.2-3",
-  "preparedAt": "2026-07-20T05:57:15.378882+00:00",
+  "releaseTag": "storyboard-hermes-v0.18.2-4",
+  "preparedAt": "2026-07-20T07:37:12.718938+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -34,6 +34,926 @@
     {
       "path": "storyboard_integration/skills/script-platform-api/storyboard-text/SKILL.md",
       "sha256": "4c16f155851906adc0123cd6ade748cbca8a0458da5b6ca00f2473ae6a9bc391"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/config",
+      "sha256": "33f768e8c43ecd590fd7e35fd18ace9f2ccfef8d9f5f479d68d27f6ecdcfdbbf"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/description",
+      "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/HEAD",
+      "sha256": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/applypatch-msg.sample",
+      "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/commit-msg.sample",
+      "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/fsmonitor-watchman.sample",
+      "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/post-update.sample",
+      "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-applypatch.sample",
+      "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-commit.sample",
+      "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-merge-commit.sample",
+      "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-push.sample",
+      "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-rebase.sample",
+      "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-receive.sample",
+      "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/prepare-commit-msg.sample",
+      "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/push-to-checkout.sample",
+      "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/sendemail-validate.sample",
+      "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/update.sample",
+      "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/index",
+      "sha256": "ce26a77fe909510d0d22faa2f1302f707932e9282410ec7d14735a3b558303eb"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/info/exclude",
+      "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/logs/HEAD",
+      "sha256": "7be851f2a1b40f85022d6a9ed8f8de0487e8f798bc03a6ea39e734ece2f42cf1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/logs/refs/heads/main",
+      "sha256": "7be851f2a1b40f85022d6a9ed8f8de0487e8f798bc03a6ea39e734ece2f42cf1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/logs/refs/remotes/origin/HEAD",
+      "sha256": "7be851f2a1b40f85022d6a9ed8f8de0487e8f798bc03a6ea39e734ece2f42cf1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/objects/pack/pack-54efbc6fb66664f467e13eb16b0163c7518cecda.idx",
+      "sha256": "b2f477e0d27a4a074b79ca7c75fc2eb480ec8f0248f9c3eb087e958d1a0cdb66"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/objects/pack/pack-54efbc6fb66664f467e13eb16b0163c7518cecda.pack",
+      "sha256": "05a4db012d94dc41ba4f47310108971193ef3cadcd94563131a9952592da1214"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/objects/pack/pack-54efbc6fb66664f467e13eb16b0163c7518cecda.rev",
+      "sha256": "0eb6df6e60aa901446553e825f59d224fbd8faefe196c6b7cedcc92bcd0637a4"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/packed-refs",
+      "sha256": "de30861d7a51468b585732150c7cd8e3da1e519094dcd61b30b5f799d3da5fed"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/refs/heads/main",
+      "sha256": "298878c2152a767735a8ca684b38740dcddef041ee0849fbbdffd4bd2dab6efd"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.git/refs/remotes/origin/HEAD",
+      "sha256": "2bb6a24aa0fc6c484100f5d51a29bbad841cd2c755f5d93faa204e5dbb4eb2b4"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.github/CODEOWNERS",
+      "sha256": "7a3c0173ee61e9100c884dd7f1476efb534dce2b2818b2560b0620f4b29d7d62"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.github/workflows/validate-skills.yml",
+      "sha256": "a2a18631a9d83421440ed70b2173aaa9a2c4c656b47eed52b1c2f2b0358bf50b"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/.gitignore",
+      "sha256": "7a8b918e710506cbb46e7bcb7701ede96f10ca3ed53f70f0064187adf6a9ee9c"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/agents/openai.yaml",
+      "sha256": "59d717802c877158bd37c820a14f8c172dacbabeb217b4b96de0aac3f254e5e8"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/hero-cinematic.png",
+      "sha256": "c33f8a7a37363f65c02b225e5c480207f779e2c24b66caac9d7aad6a8bd4bc57"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/hero-command-center.png",
+      "sha256": "8dec12f851de96a8ff80b6921b350a1dbbf63190fb9f3b9a9969d150e27dc90b"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/hero-dark.svg",
+      "sha256": "6bf91105eeca7778210fb5837d1b9c0c10b1cfb7b49a3df4539111aa5a16f6fb"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/hero-global-filmmaker-mode.png",
+      "sha256": "d7a2a5d22242d93d2c24a9cb6c595bced719790e8a2fbcc381c41e8de38cc851"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/hero-light.svg",
+      "sha256": "73edf85b4b38b0a2ad55104ea8d967f49a0b8192d2744403b6ffea6f9c6ca59d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/infographic-cdn-delivery-map.png",
+      "sha256": "5971640e486c46e0186344c4c255e77260858a382ce19f6ef5b62f4c229c1326"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/infographic-production-delivery.png",
+      "sha256": "42a6ea7cb3aebb1daa06a0664625b0d07254ac62c70dcd6ba3b68bc36ed0a379"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/infographic-professional-qc-stack.png",
+      "sha256": "44dd738ccccc570c799231b3a697d2bad118526e4fa13cf2c005186a079b6d6a"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/infographic-reference-role-map.png",
+      "sha256": "0dcfafaff22cd405a1d54e578332f61e1bb943defe5c30348ed14353556fc7f8"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/infographic-skill-capabilities.png",
+      "sha256": "08d5c56a1f2089c2ac16150b1fda7d750bef01ffbb1f82a24ac246a2c4371872"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/skill-map-cinematic.png",
+      "sha256": "a61c488fe25f32a8efdaa96a945fcfbf95aea0770e9451eb8ce631ac80bb773e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/skill-map.svg",
+      "sha256": "8f15e3078d44d51db803223ef277db06c36faa4682460568e8ce88792b391914"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/assets/skill-os-infographic.png",
+      "sha256": "970cb3bf67ebf5e208e0baf6b09fd647410a9bfd5be6d8c5cb802df75e43843d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/CHANGELOG.md",
+      "sha256": "959b50b2a0c8794caa11686b038a3d49a42cb1c91831a336f3a0b2b7f62f7f66"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/data/community-patterns.seedance-2026-05-30.json",
+      "sha256": "f65e6c9b3a71c901cd6c01ec77e7fa9edb09c84fa479e8822dd3b1fee6728695"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/data/generation-runs.example.jsonl",
+      "sha256": "fa99d5c3dc8cb4a0a0bede52b834ea84d37f568cf5d206095c404fa929850a97"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/data/sources.seedance-2026-05-30.json",
+      "sha256": "89210eab4dc9bf9127aa2fae2a5fd32860aec4ab1093f34b3db7f6345850a128"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/frontend-redesign.md",
+      "sha256": "34d7474900aa22e141a38dd6392e8d6077d5e4fc07af7a1e82942da8f98e1264"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/QUICKSTART.es.md",
+      "sha256": "a67201698a46db4885e5d57d8f08539d7fe05d01b6c0f4f09aceb6838cc6d4dc"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/QUICKSTART.ja.md",
+      "sha256": "2e4307da14b2fd1a24df28cb238b72cf6e8fe7c46b841f16bba4a3057bfb879f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/QUICKSTART.ko.md",
+      "sha256": "31a9f7ae45792150a8ce064bd8dca619bdd57a0a51287f661392f49e37767f21"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/QUICKSTART.md",
+      "sha256": "abc693131d3c82522ce6b4aebd81141ba89cecfdcc78a3692beb5a44464b99a4"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/QUICKSTART.ru.md",
+      "sha256": "112535d9c25471bee5e1b20516866c235d1c34f1d5f966d60e5734bbc8ebbf75"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/QUICKSTART.zh.md",
+      "sha256": "3385309e1e166fb6360f83a74f5eb474a4767088a23925e09842dd622711fbd5"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/README.ja.md",
+      "sha256": "c776443e8bc31632cabbeaad8af823bbfd3aea8d87af13078d29397ab0466fde"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/README.ko.md",
+      "sha256": "bfd756eab1179e7d26aa439aba50824152fafb93d5ecec63963c37ba0c512634"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/README.zh.md",
+      "sha256": "623862d0aa819fa0a3fabe42f1f604219ec8305c40d41d50f784d7a2455c5299"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/RELEASE_v6.2.0.md",
+      "sha256": "eb6e003ace45ae20f1daeec597c57454e99c863dddfc1dbd5a2d0e9f2ed963d3"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/RELEASE_v6.3.0.md",
+      "sha256": "2e41f7f30862eacfffeb43d4436577c6ba78ec0db39b6a4aa23834d6e3bb69c7"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/RELEASE_v6.4.0.md",
+      "sha256": "a973a35255d7431d2e12d4c253aaf074d5f8fa893efba6586557e51daaadc2fb"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/RELEASE_v6.5.0.md",
+      "sha256": "746d31831a5f8841ad6ffb159b8f7ea4dab3d4b03dc07e6bee0db60cb13ce344"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/RELEASE_v6.6.0.md",
+      "sha256": "b8287f2f70081e6520b52ec9d12c15b97dc2cba4fd0828d7028911ecc47a1bb3"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/v6-release-readiness.md",
+      "sha256": "34de7cc46b4719210c5f3fc3422bad01bbd1e4e95c8b8a8585b9c77cf657926c"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/evals/eval-run-ledger.md",
+      "sha256": "1db2d0103b227a6c2105757562f98db1a2f74ca8fc6d963584f3ddf32d39a2d7"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/evals/evals.json",
+      "sha256": "2338346ceb26a2e26ef2e7ec8ad77c9be86eab85cbdb0094addfa6f294f7410f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/evals/generation-benchmark.json",
+      "sha256": "33971ae53920a342b2d94a277a71ba19fcee82637233feb76d4defdca1772340"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/golden-prompts/compact-i2v.md",
+      "sha256": "d8b0955082800f7eac65786cce85fcd0d8480aea793f5b10e53fdf9db0702bc4"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/golden-prompts/continuation-observed-deviation.md",
+      "sha256": "b150b8b302325c934c0c0cec31555c8945b23ac285a69a18e66a080468299fa2"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/golden-prompts/dense-2d-storyboard.md",
+      "sha256": "c5bdfc017f1acc97bea9c5a7302e753522959abd09a650fba4ee7e0111ed30bb"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/golden-prompts/first-last-frame-transition.md",
+      "sha256": "17d9dee4dd11d341ff0626dd17fb38b1df80e8934ada76836ab20c87e7fe253e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/golden-prompts/phased-single-take.md",
+      "sha256": "a6dcf3714ca73ffe63d9672200f6de859b9acd29a73d8e29a490f7ea7147f6ec"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/golden-prompts/r2v-role-isolation.md",
+      "sha256": "43f8fb5d0dab3f2a43b6d8f65db69ca5b4ce1efe3ed793535aa3f906cf08f3f8"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/golden-prompts/sequence-continuation.md",
+      "sha256": "f262fca98a8cdd30f8e3aa14849df6839aeae9a9963a2623b81c846073b3c54d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/golden-prompts/video-edit-one-layer.md",
+      "sha256": "f803c31431f6510a9be56e890367cec29a44071382873bd18ca8b2ed6fd05d74"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-airport-arrival/clip-01-contract.json",
+      "sha256": "0ee83fdb8e09d7fd5cb6df8754e2fd056876242e7d2a925612c988ea4ecb957f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-airport-arrival/clip-01-prompt.md",
+      "sha256": "1bb3a0ac260258a5b69a910c5c324d372ff7c6a418de7a41a2b32d6f1bfb2328"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-airport-arrival/clip-01-take-review.json",
+      "sha256": "98f8c39a1350865c49dcc6cc3c06771aa98a50a15b1028da650ffada4206892d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-airport-arrival/clip-02-continuation-contract.json",
+      "sha256": "df28923af8463681a1bdcf977c6fae8bd855c42aecaf965ee168cae7a385f4e1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-airport-arrival/clip-02-prompt.md",
+      "sha256": "2f254d810a527b5a77969fe123a99be619ad8a8f45270237ab15e67c63a8e596"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-airport-arrival/project-state.json",
+      "sha256": "853a67e05f5d4652c84824e497e1ddce4feb78f8468f4ed169dfca3e8d59116e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-airport-arrival/sequence-plan.md",
+      "sha256": "af209f69e8758d794ea545d5697b11e4671fd75b231007dd599e53b72df7133e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-observed-deviation/project-state-after.json",
+      "sha256": "5eace6526abab02b539d6777e7e7f622cf28f2801caeb3d51fb11d520d253fe1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-observed-deviation/project-state-before.json",
+      "sha256": "877550a18c36f84a77ba281c0ef32898da4481e6d33d28f5ad8205f3960a2a14"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/sequence-observed-deviation/take-review.json",
+      "sha256": "df61ebf2ff93d205803500038c92d79413868d121b0f558cd5564f7ba9e7f1f7"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/standalone-clip/project-state.json",
+      "sha256": "0e14c926f6ce8645208588eb8539b225c713f2ab65bb39d09461d824e463391d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/examples/standalone-clip/prompt.md",
+      "sha256": "beb2b55de1739f391f20f94c4e65dadc992e16b114fc59a8809f1dc6358d7700"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/LICENSE",
+      "sha256": "883fcf374166a7e70e9384c14dfda70a1bd4f24b6893160f922e9ac216599394"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/README.md",
+      "sha256": "443591c30e2a083dc5d1907a32c6bfa7943f82825e89b506447df304f54e872c"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/2d-anime-grammar.md",
+      "sha256": "b1d5c20b9322375e957bd8e6624acd818e4fc5691fd2b3d91d67a9f03da3fa84"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/agent-compatibility.md",
+      "sha256": "953b2169a37d05e739ffd170aae244c898e1f6a0b432a10042c38f07aad53630"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/allocation-model.md",
+      "sha256": "20b9d548ea1e6301f6e2568ee9f0d40907857e64b96ed9995c6943dd8ac049a2"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/anti-slop-lexicon.md",
+      "sha256": "62716e4c640d711db832a51d98b0070d38947a172b6cbfaf13c5c88f2d3f0ad8"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/api-status.md",
+      "sha256": "e37edd8d55ad451dcdd5d70e19db5fbddb472e7271641a2d1c37e7f326a6f242"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/api-workflow.md",
+      "sha256": "2100d24754cc497c1fd657108422b0805d522dfde71509d8c57f7e496626fd17"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/aspect-ratio-delivery.md",
+      "sha256": "546cd0a2bbff1370073237595dc73427188e0d3cda88d5b958a9a5ccda0ccd8a"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/audio-guide.md",
+      "sha256": "0de7f43ff3ace285fb7fd804f198aaf9a78335508ab87a4ccf40be04405bc3b9"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/audio-post-delivery.md",
+      "sha256": "b0b4fd9767be70b3348a13885f65eab6a6d43401006995d73688008cc890859e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/capability-map.md",
+      "sha256": "22e601459b02eaa2535fc59c58293f79f88657a05a4cf7241e61f61e51334d03"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/cinematography-shot-language.md",
+      "sha256": "cb095f740b88f49cf2d2b34cb89aa37f59706e3c1b3423ebb7b4b9b939a0e837"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/color-pipeline-aces.md",
+      "sha256": "b2cf31d028c3f8dccecf7bc91ee7b56b590be310742dccd74093673b6ee0ee9f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/community-source-methodology.md",
+      "sha256": "b366c190454df59ce812e55740e479cdd7ab5e38fea1cd00b4443ceb6da01d5e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/continuation-handoff.md",
+      "sha256": "c7c24f8079639cfdf7431efe06cb14bc0384862e85e473126525e9603ed0ee50"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/continuity-qc.md",
+      "sha256": "1199e0233292743e3d36298d371b977dba1cbd8c2859dae93cdd955198516150"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/delivery-qc.md",
+      "sha256": "211c699810b51dabc24d3e932dca7ab602aa96c3fd30f09bede27fb503589afc"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/dense-storyboard-mode.md",
+      "sha256": "56f5fb1ee320336d3eb09dc0792dcd4d643a048c4efd72dae19ecf92b8556d43"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/directing-engine-genre-library.md",
+      "sha256": "db2f48fe8a215bb93202c87f223e50f7b38e70dd0d6c318ef49b4bd89ee45ff2"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/directing-engine.md",
+      "sha256": "754b3cbd9ccb094e61eb6c7025aec1e1c8e4adc09f1db82de005937a85466ca4"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/eval-rubric.md",
+      "sha256": "ebde922cda2ac9c9a0efa6a5f73e0ca06a2493dd5644817a2845b4b5b5da06ec"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/event-density.md",
+      "sha256": "181d3bcf36f6f79a5c28d7b5e22d9ebe6d6c72c05c2814b3474ffbc8de49ee87"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/examples-by-mode.md",
+      "sha256": "32cd7be32cc0c5f307fb839ea38292c375214da357b63db398dbd15fc5a10f49"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/failure-atlas.md",
+      "sha256": "9a1cf6d7fdb6be98ae744317632f461702952e36e2aeee909389306b3b86c139"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/field-observed-tips.md",
+      "sha256": "d63a5869fa2faed961a039b3442b854359400598bd9374d658d07377ab5f8902"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/filter-vocab.md",
+      "sha256": "21dd32fad88ec88d0afb7df197121bcf01ce6206a2e32a61cca0d20f41984f1e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/first-last-frame-guide.md",
+      "sha256": "efd74ef05423be7f0b2c94fbc297848453e58d9154bdc08f17ddbb942fc66006"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/frontend-design-system.md",
+      "sha256": "193961b52b6ecd497ddeb44333138ade0b237d02da23fa834bc4310f0895b035"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/genre-guides.md",
+      "sha256": "5c30b790dfac5c3907c2759571c17af51dd48ce94e4e5a3c6b4071c204018dff"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/i2v-guide.md",
+      "sha256": "f006ba4ee7ac4f99fe30317e4711f863aa5f3ee88f1e9c4231285ce640f46dbe"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/intent-vs-precision.md",
+      "sha256": "c9e03e58c35768950a8fb593b512416ecb972b0d91c7580adcfbc33e78d67363"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/interview-starters.md",
+      "sha256": "8223c3efccd860ef69e7b529cdaf56f82d7ad17c8e0a85fe8aff3bbbafd90af9"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/json-schema.md",
+      "sha256": "d937777e1315e808b188ff69e0a0749175f1ad43deffb7a6d85f7d826b50ac64"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/README.md",
+      "sha256": "1d6f35b04d4fc9ed3461e0314e90edbe605d4a4583769ba809118fb8c16e2637"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-antislop-original.md",
+      "sha256": "fe2c9e766ef6ae18a4fa7b240a7b33c7cadd1f6dc0d1061a348cf92a2a7fdd34"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-audio-original.md",
+      "sha256": "7f6a27a274a961e099d662d01a52dfe2409df8fb93b215690b9d01fbe60ba251"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-copyright-original.md",
+      "sha256": "9d395a363523d47e8d48dc6d24dfc3b49e30bf106a9153f99155fc838118130d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-examples-zh-original.md",
+      "sha256": "31441084a6f7b844c7d98ea49419ec464bea4b12f60c64bfd8df6dd2a688ac11"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-filter-original.md",
+      "sha256": "c687a554a526897e71caac5511812c027d9a881060e0c23cb820c0c518e02872"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-pipeline-original.md",
+      "sha256": "dd96c3d95479e0c3aa3effe1fdccaba5899a844eb936f27e7f34c0792dd2520f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-recipes-original.md",
+      "sha256": "8273d362d636d1fb4e8e736cf4b356c88e09cc5d1a7b60d07079a5dfade75a16"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-vocab-es-original.md",
+      "sha256": "01ffe5ab44fe518abede5a224b9d5a0b58e412443cdff9c279dd1716dc761797"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-vocab-ja-original.md",
+      "sha256": "1fe758f5bdbf7c569cb8bca83e28b23da9225aa2063ba1c93bff696d4fb8c46b"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-vocab-ko-original.md",
+      "sha256": "6b8855c1d5c6a7f3d6c78d011441190c0a95713fac5cccc3c96a8e0107083d0e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-vocab-ru-original.md",
+      "sha256": "20a19cf7d193dbc8ff6814cd90b8d4efe912fe4444c135d191b5d971c3a9aeab"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/seedance-vocab-zh-original.md",
+      "sha256": "6076d032a67a3e8ca1cc2a74a46bd7a989b672e49e260c2e9a14401a5ec212fc"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-antislop.md",
+      "sha256": "90e4ace99251d471f01349912a084a237ffaa7e67ca826927c3d530a3bd48ca6"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-audio.md",
+      "sha256": "fc868ad4969df1a8ed37e339e7504fc709488ad2cd2ac9b061338406b8621bec"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-copyright.md",
+      "sha256": "1b31d30fd3f81cfaa0800a42048f1e44e31ceb7711c68264736886e8a429ca35"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-examples-zh.md",
+      "sha256": "7458b57a3e57de858837c3fe280df260e043e1d44ec5575cbddb9e347bcd1e52"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-filter.md",
+      "sha256": "e44b3ac307a7e7801f4624058d569512114c3c8066dd00f96a45d04d3ee9b074"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-vocab-es.md",
+      "sha256": "2069c674080ba94ddf8fdb95594097005d2b00c32c2d394670ea3094c4fb8700"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-vocab-ja.md",
+      "sha256": "8777e13858afda5f30ed424a4b9dba593f9cf611e8f908bb84d9729dd8addef2"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-vocab-ko.md",
+      "sha256": "5140e58cee8b027b6036ac10d1bb15e9ec9690aef051e0c7f37f32a3fb1de13a"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-vocab-ru.md",
+      "sha256": "72221ca5cf51187d83d68e0bf77875a9191792d58a6e05e9febfd07bf0d17586"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/migrated/v5.2-legacy-skill-bodies/seedance-vocab-zh.md",
+      "sha256": "d8abf1e45b8464efefd2c1496186e572aa96c5fbe9429b628ecf88a7a7a70826"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/model-mechanics.md",
+      "sha256": "d703f2ab7d756d0ed1c0bb82017dd71dfd1fd0ecf2cebcf76c8378f25a9d2ff4"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/model-name-map.md",
+      "sha256": "a177cc545ccc96e7151d8f0922ce45657850d0d25de9241a0a8e847c0a411879"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/multilingual-community-examples.md",
+      "sha256": "60b4378ced62e5e90942c0446156fe0f40a9e7a1c999860bdbdb310e8196e2e2"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/multishot-grammar.md",
+      "sha256": "9bab2f08d681f246bb60e31696714b7d9b4104cc97dfbb7eed34a78e18c19fdd"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/platform-constraints.md",
+      "sha256": "5a1e30ef7684da8d5496c065b7d441ea0a41a7f2deef9f2419c78ef1f7397e67"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/platform-surface-matrix.md",
+      "sha256": "ff047dd9770c8dd9b81d78311207c7337a953d1f1ac2b2e51a73799cece5c782"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/pro-filmmaking-standards.md",
+      "sha256": "7e181a740a5e00105a67b7f7de90ba5d3dd1657335ae4cdaab4a94920ac89e54"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/progressive-disclosure.md",
+      "sha256": "524c41c12677a4f438bcd811e589d3ff623c5cc9ec02cf51429f5f0d37b2f0c5"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/prompt-compiler.md",
+      "sha256": "e97c337f8817780f21275a1ec4dcd0944556218042b8d062a8c9f407d491a299"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/prompt-examples.md",
+      "sha256": "72687b1891e2daf71ea6482a7b60342d26a10ddf89e2684993d2cf0c09c19153"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/quick-ref.md",
+      "sha256": "2bedb30e9da778f8bf557e92024bc14ac2df6f44711cb32ccc86d4ecc125c3fb"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/reference-transfer-contract.md",
+      "sha256": "f8523b810f7be505c6cd978cdafe2313f8ab5a179ad9b707c401d2dfc1f4f252"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/reference-workflow.md",
+      "sha256": "d07be861f246882c61c941d7c1e2b929975ef1fb8299a624fe85cc2577408857"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/research-2026-05-30.md",
+      "sha256": "9216f8e509e223e9bf6d6d4a85baae3787846a0e187f737242038bb7af68734b"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/retake-protocol.md",
+      "sha256": "c85ec247c18d27ff0ce69eaeb05504fb33d306283e377847e5ef06bf05ee7183"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/sequence-project-state.md",
+      "sha256": "fb6bcbd9cee2fceaa0d209ea8b9cf212cb7111b39534189ee77b565976642a64"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/sequence-worked-trace.md",
+      "sha256": "c6b0ed8381d1b308f0199d549648f42cd4c890f8b5b0abf63870bb779eada98a"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/shot-list-continuity.md",
+      "sha256": "b5198924d1b1f236860be3568c9e55069f0da4f4a80b3ba3f03e6dc9a8899061"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/source-registry.md",
+      "sha256": "f92c039fc47fdf64e17de418b204cfe58c4d4232dac718c25b39643a4bef3d32"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/storytelling-framework.md",
+      "sha256": "658099155a600b755da852db13aef7bcd295f1e09f804f041f7f102f8a3398b1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/subtitles-localization.md",
+      "sha256": "25d63be0c09cc28841503a02c0077d4db20c8fbdd38306d32b1d4061c326e04b"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/surface-prompt-profiles.md",
+      "sha256": "125133c4f1a00fa8a7e51aaae974e7023d1de609b76708a8d906fef66f97569f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/vocab/en.md",
+      "sha256": "aef3415f952474e00c7f5d2d555979140151d71e37d78d5658c002a43bb1f4cb"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/vocab/es.md",
+      "sha256": "d5bdc96283d012ba0ae6ffd015a86840dd06264a751bd7811bda660281ada693"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/vocab/ja.md",
+      "sha256": "e8012684528435fb82020641e3c9ea2114ac28014c37f5ad6d0f977279929846"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/vocab/ko.md",
+      "sha256": "867b9e0780b293e626f411c61ad70ca863736f7bf006bb90d93dd894f0a91e22"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/vocab/ru.md",
+      "sha256": "6fbb427cc5fa85c1df3d7f6469fce1018d3b4538d7d59248ccd7dcbf542ade76"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/references/vocab/zh.md",
+      "sha256": "4cde5635d13cab4baa05eb0a8d95c839f3cdd822d37c7c86095b03b85854b9a4"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/schemas/clip-contract.schema.json",
+      "sha256": "02590a5112d218577c79f57c4331016dd23cdcb7378799e328cc9f07fe952684"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/schemas/generation-run.schema.json",
+      "sha256": "b48cc7c2cd7f30406c80561a93d3a28449834ccbf2374546013edb2a0fedb92e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/schemas/project-state.schema.json",
+      "sha256": "2f16f9fdb9bc31812c69ba76796ccf94975b4f1a8ffefadd9fc356e0d918227d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/schemas/prompt-spec.schema.json",
+      "sha256": "b7fea59647e2c6b5739f8938896bfe64e6a6b344a55286b064795f678d74c102"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/schemas/take-review.schema.json",
+      "sha256": "965cee4c6c6893e50ed5c282b06ae949cc14aa46a8b1b7f6402a495f84efc70d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/behavior_contract_check.py",
+      "sha256": "7fd09732c08e0d9f53647eabf7ddacf8c14b1acb33b8fad3156c1570fcb21f94"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/content_audit.py",
+      "sha256": "40680952e6f876c0eeffdbb834ab77267d256f78d352cc577763efa1ac083379"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/continuity_chain_check.py",
+      "sha256": "18686fcca4bf984b28b1e1addc5f5f149262ec74eba80deadc51e96b6a899fb0"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/design_audit.py",
+      "sha256": "8166f03a40920e7732288106f7a5c1046191e45465ffff8b0ec70d7f9b710ac3"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/eval_run.py",
+      "sha256": "70ee669e866539912dfc803f4d01ba6e216a4c3ba74cb6bb5ebdb5bda0c863fb"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/eval_schema_check.py",
+      "sha256": "7ec17db8edb059f2280197aef13813a0ed869a82cb71907278c03e4db8fa2b69"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/extract_last_frame.py",
+      "sha256": "70da39a3607ff90dff312db3e79e9815df296727d525952c6ba94c0f87cbf52f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/generation_run_check.py",
+      "sha256": "b2daf106f167022c692fe9a794da9dfa345ac0c8ae67c7231b1f4ca02ae86561"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/install_codex_skill.py",
+      "sha256": "dc33e2f1d47d55934dba6f05a93641da90e2b76d5701a761320c52be7d009a63"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/project_state_check.py",
+      "sha256": "8576c3250a7e33a2b2a8195547b720d52a149640efec5795052c92436523bc02"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/prompt_lint.py",
+      "sha256": "6691c3698bc91294e4e7c645ea2000f682b764758b3cfd7b3e3c83e9f2251f5a"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/sequence_eval_check.py",
+      "sha256": "6d9920a5a8f5664f4cf42c600c6c046949eff71e65cde7b876c29258ac1e22cf"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/source_registry_check.py",
+      "sha256": "8b9d72a34dd340bfada4bcc952ad9e28d556870f132cb1754a4dc950ee05766a"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/validate_skills.py",
+      "sha256": "df264ae19a4557c62b30d4e13a2f37a76f3184c99870e9c8b4de2d6a9b0e7251"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/scripts/vocab_schema_check.py",
+      "sha256": "af4698bbef5159ba2adc38d2d387da1f68625deb72a0ef7fd316c057be1e0b03"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/SECURITY.md",
+      "sha256": "8379e1f0af58ab1d8df4425525aeee0d1c42e69d1d8b94e8415f8214a0633f8c"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/SKILL.md",
+      "sha256": "14a618871c5ddf099b8891889a4d0c04b0d93fb5d388957d882125ed3dcd80c3"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-antislop/SKILL.md",
+      "sha256": "3303e4ae1de3dc2fcf784e965c4df95b91c8d6522e04a11df9533440d9117eb1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-audio/SKILL.md",
+      "sha256": "3a5a906f9775222389520c9b4d426842d0fc3cb9d20621491a91e884d774e424"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-camera/SKILL.md",
+      "sha256": "9785dee770590268ee98eab9fa7b2f7580cce8ad92764ee7b9c4a6613686b4bf"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-characters/SKILL.md",
+      "sha256": "355500e3f0e00f789d736438e395501d7eac8136d40bac4b39b1b98a6e271148"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-continuation/SKILL.md",
+      "sha256": "aa855aa046a2b51db6bfdb35b2c118a33aa7cce492b627aaf75a5f610cac4628"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-copyright/SKILL.md",
+      "sha256": "a76e90ac9148b14b6283925997d145c00274ad5f04545a2d3851753310d969d0"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-examples-ja/SKILL.md",
+      "sha256": "c0cbabad8ce75228aed356b6f14c8536cf3b64e6efc60c5f3e1cf981fdeaf773"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-examples-ko/SKILL.md",
+      "sha256": "b4e19fd63ca99e8b6233f0070ee8feafb548ae1cd62fb99d887bee49e992f032"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-examples-zh/SKILL.md",
+      "sha256": "e50333a1e52bf84b0b969f01751158b81b16d0dadcee77e2909d685e26d4635a"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-filter/SKILL.md",
+      "sha256": "4f5065eca2d7ec9eae640db92c0d973d73fb8686551a0abaedb59cb3e904870d"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-interview/SKILL.md",
+      "sha256": "89dd670c284c30eee272aea1d61b8429a349833ae261be9a6ad4f75915671f8c"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-interview-short/SKILL.md",
+      "sha256": "c544e14948344c3150b4b07a30906fdbd33aa2d1df2113d295f49f1275356c83"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-lighting/SKILL.md",
+      "sha256": "8dd249bd1bc380801b624cb90cc37d46ac725ac20e7ec2b8efce02ac67cd21f7"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-motion/SKILL.md",
+      "sha256": "29dcb5b1718fe9742fea8498da3b468f47309d595ad56c9c62d65edccdbf52c7"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-pipeline/SKILL.md",
+      "sha256": "0d4bda8cec0a98a82360cd497cf6cf7f3550f74b3794eb5e3272ba773f7d4010"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-prompt/SKILL.md",
+      "sha256": "ce558207516a6408de3425956c911dac4dbaa5da0d024d29ef03a01186d964a6"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-prompt-short/SKILL.md",
+      "sha256": "21e643b541bc0f25592a76456bed60d5202968092d2611e1f8b5749af4c7a7d1"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-recipes/SKILL.md",
+      "sha256": "428e8efd886399c7f739eabecc97a1fcb76067d15f5e669f3a1e2cc0e6247510"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-sequence/SKILL.md",
+      "sha256": "cbaecde282c0efb73120366dc54628a3f9988919ae545237f6cdd1b2e40f5758"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-style/SKILL.md",
+      "sha256": "cc2e78fc5dc209a4ee5fa894371d882345ef2f057954210dd4a919d4383d604e"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-troubleshoot/SKILL.md",
+      "sha256": "9829ea8901f63e08faf16b620872131eba316aa9ce8bab03407fa6afb00889f5"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-vfx/SKILL.md",
+      "sha256": "50966386e1512f4bdbc7114559e3b330cfaa9e014c6e915cb46663f35fe2fbbf"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-vocab-en/SKILL.md",
+      "sha256": "d3b7ae13525cccd5234190024be0a7f848cd49aad474593a567a496242f72000"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-vocab-es/SKILL.md",
+      "sha256": "8e5e5d36441976d047edc23fc7aff7535886e13275f39d1f8eddacabb96ad43f"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-vocab-ja/SKILL.md",
+      "sha256": "fff19b514a3a467c0e3fd753ea82688ba040d605335e363a885ae8ea1e3f5b21"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-vocab-ko/SKILL.md",
+      "sha256": "c466b1ea9dc607e48d019df6689923dcf9a6e01f7f1f15c8631eeec98e0171d3"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-vocab-ru/SKILL.md",
+      "sha256": "c4956e53d4412e146104b5e33b5a95c19348c8bad222f11d2150e7fc9739d1ee"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-vocab-zh/SKILL.md",
+      "sha256": "86d9f382271d6a3d1b41706e5e55904643bd6ef93a1f68f339e5decb049e3aff"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/tests/test_behavior_contract.py",
+      "sha256": "0f08db9439a1ab75d2f2a5c86812930a349e9b8355c2ce976a44213985fb3342"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/tests/test_continuity_chain.py",
+      "sha256": "6b76eb1e4ec64fddc059b7d4e95e56143c660ccfe3ee262ea44e8bbb7542b9f2"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/tests/test_generation_run_check.py",
+      "sha256": "ac7cfae67eaf07ec55a470673444d7e90e29c784d2f98ce456023fd04eec7dcb"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/tests/test_project_state.py",
+      "sha256": "7128fe759cc60bf19aafdc4088dca123d9c6f838fa5de44ff38ce2cb0f8e068c"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/tests/test_prompt_lint.py",
+      "sha256": "484c23e7bfdce6db7987139d9d28695293baa7d5cc09797b8219651cc5d02368"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/tests/test_sequence_eval.py",
+      "sha256": "03403de53e34081db2226dfc8f3312892832f510ec6de9b118a9e8cbde6e6a87"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/V6_SEQUENCE_PROMPT_COMPILER_MANIFEST.md",
+      "sha256": "faf2de9bc989c7238fe2ae447c46bc99bdb6940707789dd68107998e8e01a59d"
     },
     {
       "path": "tools/storyboard_api_tool.py",
