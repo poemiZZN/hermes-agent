@@ -4,8 +4,8 @@
   "hermesVersion": "0.18.2",
   "upstreamCommit": "2ea39daeb1f675d72e5c21c9400f2d58d7e6d71a",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.18.2-4",
-  "preparedAt": "2026-07-20T07:37:12.718938+00:00",
+  "releaseTag": "storyboard-hermes-v0.18.2-5",
+  "preparedAt": "2026-07-20T07:49:31.299199+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -34,118 +34,6 @@
     {
       "path": "storyboard_integration/skills/script-platform-api/storyboard-text/SKILL.md",
       "sha256": "4c16f155851906adc0123cd6ade748cbca8a0458da5b6ca00f2473ae6a9bc391"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/config",
-      "sha256": "33f768e8c43ecd590fd7e35fd18ace9f2ccfef8d9f5f479d68d27f6ecdcfdbbf"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/description",
-      "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/HEAD",
-      "sha256": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/applypatch-msg.sample",
-      "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/commit-msg.sample",
-      "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/fsmonitor-watchman.sample",
-      "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/post-update.sample",
-      "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-applypatch.sample",
-      "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-commit.sample",
-      "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-merge-commit.sample",
-      "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-push.sample",
-      "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-rebase.sample",
-      "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/pre-receive.sample",
-      "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/prepare-commit-msg.sample",
-      "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/push-to-checkout.sample",
-      "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/sendemail-validate.sample",
-      "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/hooks/update.sample",
-      "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/index",
-      "sha256": "ce26a77fe909510d0d22faa2f1302f707932e9282410ec7d14735a3b558303eb"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/info/exclude",
-      "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/logs/HEAD",
-      "sha256": "7be851f2a1b40f85022d6a9ed8f8de0487e8f798bc03a6ea39e734ece2f42cf1"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/logs/refs/heads/main",
-      "sha256": "7be851f2a1b40f85022d6a9ed8f8de0487e8f798bc03a6ea39e734ece2f42cf1"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/logs/refs/remotes/origin/HEAD",
-      "sha256": "7be851f2a1b40f85022d6a9ed8f8de0487e8f798bc03a6ea39e734ece2f42cf1"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/objects/pack/pack-54efbc6fb66664f467e13eb16b0163c7518cecda.idx",
-      "sha256": "b2f477e0d27a4a074b79ca7c75fc2eb480ec8f0248f9c3eb087e958d1a0cdb66"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/objects/pack/pack-54efbc6fb66664f467e13eb16b0163c7518cecda.pack",
-      "sha256": "05a4db012d94dc41ba4f47310108971193ef3cadcd94563131a9952592da1214"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/objects/pack/pack-54efbc6fb66664f467e13eb16b0163c7518cecda.rev",
-      "sha256": "0eb6df6e60aa901446553e825f59d224fbd8faefe196c6b7cedcc92bcd0637a4"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/packed-refs",
-      "sha256": "de30861d7a51468b585732150c7cd8e3da1e519094dcd61b30b5f799d3da5fed"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/refs/heads/main",
-      "sha256": "298878c2152a767735a8ca684b38740dcddef041ee0849fbbdffd4bd2dab6efd"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/.git/refs/remotes/origin/HEAD",
-      "sha256": "2bb6a24aa0fc6c484100f5d51a29bbad841cd2c755f5d93faa204e5dbb4eb2b4"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/.github/CODEOWNERS",
