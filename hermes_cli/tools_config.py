@@ -64,6 +64,7 @@ CONFIGURABLE_TOOLSETS = [
     ("file",            "📁 File Operations",           "read, write, patch, search"),
     ("code_execution",  "⚡ Code Execution",            "execute_code"),
     ("vision",          "👁️  Vision / Image Analysis",  "vision_analyze"),
+    ("storyboard",      "Storyboard Platform",          "storyboard, canvas image, video analysis"),
     ("video",           "🎬 Video Analysis",            "video_analyze (requires video-capable model)"),
     ("image_gen",       "🎨 Image Generation",          "image_generate"),
     ("video_gen",       "🎬 Video Generation",          "video_generate (text/image/reference)"),
@@ -116,6 +117,7 @@ def gui_toolset_label(label: str) -> str:
 # setup. The tool's check_fn means the schema still won't appear to the
 # model if the credential later goes missing or expires.
 _DEFAULT_OFF_TOOLSETS = {"homeassistant", "spotify", "discord", "discord_admin", "video", "video_gen", "x_search"}
+_STORYBOARD_AUTO_PLATFORMS = {"api_server", "wecom", "wecom_callback"}
 
 
 def _xai_credentials_present() -> bool:
@@ -1900,6 +1902,12 @@ def _get_platform_tools(
             enabled_toolsets.update(enabled_mcp_servers)
     else:
         enabled_toolsets.update(explicit_mcp_servers)
+
+    # Storyboard sessions enter through the platform API or enterprise WeChat.
+    # Keep this integration available even when an existing installation has
+    # an explicit per-platform toolset list created before Storyboard existed.
+    if platform in _STORYBOARD_AUTO_PLATFORMS:
+        enabled_toolsets.add("storyboard")
 
     # Honor agent.disabled_toolsets from config.yaml — allows users to
     # globally suppress specific toolsets (e.g. "memory") across all

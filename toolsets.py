@@ -123,6 +123,16 @@ TOOLSETS = {
         "includes": []
     },
 
+    "storyboard": {
+        "description": "Storyboard platform APIs with session-scoped authentication",
+        "tools": [
+            "storyboard_api",
+            "canvas_image_generate",
+            "zenmux_video_analyze",
+        ],
+        "includes": []
+    },
+
     "video": {
         "description": "Video analysis and understanding tools (opt-in, not in default toolset)",
         "tools": ["video_analyze"],
