@@ -134,7 +134,7 @@ def verify_installed_skill(source: Path, destination: Path) -> None:
 
 def current_commit(fork_root: Path) -> str:
     result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
+        ["git", "-c", f"safe.directory={fork_root}", "rev-parse", "HEAD"],
         cwd=fork_root,
         text=True,
         stdout=subprocess.PIPE,

@@ -5,7 +5,7 @@
   "upstreamCommit": "2ea39daeb1f675d72e5c21c9400f2d58d7e6d71a",
   "integrationBranch": "storyboard-integration",
   "releaseTag": "storyboard-hermes-v0.18.2-3",
-  "preparedAt": "2026-07-20T05:55:10.240900+00:00",
+  "preparedAt": "2026-07-20T05:57:15.378882+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -21,7 +21,7 @@
     },
     {
       "path": "storyboard_integration/install_runtime.py",
-      "sha256": "0fc0f66b7df3ad2ca6ffa7dc0ad4a825799e9d5c5d3e588cec3078a7e423b70d"
+      "sha256": "e2d3db149f7a8ec91087e56fab42bbb27cb934ee44288d0d1ebfa604c7e1733c"
     },
     {
       "path": "storyboard_integration/skills/script-platform-api/DESCRIPTION.md",
