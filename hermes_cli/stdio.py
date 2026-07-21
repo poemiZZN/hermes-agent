@@ -229,10 +229,6 @@ def _augment_path_with_known_tools() -> None:
         os.path.join(local_appdata, "hermes", "git", "cmd"),
         os.path.join(local_appdata, "hermes", "git", "bin"),
         os.path.join(local_appdata, "hermes", "git", "usr", "bin"),
-        # Hermes venv Scripts directory — host of the hermes.exe shim itself,
-        # also where any pip-installed console scripts land.  Usually already
-        # on PATH when the user invokes hermes, but harmless to include.
-        os.path.join(local_appdata, "hermes", "hermes-agent", "venv", "Scripts"),
         # WinGet packages directory — where ``winget install`` drops CLI
         # shims by default (ripgrep lands here as rg.exe).  Covers the case
         # of a system-Git install + ripgrep-via-winget that isn't yet on
@@ -240,12 +236,25 @@ def _augment_path_with_known_tools() -> None:
         os.path.join(local_appdata, "Microsoft", "WinGet", "Links"),
     ]
 
+    # Keep subprocesses in the same environment as the running Hermes process.
+    # A canonical install and a fork may coexist, so a fixed install path can
+    # make bare ``python`` and ``pip`` resolve against the wrong checkout.
+    own_scripts = os.path.normpath(os.path.join(sys.prefix, "Scripts"))
+
+    def path_key(path: str) -> str:
+        return os.path.normpath(path).casefold()
+
     existing = os.environ.get("PATH", "")
-    existing_lower = {p.lower() for p in existing.split(os.pathsep) if p}
+    existing_parts = [p for p in existing.split(os.pathsep) if p]
+    existing_keys = {path_key(p) for p in existing_parts}
     prepend = []
     for d in candidate_dirs:
-        if os.path.isdir(d) and d.lower() not in existing_lower:
+        d = os.path.normpath(d)
+        if os.path.isdir(d) and path_key(d) not in existing_keys:
             prepend.append(d)
 
-    if prepend:
-        os.environ["PATH"] = os.pathsep.join([*prepend, existing])
+    filtered = [p for p in existing_parts if path_key(p) != path_key(own_scripts)]
+    if os.path.isdir(own_scripts):
+        os.environ["PATH"] = os.pathsep.join([own_scripts, *prepend, *filtered])
+    elif prepend:
+        os.environ["PATH"] = os.pathsep.join([*prepend, *existing_parts])

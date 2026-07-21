@@ -102,6 +102,57 @@ class TestConfigureWindowsStdio:
         assert len(cp_calls) == 1  # SetConsoleOutputCP path hit
         assert len(reconfigure_calls) == 3  # stdout, stderr, stdin
 
+    def test_running_venv_precedes_stale_hermes_venv(self, monkeypatch):
+        from hermes_cli import stdio
+
+        own_venv = os.path.join("", "fork", ".venv")
+        own_scripts = os.path.join(own_venv, "Scripts")
+        stale_scripts = os.path.join("", "stock", "venv", "Scripts")
+        system_scripts = os.path.join("", "system", "bin")
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        monkeypatch.setattr(stdio.sys, "prefix", own_venv)
+        monkeypatch.setattr(
+            stdio.os.path,
+            "isdir",
+            lambda path: os.path.normpath(path) == os.path.normpath(own_scripts),
+        )
+        monkeypatch.setenv("LOCALAPPDATA", os.path.join("", "local"))
+        monkeypatch.setenv(
+            "PATH",
+            os.pathsep.join([stale_scripts, own_scripts, system_scripts]),
+        )
+
+        stdio._augment_path_with_known_tools()
+
+        entries = os.environ["PATH"].split(os.pathsep)
+        assert entries[0] == os.path.normpath(own_scripts)
+        assert entries.count(os.path.normpath(own_scripts)) == 1
+        assert entries.index(stale_scripts) > entries.index(own_scripts)
+
+    def test_known_tools_still_prepend_without_interpreter_scripts(
+        self, monkeypatch
+    ):
+        from hermes_cli import stdio
+
+        local_appdata = os.path.join("", "local")
+        git_cmd = os.path.join(local_appdata, "hermes", "git", "cmd")
+        system_scripts = os.path.join("", "system", "bin")
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        monkeypatch.setattr(stdio.sys, "prefix", os.path.join("", "missing"))
+        monkeypatch.setattr(
+            stdio.os.path,
+            "isdir",
+            lambda path: os.path.normpath(path) == os.path.normpath(git_cmd),
+        )
+        monkeypatch.setenv("LOCALAPPDATA", local_appdata)
+        monkeypatch.setenv("PATH", system_scripts)
+
+        stdio._augment_path_with_known_tools()
+
+        assert os.environ["PATH"].split(os.pathsep) == [git_cmd, system_scripts]
+
     def test_respects_existing_editor_var(self, monkeypatch):
         """User's explicit EDITOR wins over our default."""
         from hermes_cli import stdio
