@@ -1,23 +1,23 @@
 {
   "schemaVersion": 1,
   "name": "storyboard-platform-hermes-integration",
-  "hermesVersion": "0.18.2",
-  "upstreamCommit": "2ea39daeb1f675d72e5c21c9400f2d58d7e6d71a",
+  "hermesVersion": "0.19.0",
+  "upstreamCommit": "3ef6bbd201263d354fd83ec55b3c306ded2eb72a",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.18.2-6",
-  "preparedAt": "2026-07-20T07:59:23.445539+00:00",
+  "releaseTag": "storyboard-hermes-v0.19.0-1",
+  "preparedAt": "2026-07-21T05:49:18.335485+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
-      "sha256": "413041b039aa41ccb1fa34d95ed61047d4811b873dce559c57a18b06092597e8"
+      "sha256": "a772429e46d19fb58ec3bf1f3ed307ef4cf69a298a1df93608729d0936a30425"
     },
     {
       "path": "gateway/session_context.py",
-      "sha256": "018de1a23752caf6619fed1f2185fc94f8f76d11d1f8af1aaa2af167f1637deb"
+      "sha256": "2bbc9175c23130e72a9047a2ccf7e03a4100306b256e7b05ec4a0f8a74801f7f"
     },
     {
       "path": "hermes_cli/tools_config.py",
-      "sha256": "44908a4a0c92804361027d7a2d47d5021bbeae3c0456e91988c474d81ea6de71"
+      "sha256": "3d7d21ba68f1549afbeb51fe7828315d58b82a1d86fa45a7c96f7e3e16b9394a"
     },
     {
       "path": "storyboard_integration/install_runtime.py",
@@ -853,7 +853,7 @@
     },
     {
       "path": "toolsets.py",
-      "sha256": "3e83ba4dff1908a5e6866d5d0e572bf57ba4ec78219c04db81870249b953947f"
+      "sha256": "dfd31d07e1a2247b5be83a7bf90d25bf9edaea6375c10d7a7737e2fcb4745e90"
     }
   ]
 }
