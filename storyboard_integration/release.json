@@ -4,8 +4,8 @@
   "hermesVersion": "0.19.0",
   "upstreamCommit": "3ef6bbd201263d354fd83ec55b3c306ded2eb72a",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.19.0-1",
-  "preparedAt": "2026-07-21T05:49:18.335485+00:00",
+  "releaseTag": "storyboard-hermes-v0.19.0-3",
+  "preparedAt": "2026-07-22T06:17:10.956538+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -22,6 +22,14 @@
     {
       "path": "storyboard_integration/install_runtime.py",
       "sha256": "9a08a16ef9b7fd69b769c026683bc5b8250aacd500a9a67c1974da01afde03cc"
+    },
+    {
+      "path": "storyboard_integration/skills/character-design-prompt/references/prompt-templates.md",
+      "sha256": "23477e09adea0594f0b75d4fb17a82fc346d1f816256c7fe9d0c15a7229a18b6"
+    },
+    {
+      "path": "storyboard_integration/skills/character-design-prompt/SKILL.md",
+      "sha256": "5a9127e7b3db2e136798816e527277195808b488c25e9fd0570f339b36d886e5"
     },
     {
       "path": "storyboard_integration/skills/script-platform-api/DESCRIPTION.md",
