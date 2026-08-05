@@ -1,7 +1,7 @@
 ---
 name: character-three-view
 description: "Use when the user asks to turn one full-body character image into a character reference sheet, character three-view, 三视图, 人设三视图, 半身特写加全身三视图, or wants the ready-to-use three-image character-sheet workflow on the Storyboard platform."
-version: 1.0.0
+version: 1.1.0
 platforms: [linux, macos, windows]
 metadata:
   hermes:
@@ -11,20 +11,17 @@ metadata:
 
 # 人设三视图生成
 
-将一张人物全身图生成三份可交付图片，顺序固定为：
+将一张人物全身图通过后端聚合任务生成三份可交付图片，顺序固定为：
 
 1. 完整人设图：半身特写在左、全身三视图在右。
 2. 半身特写图。
 3. 全身三视图。
 
-仅在用户明确要生成三视图、人设图或角色设定图时使用。这个 Skill 会实际提交图片任务；不要只写提示词冒充已经生成。
+仅在用户明确要生成三视图、人设图或角色设定图时使用。这个 Skill 会实际提交一个聚合任务；不要只写提示词冒充已经生成，也不要自行拆成多次图片请求。
 
 ## 使用的工具
 
-只使用平台已注册的工具：
-
-- `storyboard_api`：准备固定参考图、校验输入图、提交带自定义尺寸的生图任务、查询任务结果及拼接最终图片。
-- `canvas_image_generate`：当平台版本不需要自定义 `size` 时可作为后备；本流程优先使用 `storyboard_api`，以保证三视图的固定尺寸。
+只使用平台已注册的 `storyboard_api`。后端聚合接口负责准备固定参考图、两阶段 C2 生图、图片任务轮询和最终拼接；不要由 Hermes 单独提交两次生图任务。
 
 认证、平台地址和密钥由工具处理。不要读取环境变量、Token 文件或直接构造 Authorization 请求头。
 
@@ -74,116 +71,50 @@ storyboard_api(
 - `is_full_body: false` 时立即停止，回复用户：`请换一张人物全身图后再生成三视图。`
 - 校验接口失败时直接报告可操作的错误，不要跳过校验或用模型自行猜测。
 
-### 2. 获取两张固定构图参考图
+### 2. 提交聚合任务
 
-调用：
-
-```text
-storyboard_api(
-  endpoint="/api/canvas/character-sheet/references",
-  method="GET",
-  query={"scriptName":"<script_name>"}
-)
-```
-
-响应中的 `ref1.url` 是全身三视图构图参考，`ref2.url` 是半身特写构图参考。缺少任一 URL 时停止并报告固定参考图准备失败。
-
-### 3. 生成半身特写图
-
-提交：
+调用一次接口。它会在后台完成固定参考图准备、半身特写、全身三视图、每一阶段的轮询以及最终拼接：
 
 ```text
 storyboard_api(
-  endpoint="/api/canvas/generate",
-  method="POST",
-  body={
-    "scriptName":"<script_name>",
-    "prompt":"给图片1生成一张人物设定大头照，大头照的构图参考图片2，保持人物一致性",
-    "model":"gpt-image-2-c2",
-    "size":"<portrait_size>",
-    "resolution":"<1K_or_2K>",
-    "quality":"high",
-    "output_format":"png",
-    "n":1,
-    "reference_images":[
-      {"url":"<source_image_url>","name":"人物全身图.png"},
-      {"url":"<ref2_url>","name":"半身特写构图参考.png"}
-    ]
-  }
-)
-```
-
-`<portrait_size>` 按上表选择。请求成功但返回 `submitted: true` 时，保存 `task_id` 并进入轮询；不能假设提交成功即已拿到图片。
-
-### 4. 轮询单个图片任务
-
-对每个异步任务调用：
-
-```text
-storyboard_api(
-  endpoint="/api/canvas/image/generate/<task_id>/status",
-  method="GET",
-  query={"scriptName":"<script_name>"}
-)
-```
-
-- 每 5 秒查询一次。
-- 返回 `done: true` 且 `success: true` 时，从 `images[0].image`（或等价的 `data[0].image`）读取图片 URL。
-- 返回终态失败、`success: false` 或没有图片 URL 时停止；不要继续下一阶段，也不要静默改用其他模型。
-- 等待期间只简短告知正在生成，最多持续 5 分钟；超过后告诉用户任务仍在平台处理中，并保留任务由平台后续显示。
-
-### 5. 生成全身三视图
-
-半身特写完成后，提交：
-
-```text
-storyboard_api(
-  endpoint="/api/canvas/generate",
-  method="POST",
-  body={
-    "scriptName":"<script_name>",
-    "prompt":"给图片1生成一张人物设定全身三视图，三视图的站姿和构图参考图片3，保持人物一致性",
-    "model":"gpt-image-2-c2",
-    "size":"<turnaround_size>",
-    "resolution":"<1K_or_2K>",
-    "quality":"high",
-    "output_format":"png",
-    "n":1,
-    "reference_images":[
-      {"url":"<source_image_url>","name":"人物全身图.png"},
-      {"url":"<portrait_image_url>","name":"半身特写图.png"},
-      {"url":"<ref1_url>","name":"全身三视图构图参考.png"}
-    ]
-  }
-)
-```
-
-`<turnaround_size>` 按上表选择。严格保持参考图顺序：原始全身图、刚生成的半身特写、`ref1`。之后按步骤 4 轮询到获得全身三视图 URL。
-
-### 6. 拼接并返回三张图片
-
-调用：
-
-```text
-storyboard_api(
-  endpoint="/api/canvas/character-sheet/compose",
+  endpoint="/api/canvas/character-sheet/generate",
   method="POST",
   body={
     "scriptName":"<script_name>",
     "resolution":"<1k_or_2k>",
-    "portrait_url":"<portrait_image_url>",
-    "turnaround_url":"<turnaround_image_url>"
+    "source_image":{
+      "url":"<source_image_url>",
+      "name":"人物全身图.png"
+    }
   }
 )
 ```
 
-`resolution` 只能是小写 `1k` 或 `2k`。接口会按指定最终尺寸，将半身图置于左侧、全身三视图置于右侧，并返回：
+成功提交后保存响应中的 `task_id`。不要自行调用 `/api/canvas/generate`、`/references` 或 `/compose`，也不要生成额外图片。
+
+### 3. 轮询聚合任务
+
+每 5 秒调用：
 
 ```text
-images.combined.image
-images.portrait.image
-images.turnaround.image
+storyboard_api(
+  endpoint="/api/canvas/character-sheet/generate/<task_id>/status",
+  method="GET",
+  query={"scriptName":"<script_name>"}
+)
 ```
+
+- `task.status` 为 `pending` 或 `running` 时，读取 `task.message` 作为当前阶段状态。
+- `task.status` 为 `succeeded` 时，从以下字段按顺序交付三张图：
+
+```text
+task.images.combined.image
+task.images.portrait.image
+task.images.turnaround.image
+```
+
+- `task.status` 为 `failed` 时停止并直接反馈 `task.error`，不要补发或改用其他模型。
+- 单个聚合任务由后端最多等待 20 分钟完成两阶段生图；Hermes 不应另起重复任务。
 
 交付顺序必须是 `combined`、`portrait`、`turnaround`。不要把中间原始参考图、任务 ID、上游模型 ID 或调试信息当作交付内容。
 
@@ -197,4 +128,4 @@ images.turnaround.image
 
 ## 回复约束
 
-成功后简洁说明已生成，并按以下顺序展示可访问链接：完整人设图、半身特写图、全身三视图。不要说“已完成”直到拼接接口成功返回三张图片。
+成功后简洁说明已生成，并按以下顺序展示可访问链接：完整人设图、半身特写图、全身三视图。不要说“已完成”直到拼接接口成功返回三张图片。使用![](<url>) Markdown 语法展示图片。
