@@ -26,6 +26,7 @@ _ENDPOINT_RE = re.compile(r"^/api/[A-Za-z0-9_./:-]+$")
 _BLOCKED_ENDPOINT_PREFIXES = ("/api/auth", "/api/admin", "/api/hermes/auth")
 _DEFAULT_TIMEOUT_SECONDS = 120
 _MAX_CANVAS_IMAGE_PROMPTS = 10
+_CHARACTER_SHEET_RESOLUTIONS = {"1k": "1K", "2k": "2K"}
 _CANVAS_IMAGE_EXTENSION_RE = re.compile(r"\.(?:png|jpe?g|webp|gif|bmp)$", re.IGNORECASE)
 _CANVAS_IMAGE_VERSION_RE = re.compile(r"^(?P<stem>.+)_v(?P<version>[1-9]\d*)$", re.IGNORECASE)
 
@@ -475,6 +476,67 @@ def _request_json(args: Dict[str, Any], **kwargs) -> str:
     return tool_result(result)
 
 
+def _parse_tool_result(value: str) -> Dict[str, Any]:
+    try:
+        parsed = json.loads(value)
+    except Exception:
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _resolve_script_name(args: Dict[str, Any]) -> str:
+    provider, _ = _current_identity()
+    session_script_name = _get_session_value("HERMES_STORYBOARD_SCRIPT_NAME", "").strip()
+    requested_script_name = str(args.get("scriptName") or args.get("script_name") or "").strip()
+    if _is_platform_embedded_identity(provider):
+        return session_script_name
+    return requested_script_name
+
+
+def _character_three_view_generate(args: Dict[str, Any], **kwargs) -> str:
+    """Validate a full-body reference and submit one character-sheet task."""
+    script_name = _resolve_script_name(args)
+    source_url = str(args.get("source_image_url") or args.get("sourceImageUrl") or "").strip()
+    source_name = str(args.get("source_image_name") or args.get("sourceImageName") or "人物全身图.png").strip()
+    resolution_key = str(args.get("resolution") or "").strip().lower()
+
+    if not script_name:
+        return tool_error("Current platform scriptName is unavailable for this session", success=False)
+    if not source_url:
+        return tool_error("source_image_url is required", success=False)
+    if not re.match(r"^https?://", source_url, re.IGNORECASE):
+        return tool_error("source_image_url must be an accessible http(s) image URL", success=False)
+    if resolution_key not in _CHARACTER_SHEET_RESOLUTIONS:
+        return tool_error("resolution must be 1K or 2K", success=False)
+
+    validation_result = _request_json(
+        {
+            "endpoint": "/api/canvas/character-sheet/validate-source",
+            "method": "POST",
+            "body": {"scriptName": script_name, "image_url": source_url},
+        }
+    )
+    validation_payload = _parse_tool_result(validation_result)
+    if validation_payload.get("needsLogin") or not validation_payload.get("success"):
+        return validation_result
+
+    validation_data = validation_payload.get("data")
+    if not isinstance(validation_data, dict) or validation_data.get("is_full_body") is not True:
+        return tool_error("请换一张人物全身图后再生成三视图。", success=False, status="invalid_source_image")
+
+    return _request_json(
+        {
+            "endpoint": "/api/canvas/character-sheet/generate",
+            "method": "POST",
+            "body": {
+                "scriptName": script_name,
+                "resolution": _CHARACTER_SHEET_RESOLUTIONS[resolution_key],
+                "source_image": {"url": source_url, "name": source_name or "人物全身图.png"},
+            },
+        }
+    )
+
+
 STORYBOARD_API_SCHEMA = {
     "name": "storyboard_api",
     "description": "Call storyboard platform API endpoints using internal session auth. Do not pass or ask for tokens.",
@@ -496,16 +558,44 @@ STORYBOARD_API_SCHEMA = {
 }
 
 
+CHARACTER_THREE_VIEW_GENERATE_SCHEMA = {
+    "name": "character_three_view_generate",
+    "description": (
+        "Create a character reference sheet from one full-body character image through the Storyboard platform. "
+        "The tool validates the source image, then submits one backend aggregation task that generates the combined "
+        "character sheet, portrait, and turnaround view. Use only when the user explicitly asks for a character "
+        "three-view, character reference sheet, or 人设三视图. Do not use canvas_image_generate for this workflow. "
+        "After a successful submission, do not mention task IDs, job IDs, request IDs, or model IDs in the assistant reply."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "scriptName": {
+                "type": "string",
+                "description": "Optional script name. API-server embedded sessions use the current page scriptName instead.",
+            },
+            "source_image_url": {
+                "type": "string",
+                "description": "Accessible HTTP(S) URL of one clear, single-person full-body reference image.",
+            },
+            "source_image_name": {
+                "type": "string",
+                "description": "Optional display name for the source image. Defaults to 人物全身图.png.",
+            },
+            "resolution": {
+                "type": "string",
+                "enum": ["1K", "2K"],
+                "description": "Required output resolution for the character sheet.",
+            },
+        },
+        "required": ["source_image_url", "resolution"],
+    },
+}
+
+
 def _canvas_image_generate(args: Dict[str, Any], **kwargs) -> str:
     provider, provider_subject = _current_identity()
-    session_script_name = _get_session_value("HERMES_STORYBOARD_SCRIPT_NAME", "").strip()
-    requested_script_name = str(args.get("scriptName") or args.get("script_name") or "").strip()
-    if _is_platform_embedded_identity(provider):
-        if not session_script_name:
-            return tool_error("Current platform scriptName is unavailable for this session", success=False)
-        script_name = session_script_name
-    else:
-        script_name = requested_script_name
+    script_name = _resolve_script_name(args)
     raw_prompts = args.get("prompt")
     if isinstance(raw_prompts, list):
         prompts = [str(item or "").strip() for item in raw_prompts]
@@ -703,5 +793,14 @@ registry.register(
     schema=CANVAS_IMAGE_GENERATE_SCHEMA,
     handler=_canvas_image_generate,
     emoji="IMG",
+    max_result_size_chars=12000,
+)
+
+registry.register(
+    name="character_three_view_generate",
+    toolset="storyboard",
+    schema=CHARACTER_THREE_VIEW_GENERATE_SCHEMA,
+    handler=_character_three_view_generate,
+    emoji="ART",
     max_result_size_chars=12000,
 )

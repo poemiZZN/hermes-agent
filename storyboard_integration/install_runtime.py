@@ -67,6 +67,7 @@ def assert_toolset_integration(fork_root: Path) -> None:
     expected_tools = {
         "storyboard_api",
         "canvas_image_generate",
+        "character_three_view_generate",
         "zenmux_video_analyze",
     }
     sys.path.insert(0, str(fork_root))

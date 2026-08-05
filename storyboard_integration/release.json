@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-3",
-  "preparedAt": "2026-08-05T09:12:35.341135+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-4",
+  "preparedAt": "2026-08-05T09:31:57.830233+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -21,7 +21,7 @@
     },
     {
       "path": "storyboard_integration/install_runtime.py",
-      "sha256": "9a08a16ef9b7fd69b769c026683bc5b8250aacd500a9a67c1974da01afde03cc"
+      "sha256": "0b1070e9aedffaf01ce8116a6e8873bddc3ab78b29b47fcc759f7b4ab759fb78"
     },
     {
       "path": "storyboard_integration/skills/art-asset-production/references/character-assets.md",
@@ -53,7 +53,7 @@
     },
     {
       "path": "storyboard_integration/skills/character-three-view/SKILL.md",
-      "sha256": "73756ca7355eade7c8831744d867d91d376ae50f094f6cb3ce637d1953cb6c3e"
+      "sha256": "a7c05f25ba2e29b4a215d9458bf3034d9dbfb7e1ece948fbb6cf898bcde842ad"
     },
     {
       "path": "storyboard_integration/skills/script-platform-api/DESCRIPTION.md",
@@ -877,7 +877,7 @@
     },
     {
       "path": "tools/storyboard_api_tool.py",
-      "sha256": "64d647b6a37eb506d55bc2d871cebd2a74ad3ced1776e9227998694505d5f5bb"
+      "sha256": "e659f196a587c7ed71933f89cf075fe63e360065ff54ed0f28f18968c014df61"
     },
     {
       "path": "tools/zenmux_video_analyze_tool.py",
