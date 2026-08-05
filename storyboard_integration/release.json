@@ -1,27 +1,47 @@
 {
   "schemaVersion": 1,
   "name": "storyboard-platform-hermes-integration",
-  "hermesVersion": "0.19.0",
-  "upstreamCommit": "3ef6bbd201263d354fd83ec55b3c306ded2eb72a",
+  "hermesVersion": "0.20.0",
+  "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.19.0-3",
-  "preparedAt": "2026-07-22T06:17:10.956538+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-1",
+  "preparedAt": "2026-08-05T07:01:19.440066+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
-      "sha256": "a772429e46d19fb58ec3bf1f3ed307ef4cf69a298a1df93608729d0936a30425"
+      "sha256": "02adccb2f1677467d05893fd21b6c4d8c665516ab251bd4841dcf8c9bcb14406"
     },
     {
       "path": "gateway/session_context.py",
-      "sha256": "2bbc9175c23130e72a9047a2ccf7e03a4100306b256e7b05ec4a0f8a74801f7f"
+      "sha256": "174956c86e0d2cb81b92234e70a658a93ccb292645e033dbd31ce21f7e63c392"
     },
     {
       "path": "hermes_cli/tools_config.py",
-      "sha256": "3d7d21ba68f1549afbeb51fe7828315d58b82a1d86fa45a7c96f7e3e16b9394a"
+      "sha256": "2ef9d63a5b7c56333d3e77a35363bb0603bb4dd22f46e79ffa3620fb6f51d1c1"
     },
     {
       "path": "storyboard_integration/install_runtime.py",
       "sha256": "9a08a16ef9b7fd69b769c026683bc5b8250aacd500a9a67c1974da01afde03cc"
+    },
+    {
+      "path": "storyboard_integration/skills/art-asset-production/references/character-assets.md",
+      "sha256": "b58334582f7d19d6c1902c4681dce98ccaa0f81d80067d654e8f33939285d6cb"
+    },
+    {
+      "path": "storyboard_integration/skills/art-asset-production/references/quality-control.md",
+      "sha256": "43b3776d2fa2d6d263339d97183fe0cb2bd9204671497b595611ae5453f8e72f"
+    },
+    {
+      "path": "storyboard_integration/skills/art-asset-production/references/scene-and-prop-assets.md",
+      "sha256": "2d183210251b98a42f9b3a9dffb70772bb840b5728b7dee7b8508a627a3e34c0"
+    },
+    {
+      "path": "storyboard_integration/skills/art-asset-production/references/script-extraction.md",
+      "sha256": "7aec3434fec4f07c3033fc2981ec6da68a690322b3792a309e537748170a73a4"
+    },
+    {
+      "path": "storyboard_integration/skills/art-asset-production/SKILL.md",
+      "sha256": "258265e1ee4deb775098e0689f7ab72c40c0dbab683fbd3b23634a4c2d6919ee"
     },
     {
       "path": "storyboard_integration/skills/character-design-prompt/references/prompt-templates.md",
@@ -861,7 +881,7 @@
     },
     {
       "path": "toolsets.py",
-      "sha256": "dfd31d07e1a2247b5be83a7bf90d25bf9edaea6375c10d7a7737e2fcb4745e90"
+      "sha256": "d7f0cceb6e16fd21681b29aeb800f9b97d684425434814cc4e7184ebc09ba00c"
     }
   ]
 }
