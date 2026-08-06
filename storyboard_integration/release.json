@@ -5,7 +5,7 @@
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
   "releaseTag": "storyboard-hermes-v0.20.0-4",
-  "preparedAt": "2026-08-05T09:31:57.830233+00:00",
+  "preparedAt": "2026-08-06T02:45:45.174654+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -24,6 +24,10 @@
       "sha256": "0b1070e9aedffaf01ce8116a6e8873bddc3ab78b29b47fcc759f7b4ab759fb78"
     },
     {
+      "path": "storyboard_integration/skills/art-asset-production/SKILL.md",
+      "sha256": "258265e1ee4deb775098e0689f7ab72c40c0dbab683fbd3b23634a4c2d6919ee"
+    },
+    {
       "path": "storyboard_integration/skills/art-asset-production/references/character-assets.md",
       "sha256": "b58334582f7d19d6c1902c4681dce98ccaa0f81d80067d654e8f33939285d6cb"
     },
@@ -40,16 +44,12 @@
       "sha256": "7aec3434fec4f07c3033fc2981ec6da68a690322b3792a309e537748170a73a4"
     },
     {
-      "path": "storyboard_integration/skills/art-asset-production/SKILL.md",
-      "sha256": "258265e1ee4deb775098e0689f7ab72c40c0dbab683fbd3b23634a4c2d6919ee"
+      "path": "storyboard_integration/skills/character-design-prompt/SKILL.md",
+      "sha256": "5a9127e7b3db2e136798816e527277195808b488c25e9fd0570f339b36d886e5"
     },
     {
       "path": "storyboard_integration/skills/character-design-prompt/references/prompt-templates.md",
       "sha256": "23477e09adea0594f0b75d4fb17a82fc346d1f816256c7fe9d0c15a7229a18b6"
-    },
-    {
-      "path": "storyboard_integration/skills/character-design-prompt/SKILL.md",
-      "sha256": "5a9127e7b3db2e136798816e527277195808b488c25e9fd0570f339b36d886e5"
     },
     {
       "path": "storyboard_integration/skills/character-three-view/SKILL.md",
@@ -69,7 +69,7 @@
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/.github/CODEOWNERS",
-      "sha256": "7a3c0173ee61e9100c884dd7f1476efb534dce2b2818b2560b0620f4b29d7d62"
+      "sha256": "3ba15c3b9f2ba6a798d3abc234c48bd09b2ba43c6303a7f27989c6ec0b5a9d34"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/.github/workflows/validate-skills.yml",
@@ -77,7 +77,31 @@
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/.gitignore",
-      "sha256": "7a8b918e710506cbb46e7bcb7701ede96f10ca3ed53f70f0064187adf6a9ee9c"
+      "sha256": "702af3451f1a49de77de75077b2e9ed6d88d5f1c6bcbe47c234b61a78608cc93"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/CHANGELOG.md",
+      "sha256": "959b50b2a0c8794caa11686b038a3d49a42cb1c91831a336f3a0b2b7f62f7f66"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/LICENSE",
+      "sha256": "c84a6216f6e006b4e4a65e9d056837a61ee9c4ca79f43f386df2992bc690a7f6"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/README.md",
+      "sha256": "443591c30e2a083dc5d1907a32c6bfa7943f82825e89b506447df304f54e872c"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/SECURITY.md",
+      "sha256": "8379e1f0af58ab1d8df4425525aeee0d1c42e69d1d8b94e8415f8214a0633f8c"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/SKILL.md",
+      "sha256": "14a618871c5ddf099b8891889a4d0c04b0d93fb5d388957d882125ed3dcd80c3"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/V6_SEQUENCE_PROMPT_COMPILER_MANIFEST.md",
+      "sha256": "faf2de9bc989c7238fe2ae447c46bc99bdb6940707789dd68107998e8e01a59d"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/agents/openai.yaml",
@@ -93,7 +117,7 @@
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/assets/hero-dark.svg",
-      "sha256": "6bf91105eeca7778210fb5837d1b9c0c10b1cfb7b49a3df4539111aa5a16f6fb"
+      "sha256": "4cb3f37f452c60167b9bc76ed722a255cdac3f69f524c3c953926ec45cb17709"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/assets/hero-global-filmmaker-mode.png",
@@ -101,7 +125,7 @@
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/assets/hero-light.svg",
-      "sha256": "73edf85b4b38b0a2ad55104ea8d967f49a0b8192d2744403b6ffea6f9c6ca59d"
+      "sha256": "332dce27113e1dff63eba212bce8c09a838e8734f710797acf99a6c749f6dc20"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/assets/infographic-cdn-delivery-map.png",
@@ -129,15 +153,11 @@
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/assets/skill-map.svg",
-      "sha256": "8f15e3078d44d51db803223ef277db06c36faa4682460568e8ce88792b391914"
+      "sha256": "c9fcf7982d68100fe62fbb0d8caa2bff0962312f90c166481d160ca7cefece57"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/assets/skill-os-infographic.png",
       "sha256": "970cb3bf67ebf5e208e0baf6b09fd647410a9bfd5be6d8c5cb802df75e43843d"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/CHANGELOG.md",
-      "sha256": "959b50b2a0c8794caa11686b038a3d49a42cb1c91831a336f3a0b2b7f62f7f66"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/data/community-patterns.seedance-2026-05-30.json",
@@ -145,15 +165,11 @@
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/data/generation-runs.example.jsonl",
-      "sha256": "fa99d5c3dc8cb4a0a0bede52b834ea84d37f568cf5d206095c404fa929850a97"
+      "sha256": "7efe83ec24ef912747c4a7dbd048ca94d6029daa1f7e42df62af26ba5174c377"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/data/sources.seedance-2026-05-30.json",
       "sha256": "89210eab4dc9bf9127aa2fae2a5fd32860aec4ab1093f34b3db7f6345850a128"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/docs/frontend-redesign.md",
-      "sha256": "34d7474900aa22e141a38dd6392e8d6077d5e4fc07af7a1e82942da8f98e1264"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/docs/QUICKSTART.es.md",
@@ -210,6 +226,10 @@
     {
       "path": "storyboard_integration/skills/seedance-2.0/docs/RELEASE_v6.6.0.md",
       "sha256": "b8287f2f70081e6520b52ec9d12c15b97dc2cba4fd0828d7028911ecc47a1bb3"
+    },
+    {
+      "path": "storyboard_integration/skills/seedance-2.0/docs/frontend-redesign.md",
+      "sha256": "34d7474900aa22e141a38dd6392e8d6077d5e4fc07af7a1e82942da8f98e1264"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/docs/v6-release-readiness.md",
@@ -306,14 +326,6 @@
     {
       "path": "storyboard_integration/skills/seedance-2.0/examples/standalone-clip/prompt.md",
       "sha256": "beb2b55de1739f391f20f94c4e65dadc992e16b114fc59a8809f1dc6358d7700"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/LICENSE",
-      "sha256": "883fcf374166a7e70e9384c14dfda70a1bd4f24b6893160f922e9ac216599394"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/README.md",
-      "sha256": "443591c30e2a083dc5d1907a32c6bfa7943f82825e89b506447df304f54e872c"
     },
     {
       "path": "storyboard_integration/skills/seedance-2.0/references/2d-anime-grammar.md",
@@ -728,14 +740,6 @@
       "sha256": "af4698bbef5159ba2adc38d2d387da1f68625deb72a0ef7fd316c057be1e0b03"
     },
     {
-      "path": "storyboard_integration/skills/seedance-2.0/SECURITY.md",
-      "sha256": "8379e1f0af58ab1d8df4425525aeee0d1c42e69d1d8b94e8415f8214a0633f8c"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/SKILL.md",
-      "sha256": "14a618871c5ddf099b8891889a4d0c04b0d93fb5d388957d882125ed3dcd80c3"
-    },
-    {
       "path": "storyboard_integration/skills/seedance-2.0/skills/seedance-antislop/SKILL.md",
       "sha256": "3303e4ae1de3dc2fcf784e965c4df95b91c8d6522e04a11df9533440d9117eb1"
     },
@@ -870,10 +874,6 @@
     {
       "path": "storyboard_integration/skills/seedance-2.0/tests/test_sequence_eval.py",
       "sha256": "03403de53e34081db2226dfc8f3312892832f510ec6de9b118a9e8cbde6e6a87"
-    },
-    {
-      "path": "storyboard_integration/skills/seedance-2.0/V6_SEQUENCE_PROMPT_COMPILER_MANIFEST.md",
-      "sha256": "faf2de9bc989c7238fe2ae447c46bc99bdb6940707789dd68107998e8e01a59d"
     },
     {
       "path": "tools/storyboard_api_tool.py",
