@@ -22,7 +22,7 @@ non_diegetic_music:
 ...
 ```
 
-除 `<d>` 内对白/歌词与画面中可见文字外，所有内容使用英文。
+所有格式保留字使用英文：六个章节名、参考标签、任务类型、保留关系标记、`[Shot N]`、`At MM:SS.mmm`、`(Sx)`、`<d>`、`[Language]` 和 `N/A`。除这些保留字外，描述性文本跟随用户源文本语言；用户输入为混合语言或无法判断时，使用中文。`<d>` 内对白/歌词与画面中可见文字始终保留原始语言。
 
 ## 1. 参考标签
 
@@ -33,13 +33,20 @@ non_diegetic_music:
 | `<Video N>` | 被剪辑的源视频、续写起点、全片节奏或剪辑结构来源 | 替代视频中的人物、场景或物体主体 |
 | `<Audio N>` | 原音复用、音色、音乐、对白、歌词、音效或节奏参考 | 自动代表每一个带声音的视频 |
 
-在 `subject_definitions` 中一行定义一个实际需要追踪的内容。标签一经定义，在后文保持相同含义。
+在 `subject_definitions` 中一行定义一个实际需要追踪的内容。标签一经定义，在后文保持相同含义。只有用户明确描述或当前会话实际看见了资产内容时，才描述人物外貌、场景、服装、道具、构图或其他视觉特征。看不到或无法确认时，只描述资产的功能、来源和镜头关系，不要从文件名、相邻资源或常识推测画面。
 
 ```text
 <Subject 1> is the young woman in <Picture 1>, with a navy cardigan, long dark hair, and a thin silver necklace.
 <Picture 2> is the first frame of [Shot 1], defining the café-window composition.
 <Video 1> is the source video whose final moment the target video continues from.
 <Audio 1> is the voice-timbre reference for <Subject 1> (S1).
+```
+
+无法确认视觉内容时：
+
+```text
+<Picture 1> is the first-frame reference for [Shot 1].
+<Subject 1> is the character represented by <Picture 1>; the visible attributes are preserved without adding unverified details.
 ```
 
 ## 2. `summary` 的任务类型
@@ -93,7 +100,7 @@ The target video uses a naturalistic cinematic style with soft late-afternoon wi
 ```
 
 - `[Shot 1]` 不写时间戳；后续镜头使用 `[Shot N] At MM:SS.mmm, ...`。
-- 每个镜头写清构图、可见主体及位置、环境与光线、动作和状态变化、运镜、同步声音，以及参考标签何时出现或起作用。
+- 每个镜头写清构图、可见主体及位置、环境与光线、动作和状态变化、运镜、同步声音，以及参考标签何时出现或起作用。对于看不到的参考资产，只写用户已给出的要求和该资产的功能，不要补造视觉细节。
 - 重要主体首次清晰出现时，结合 `<Subject N>` 描述其可见参考特征。后续只复用标签，不要重新定义。
 - 具体帧锚点自然写作 `the shot begins from <Picture 1>`、`the shot's keyframe corresponds to <Picture 2>` 或 `the shot ends on <Picture 3>`。
 - 生成类任务通常 350-500 英文词；视频编辑可按源视频复杂度伸缩。

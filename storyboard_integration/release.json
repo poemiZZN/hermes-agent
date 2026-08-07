@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-5",
-  "preparedAt": "2026-08-07T02:36:16.208806+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-6",
+  "preparedAt": "2026-08-07T03:20:28.534797+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -57,11 +57,11 @@
     },
     {
       "path": "storyboard_integration/skills/minimax-h3-video-prompt/references/full-reference-format.md",
-      "sha256": "c345ec4cdc04061b063fc2a211c7e3f20174bf58bdd5ee167c2b7634fa85cc50"
+      "sha256": "e0e1452e62afdb4123d9666eadb9c5fed2f629f6a548a65eb38f1bd3ff3dfffb"
     },
     {
       "path": "storyboard_integration/skills/minimax-h3-video-prompt/SKILL.md",
-      "sha256": "300bde4a013791875d935b039f03f612495acd0b328eefd74e56c86858386788"
+      "sha256": "a83c64569fabae289cc471969111646babc8509c2807ec29a0b268918207e27c"
     },
     {
       "path": "storyboard_integration/skills/script-platform-api/DESCRIPTION.md",
