@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-9",
-  "preparedAt": "2026-08-21T11:00:09.260006+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-10",
+  "preparedAt": "2026-08-21T11:21:57.584479+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -21,7 +21,7 @@
     },
     {
       "path": "storyboard_integration/install_runtime.py",
-      "sha256": "f828824d3d27a7ed7ad40a6fc50a139ab79199f1002ad0e730c4e2e2362ce84e"
+      "sha256": "ddc343e8b1b10d9a22e1809b128ad37aabcc2eec80782b243c8f8e8b2a3afafe"
     },
     {
       "path": "storyboard_integration/skills/art-asset-production/references/character-assets.md",
@@ -917,7 +917,7 @@
     },
     {
       "path": "tools/scriptmaker_agent_tool.py",
-      "sha256": "62f2b34759f90fc01db4328eed13046bcfccbe32f5a4c14a32c12bd4c808b0db"
+      "sha256": "c4eea73affb42a9a07ad4b62a4d583e3156b42d0fdcdf2f961838d2ae135624a"
     },
     {
       "path": "tools/storyboard_api_tool.py",

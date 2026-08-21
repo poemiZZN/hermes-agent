@@ -452,12 +452,114 @@ _TOOL_SCHEMAS: List[Dict[str, Any]] = [
 ]
 
 
-for _schema in _TOOL_SCHEMAS:
-    registry.register(
-        name=_schema["name"],
-        toolset="scriptmaker",
-        schema=_schema,
-        handler=_make_handler(_schema["name"]),
-        emoji="SM",
-        max_result_size_chars=_MAX_RESULT_CHARS,
-    )
+_SCHEMA_BY_NAME: Dict[str, Dict[str, Any]] = {item["name"]: item for item in _TOOL_SCHEMAS}
+
+
+# Registered with one top-level call per tool on purpose. Hermes discovers tool
+# modules by AST-scanning the module body for a direct ``registry.register(...)``
+# statement, so a registration loop would leave this file silently unimported by
+# the gateway even though it imports fine by hand.
+registry.register(
+    name="ask_choice",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["ask_choice"],
+    handler=_make_handler("ask_choice"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="list_projects",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["list_projects"],
+    handler=_make_handler("list_projects"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="select_project",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["select_project"],
+    handler=_make_handler("select_project"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="get_project_status",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["get_project_status"],
+    handler=_make_handler("get_project_status"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="prepare_script_generation",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["prepare_script_generation"],
+    handler=_make_handler("prepare_script_generation"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="confirm_script_generation",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["confirm_script_generation"],
+    handler=_make_handler("confirm_script_generation"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="pause_task",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["pause_task"],
+    handler=_make_handler("pause_task"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="resume_task",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["resume_task"],
+    handler=_make_handler("resume_task"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="retry_task",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["retry_task"],
+    handler=_make_handler("retry_task"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="terminate_task",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["terminate_task"],
+    handler=_make_handler("terminate_task"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="export_project",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["export_project"],
+    handler=_make_handler("export_project"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="run_project_doctor",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["run_project_doctor"],
+    handler=_make_handler("run_project_doctor"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="open_feature",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["open_feature"],
+    handler=_make_handler("open_feature"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)

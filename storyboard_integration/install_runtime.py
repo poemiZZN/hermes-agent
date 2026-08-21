@@ -92,6 +92,17 @@ def assert_toolset_integration(fork_root: Path) -> None:
     try:
         importlib.import_module("tools.storyboard_api_tool")
         importlib.import_module("tools.zenmux_video_analyze_tool")
+        # Hermes only auto-imports a tool module when its body contains a direct
+        # registry.register(...) statement. Importing by hand here would hide a
+        # module the gateway will never load, so assert discovery agrees first.
+        from tools.registry import _module_registers_tools
+
+        scriptmaker_tool = fork_root / "tools" / "scriptmaker_agent_tool.py"
+        if not _module_registers_tools(scriptmaker_tool):
+            fail(
+                "tools/scriptmaker_agent_tool.py is not auto-discoverable: Hermes scans "
+                "the module body for a top-level registry.register(...) call"
+            )
         importlib.import_module("tools.scriptmaker_agent_tool")
         from hermes_cli.tools_config import CONFIGURABLE_TOOLSETS, _get_platform_tools
         from tools.registry import registry
