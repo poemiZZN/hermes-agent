@@ -52,6 +52,7 @@ def assert_core_integration(fork_root: Path) -> None:
         fork_root / "hermes_cli" / "tools_config.py": '"storyboard",      "Storyboard Platform"',
         fork_root / "tools" / "storyboard_api_tool.py": 'name="canvas_image_generate"',
         fork_root / "tools" / "zenmux_video_analyze_tool.py": 'name="zenmux_video_analyze"',
+        fork_root / "tools" / "scriptmaker_agent_tool.py": 'toolset="scriptmaker"',
     }
     for path, marker in checks.items():
         if not path.is_file():
@@ -61,6 +62,23 @@ def assert_core_integration(fork_root: Path) -> None:
             fail(f"Storyboard integration marker is missing from {path}: {marker}")
         if path.suffix == ".py":
             compile(source, str(path), "exec")
+
+
+_SCRIPTMAKER_TOOLS = {
+    "ask_choice",
+    "prepare_script_generation",
+    "confirm_script_generation",
+    "list_projects",
+    "select_project",
+    "get_project_status",
+    "pause_task",
+    "resume_task",
+    "retry_task",
+    "terminate_task",
+    "run_project_doctor",
+    "export_project",
+    "open_feature",
+}
 
 
 def assert_toolset_integration(fork_root: Path) -> None:
@@ -74,6 +92,7 @@ def assert_toolset_integration(fork_root: Path) -> None:
     try:
         importlib.import_module("tools.storyboard_api_tool")
         importlib.import_module("tools.zenmux_video_analyze_tool")
+        importlib.import_module("tools.scriptmaker_agent_tool")
         from hermes_cli.tools_config import CONFIGURABLE_TOOLSETS, _get_platform_tools
         from tools.registry import registry
         from toolsets import resolve_toolset
@@ -94,6 +113,30 @@ def assert_toolset_integration(fork_root: Path) -> None:
             enabled = _get_platform_tools({}, platform, include_default_mcp_servers=False)
             if "storyboard" not in enabled:
                 fail(f"Storyboard toolset is not enabled for platform: {platform}")
+
+        registered = set(registry.get_tool_names_for_toolset("scriptmaker"))
+        if not _SCRIPTMAKER_TOOLS.issubset(registered):
+            fail(
+                "Scriptmaker registry tools are missing: "
+                f"{', '.join(sorted(_SCRIPTMAKER_TOOLS - registered))}"
+            )
+
+        resolved = set(resolve_toolset("scriptmaker"))
+        if not _SCRIPTMAKER_TOOLS.issubset(resolved):
+            fail(
+                "Scriptmaker toolset resolution is incomplete: "
+                f"{', '.join(sorted(_SCRIPTMAKER_TOOLS - resolved))}"
+            )
+
+        if "scriptmaker" not in configurable:
+            fail("Scriptmaker toolset is missing from CONFIGURABLE_TOOLSETS")
+
+        # Scriptmaker tools need a turn ticket that only the authenticated API
+        # server can supply, so the toolset must stay off everywhere else.
+        if "scriptmaker" not in _get_platform_tools(
+            {}, "api_server", include_default_mcp_servers=False
+        ):
+            fail("Scriptmaker toolset is not enabled for platform: api_server")
     finally:
         try:
             sys.path.remove(str(fork_root))
