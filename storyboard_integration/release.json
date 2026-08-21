@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-7",
-  "preparedAt": "2026-08-12T02:13:38.442791+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-8",
+  "preparedAt": "2026-08-21T03:43:32.475150+00:00",
   "files": [
     {
       "path": "gateway/platforms/api_server.py",
@@ -886,6 +886,18 @@
     {
       "path": "storyboard_integration/skills/seedance-2.0/V6_SEQUENCE_PROMPT_COMPILER_MANIFEST.md",
       "sha256": "faf2de9bc989c7238fe2ae447c46bc99bdb6940707789dd68107998e8e01a59d"
+    },
+    {
+      "path": "storyboard_integration/skills/storyboard-script-generator/references/segment-rules.md",
+      "sha256": "9625e4e637010a9539743c59f56dc88193ff9d57dc88c151953e43e0ae9b04f7"
+    },
+    {
+      "path": "storyboard_integration/skills/storyboard-script-generator/references/translation-guide.md",
+      "sha256": "37f312ef72b44d42c8352c8ae9203f1a76ae175657ee01404e2d7970949861fa"
+    },
+    {
+      "path": "storyboard_integration/skills/storyboard-script-generator/SKILL.md",
+      "sha256": "26d98ad442290b3982bbae8abb7e09f8619971f779af7ca38b223c44b123b97a"
     },
     {
       "path": "tools/storyboard_api_tool.py",
