@@ -141,6 +141,26 @@ TOOLSETS = {
         "includes": []
     },
 
+    "scriptmaker": {
+        "description": "Scriptmaker conversational script platform operations",
+        "tools": [
+            "ask_choice",
+            "prepare_script_generation",
+            "confirm_script_generation",
+            "list_projects",
+            "select_project",
+            "get_project_status",
+            "pause_task",
+            "resume_task",
+            "retry_task",
+            "terminate_task",
+            "run_project_doctor",
+            "export_project",
+            "open_feature",
+        ],
+        "includes": []
+    },
+
     "video": {
         "description": "Video analysis and understanding tools (opt-in, not in default toolset)",
         "tools": ["video_analyze"],

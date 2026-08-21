@@ -2061,6 +2061,12 @@ class APIServerAdapter(BasePlatformAdapter):
         encoded_cos_path = request.headers.get(
             "X-Hermes-Storyboard-Cos-Path-B64", ""
         ).strip()
+        platform_turn_ticket = request.headers.get(
+            "X-Hermes-Platform-Turn-Ticket", ""
+        ).strip()
+        platform_api_base = request.headers.get(
+            "X-Hermes-Platform-Api-Base", ""
+        ).strip()
 
         for label, value, limit in (
             ("session user ID", user_id, self._MAX_SESSION_HEADER_LEN),
@@ -2068,6 +2074,8 @@ class APIServerAdapter(BasePlatformAdapter):
             ("platform token", platform_token, 8192),
             ("encoded script name", encoded_script_name, 4096),
             ("encoded COS path", encoded_cos_path, 4096),
+            ("platform turn ticket", platform_turn_ticket, 256),
+            ("platform API base", platform_api_base, 512),
         ):
             if len(value) > limit or re.search(r"[\r\n\x00]", value):
                 return {}, web.json_response(
@@ -2127,6 +2135,8 @@ class APIServerAdapter(BasePlatformAdapter):
             "storyboard_platform_token": platform_token,
             "storyboard_script_name": script_name,
             "storyboard_cos_path": cos_path,
+            "platform_turn_ticket": platform_turn_ticket,
+            "platform_api_base": platform_api_base,
         }, None
 
     # ------------------------------------------------------------------
@@ -5990,6 +6000,8 @@ class APIServerAdapter(BasePlatformAdapter):
         storyboard_platform_token: str = "",
         storyboard_script_name: str = "",
         storyboard_cos_path: str = "",
+        platform_turn_ticket: str = "",
+        platform_api_base: str = "",
     ) -> list:
         """Bind session contextvars for an API-server agent run.
 
@@ -6018,6 +6030,8 @@ class APIServerAdapter(BasePlatformAdapter):
             storyboard_platform_token=storyboard_platform_token,
             storyboard_script_name=storyboard_script_name,
             storyboard_cos_path=storyboard_cos_path,
+            platform_turn_ticket=platform_turn_ticket,
+            platform_api_base=platform_api_base,
             async_delivery=False,
             cron_session="",
         )
@@ -6093,6 +6107,8 @@ class APIServerAdapter(BasePlatformAdapter):
                         "storyboard_script_name", ""
                     ),
                     storyboard_cos_path=session_context.get("storyboard_cos_path", ""),
+                    platform_turn_ticket=session_context.get("platform_turn_ticket", ""),
+                    platform_api_base=session_context.get("platform_api_base", ""),
                 )
                 agent = None
                 try:
@@ -6612,6 +6628,12 @@ class APIServerAdapter(BasePlatformAdapter):
                                 ),
                                 storyboard_cos_path=session_context.get(
                                     "storyboard_cos_path", ""
+                                ),
+                                platform_turn_ticket=session_context.get(
+                                    "platform_turn_ticket", ""
+                                ),
+                                platform_api_base=session_context.get(
+                                    "platform_api_base", ""
                                 ),
                                 session_id=session_id or "",
                             )
