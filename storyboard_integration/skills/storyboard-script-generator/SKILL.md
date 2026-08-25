@@ -6,7 +6,6 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [storyboard, script-generator, seedance, 分镜, 剧本, 脚本]
-    related_skills: [seedance-2.0, script-platform-api]
 ---
 
 # 分镜脚本生成器（Storyboard Script Generator）

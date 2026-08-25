@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-15",
-  "preparedAt": "2026-08-25T08:15:03.483039+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-16",
+  "preparedAt": "2026-08-25T09:26:30.979359+00:00",
   "files": [
     {
       "path": "agent/agent_runtime_helpers.py",
@@ -941,7 +941,7 @@
     },
     {
       "path": "storyboard_integration/skills/storyboard-script-generator/SKILL.md",
-      "sha256": "b779be74b9d3582c242d9a4c6941f44aefe58e87b6b67e1d7e1f425a6fbcce85"
+      "sha256": "0e04588261011135deecb4c24f4fa073397f7ffd68adc64125251aab087355ef"
     },
     {
       "path": "tools/scriptmaker_agent_tool.py",
