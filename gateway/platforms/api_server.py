@@ -4915,7 +4915,11 @@ class APIServerAdapter(BasePlatformAdapter):
                     await _emit_text_delta(agent_final)
                 if agent_final and not final_response_text:
                     final_response_text = agent_final
-                if isinstance(result, dict) and result.get("error") and not final_response_text:
+                if self._is_empty_tool_calls_failure(result):
+                    agent_error = _redact_api_error_text(
+                        result.get("error") or agent_final or "Agent request failed"
+                    )
+                elif isinstance(result, dict) and result.get("error") and not final_response_text:
                     agent_error = _redact_api_error_text(result["error"])
             except Exception as e:  # noqa: BLE001
                 logger.error("Error running agent for streaming responses: %s", e, exc_info=True)
@@ -5365,6 +5369,20 @@ class APIServerAdapter(BasePlatformAdapter):
                     status=500,
                 )
 
+        if self._is_empty_tool_calls_failure(result):
+            error_text = (
+                result.get("error")
+                or result.get("final_response")
+                or "Agent request failed"
+            )
+            return web.json_response(
+                _openai_error(
+                    _redact_api_error_text(error_text),
+                    err_type="server_error",
+                ),
+                status=502,
+            )
+
         final_response = _resolve_media_to_data_urls(result.get("final_response", ""))
         if not final_response:
             final_response = _redact_api_error_text(result.get("error", "(No response generated)"))
@@ -5796,6 +5814,19 @@ class APIServerAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     @staticmethod
+    def _is_empty_tool_calls_failure(result: Any) -> bool:
+        """Identify the strict-provider error fixed by message sanitization."""
+        if not isinstance(result, dict) or not (
+            result.get("failed")
+            or (result.get("error") and result.get("completed") is False)
+        ):
+            return False
+        error_text = str(result.get("error") or result.get("final_response") or "").lower()
+        return "tool_calls" in error_text and (
+            "empty" in error_text or "minimum length" in error_text
+        )
+
+    @staticmethod
     def _build_response_conversation_history(
         conversation_history: List[Dict[str, Any]],
         user_message: Any,
@@ -5817,6 +5848,14 @@ class APIServerAdapter(BasePlatformAdapter):
         agent_messages = result.get("messages") if isinstance(result, dict) else None
 
         if isinstance(agent_messages, list) and agent_messages:
+            # The real AIAgent path returns the complete (and sometimes
+            # repaired/normalized) transcript. Exact prefix comparison is
+            # not reliable after that repair, so trust the explicit marker
+            # stamped by _run_agent instead of concatenating prior history a
+            # second time.
+            if result.get("_messages_are_full_transcript"):
+                return list(agent_messages)
+
             turn_start = APIServerAdapter._response_messages_turn_start_index(
                 conversation_history,
                 user_message,
@@ -5855,6 +5894,14 @@ class APIServerAdapter(BasePlatformAdapter):
         agent_messages = result.get("messages") if isinstance(result, dict) else None
         if not isinstance(agent_messages, list) or not agent_messages:
             return 0
+
+        marked_turn_start = result.get("_response_turn_start_index")
+        if (
+            isinstance(marked_turn_start, int)
+            and not isinstance(marked_turn_start, bool)
+            and 0 <= marked_turn_start <= len(agent_messages)
+        ):
+            return marked_turn_start
 
         prior = list(conversation_history)
         current_user = {"role": "user", "content": user_message}
@@ -6141,6 +6188,27 @@ class APIServerAdapter(BasePlatformAdapter):
                         conversation_history=conversation_history,
                         task_id=effective_task_id,
                     )
+                    if isinstance(result, dict):
+                        # AIAgent returns its complete transcript, not merely
+                        # the current-turn suffix. Mark that contract so the
+                        # Responses store does not duplicate history when
+                        # repair_message_sequence normalized older messages.
+                        result["_messages_are_full_transcript"] = True
+                        result_messages = result.get("messages")
+                        if isinstance(result_messages, list):
+                            # Locate the caller's user turn from the end. The
+                            # loop may add synthetic continuation users later,
+                            # so matching the original input is safer than
+                            # simply selecting the last user role.
+                            for index in range(len(result_messages) - 1, -1, -1):
+                                message = result_messages[index]
+                                if (
+                                    isinstance(message, dict)
+                                    and message.get("role") == "user"
+                                    and message.get("content") == user_message
+                                ):
+                                    result["_response_turn_start_index"] = index + 1
+                                    break
                     usage = {
                         "input_tokens": getattr(agent, "session_prompt_tokens", 0) or 0,
                         "output_tokens": getattr(agent, "session_completion_tokens", 0) or 0,

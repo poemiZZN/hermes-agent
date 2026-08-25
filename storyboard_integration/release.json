@@ -4,12 +4,16 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-10",
-  "preparedAt": "2026-08-21T11:21:57.584479+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-12",
+  "preparedAt": "2026-08-25T03:21:11.507340+00:00",
   "files": [
     {
+      "path": "agent/agent_runtime_helpers.py",
+      "sha256": "c8dea88baca9b1521bd74058b71578c44a4c61d8322eb2beb4de51a58031affe"
+    },
+    {
       "path": "gateway/platforms/api_server.py",
-      "sha256": "b997a99c5c4cf5de9d70ee8b45b3de411d3e9b1de4e0d35181459a786fd57349"
+      "sha256": "4c258e35a1da0b3e66e39b487678621e9cd6463be2708a422e2a16f0a0f5e5e4"
     },
     {
       "path": "gateway/session_context.py",
@@ -78,6 +82,14 @@
     {
       "path": "storyboard_integration/skills/script-platform-api/storyboard-text/SKILL.md",
       "sha256": "4c16f155851906adc0123cd6ade748cbca8a0458da5b6ca00f2473ae6a9bc391"
+    },
+    {
+      "path": "storyboard_integration/skills/scriptmaker-baokuan-outline/references/baokuan-gongshi.md",
+      "sha256": "ff7cd5b1ce526a84e06e83d9e8a88c0e2114e3ff534321b25400b4ed09bf46b9"
+    },
+    {
+      "path": "storyboard_integration/skills/scriptmaker-baokuan-outline/SKILL.md",
+      "sha256": "91a2e3df65bdb1f9384aa881596f38d33d778940eb4817ac3a8c3329a3b43ccc"
     },
     {
       "path": "storyboard_integration/skills/scriptmaker-platform/DESCRIPTION.md",
