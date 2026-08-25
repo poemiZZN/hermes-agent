@@ -66,6 +66,8 @@ def assert_core_integration(fork_root: Path) -> None:
 
 _SCRIPTMAKER_TOOLS = {
     "ask_choice",
+    "read_attachment",
+    "write_attachment_draft",
     "prepare_script_generation",
     "confirm_script_generation",
     "list_projects",

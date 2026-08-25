@@ -6,7 +6,7 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [scriptmaker, 剧本医生, 审查, 质检, 逻辑漏洞, 钩子节奏, 导出, docx, scriptmaker-web]
-    related_skills: [scriptmaker-script-generation, scriptmaker-task-control]
+    related_skills: [scriptmaker-attachment-adaptation, scriptmaker-script-generation, scriptmaker-task-control]
 ---
 
 # Scriptmaker Doctor, Export and Navigation
@@ -21,7 +21,7 @@ Three tools, three distinct intents:
 
 ## `run_project_doctor`
 
-Runs one AI script-doctor skill over either a finished platform project **or** a complete script the user attached this turn.
+Runs one AI script-doctor skill over either a finished platform project **or** the complete script currently bound to this conversation.
 
 `skill` is required. Pick the one matching what the user actually asked for:
 
@@ -37,7 +37,7 @@ Rules:
 
 - If the user picked a skill in the UI, that selection wins — do not substitute another one.
 - If the request is vague, use `overall_dispatcher` rather than asking. Only ask when the user names two conflicting concerns.
-- **When an attachment exists this turn, the attachment is reviewed, not the project.** Do not demand that the user first create a project or run a framework analysis.
+- **When an attachment is bound to the conversation, the attachment is reviewed, not the project.** Do not demand that the user first create a project or run a framework analysis.
 - `user_goal` is optional; pass the user's own phrasing when they said what they care about.
 - A review needs at least ~50 characters of script text. Shorter input is rejected.
 

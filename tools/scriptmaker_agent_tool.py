@@ -274,6 +274,63 @@ _TOOL_SCHEMAS: List[Dict[str, Any]] = [
         }
     },
     {
+        "name": "read_attachment",
+        "description": "读取当前会话绑定的剧本文档。支持查看元数据、按字符偏移分块读取和关键词搜索；不会启动专业剧本团队。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "operation": {
+                    "type": "string",
+                    "enum": ["metadata", "read", "search"],
+                    "description": "metadata查看文件信息；read按offset读取；search查找关键词"
+                },
+                "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "read的起始字符位置"
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 500,
+                    "maximum": 8000,
+                    "description": "单次最多读取8000字符，默认6000"
+                },
+                "query": {
+                    "type": "string",
+                    "description": "search使用的关键词"
+                }
+            },
+            "required": ["operation"]
+        }
+    },
+    {
+        "name": "write_attachment_draft",
+        "description": "把当前模型直接改编的长篇结果分段保存为草稿并生成DOCX下载，不启动专业剧本团队。短内容应直接回复，不要使用此工具。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": ["start", "append", "finish"],
+                    "description": "start创建草稿；append追加一段；finish完成并生成下载入口"
+                },
+                "draft_id": {
+                    "type": "string",
+                    "description": "append和finish必须传入start返回的draft_id"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "start时的改编稿标题"
+                },
+                "content": {
+                    "type": "string",
+                    "description": "本次写入的改编正文，可在finish时为空"
+                }
+            },
+            "required": ["action"]
+        }
+    },
+    {
         "name": "prepare_script_generation",
         "description": "在字段齐全后准备一项专业剧本团队任务，只生成确认卡，不真正启动。",
         "parameters": {
@@ -488,6 +545,22 @@ registry.register(
     toolset="scriptmaker",
     schema=_SCHEMA_BY_NAME["get_project_status"],
     handler=_make_handler("get_project_status"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="read_attachment",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["read_attachment"],
+    handler=_make_handler("read_attachment"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="write_attachment_draft",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["write_attachment_draft"],
+    handler=_make_handler("write_attachment_draft"),
     emoji="SM",
     max_result_size_chars=_MAX_RESULT_CHARS,
 )

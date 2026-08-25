@@ -1,17 +1,19 @@
 ---
 name: scriptmaker-script-generation
-description: "Use when the user wants to create, generate, adapt, or plan a new script on the IDEA TO SCRIPT platform (新剧本, 短剧, 生成剧本, 故事骨架, 框架分析, 改编, 续写). Collects the required creative fields, produces a confirmation card, and only then starts the seven-node professional screenwriting team."
-version: 1.0.0
+description: "Use when the user explicitly wants the IDEA TO SCRIPT seven-node professional screenwriting team to create, generate, adapt, or plan a script (专业剧本团队, 七节点, 启动节点, 生成完整项目). Do not use for current-model-only attachment reading or adaptation."
+version: 1.1.0
 platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [scriptmaker, 剧本平台, 剧本生成, 短剧, 专业剧本团队, 框架分析, ask_choice, scriptmaker-web]
-    related_skills: [scriptmaker-task-control, scriptmaker-doctor-and-export]
+    related_skills: [scriptmaker-attachment-adaptation, scriptmaker-task-control, scriptmaker-doctor-and-export]
 ---
 
 # Scriptmaker Script Generation
 
-Use this skill when the user wants a **new** script produced or planned on the platform: a fresh idea, an adaptation of an uploaded document, a story framework, or a continuation.
+Use this skill only when the user wants a **new professional-team task** produced or planned on the platform: a fresh idea, a team adaptation of an uploaded document, a story framework, or a continuation through the seven-node workflow.
+
+If the user says 当前模型 / 直接在对话里 / 不要启动节点 / 不用专业团队, or simply asks to read, summarize, answer questions about, locally rewrite, or directly adapt the attachment without requesting a team workflow, use `scriptmaker-attachment-adaptation` instead. Never call `prepare_script_generation` or `confirm_script_generation` for that direct mode.
 
 It covers three tools, always used in this order:
 
@@ -80,11 +82,12 @@ After the tool returns `awaiting_user_input: true`, present the question and sto
 
 ## Attachments
 
-An uploaded file means only that the file is *available* this turn. **Uploading is never itself a request to analyze, review, adapt, restructure, or generate, and must not trigger any tool.**
+An uploaded file is bound to the current conversation until another attachment replaces it. **Uploading is never itself a request to analyze, review, adapt, restructure, or generate.**
 
-- Only when the user explicitly asks for 分析框架 / 拆解重构 / 改编生成 / 续写 may the attachment be used as source material — and 总集数 plus 主要角色数量 are still required first.
+- Only when the user explicitly asks the professional team / seven nodes to perform 分析框架 / 拆解重构 / 改编生成 / 续写 does this skill apply — and 总集数 plus 主要角色数量 are still required first.
+- Direct current-model reading, Q&A, rewriting or adaptation belongs to `scriptmaker-attachment-adaptation` and does not require team fields.
 - Only when the user explicitly asks for 审查 / 质检 / 剧本医生 / 优化 does this become a doctor request — use `scriptmaker-doctor-and-export` instead.
-- If the intent is unclear, ask which of those four they want. Do not call a tool.
+- If the intent is unclear, ask whether they want the current model to handle it directly or start the professional team. Do not start a team tool.
 - **Never quote the attachment's full text back into the conversation.** The platform reads it server-side after confirmation; repeating it re-bills the whole script every turn.
 
 ## Distillation skills

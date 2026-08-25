@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-12",
-  "preparedAt": "2026-08-25T03:21:11.507340+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-13",
+  "preparedAt": "2026-08-25T04:13:34.398579+00:00",
   "files": [
     {
       "path": "agent/agent_runtime_helpers.py",
@@ -25,7 +25,7 @@
     },
     {
       "path": "storyboard_integration/install_runtime.py",
-      "sha256": "ddc343e8b1b10d9a22e1809b128ad37aabcc2eec80782b243c8f8e8b2a3afafe"
+      "sha256": "d00593411a5ec501594e58734472629f1a5a3917dddbf4030b826f450df6645e"
     },
     {
       "path": "storyboard_integration/skills/art-asset-production/references/character-assets.md",
@@ -92,16 +92,20 @@
       "sha256": "91a2e3df65bdb1f9384aa881596f38d33d778940eb4817ac3a8c3329a3b43ccc"
     },
     {
+      "path": "storyboard_integration/skills/scriptmaker-platform/attachment-adaptation/SKILL.md",
+      "sha256": "751de3419157df9e66e625c9abd2eef185695c77b90349e0e575b940f1d2afd9"
+    },
+    {
       "path": "storyboard_integration/skills/scriptmaker-platform/DESCRIPTION.md",
-      "sha256": "22b4ec7d3b3e1dfcb22778e8422c7c6f91e9e0565350da08eb50d09d8f53cb67"
+      "sha256": "dd8fde635ee2babc61bb25b98496542b91ba393bdc7cbe0b042e38c95f6dfb51"
     },
     {
       "path": "storyboard_integration/skills/scriptmaker-platform/doctor-and-export/SKILL.md",
-      "sha256": "e3a689d595b2ba94287ae6ade6b62b62c3aa1e3c49854841b823e9344159feb2"
+      "sha256": "3d9fc22e50a08aecd50f000ce8bfdc9bf38a252f32f7c822909f263269676362"
     },
     {
       "path": "storyboard_integration/skills/scriptmaker-platform/script-generation/SKILL.md",
-      "sha256": "e772641a286dbc58c686c333ff180343b74d58b68b83c1a566fd8e7f5173de8f"
+      "sha256": "43ee9e257a913d4e28921b3278a0822f862b490267132478634126862ec75960"
     },
     {
       "path": "storyboard_integration/skills/scriptmaker-platform/task-control/SKILL.md",
@@ -929,7 +933,7 @@
     },
     {
       "path": "tools/scriptmaker_agent_tool.py",
-      "sha256": "c4eea73affb42a9a07ad4b62a4d583e3156b42d0fdcdf2f961838d2ae135624a"
+      "sha256": "595b0e7cd868ec6993db81bf0f18faa45a7d3e11496b1e484283de83c32e8275"
     },
     {
       "path": "tools/storyboard_api_tool.py",
