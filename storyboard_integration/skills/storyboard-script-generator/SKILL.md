@@ -1,7 +1,7 @@
 ---
 name: storyboard-script-generator
 description: "把完整的文学剧本拆解为结构化分镜脚本（Storyboard Script Generator），支持 Seedance 2.0 / 2.5 等 AI 视频生成模型。当用户需要写分镜脚本、把剧本拆成分镜、生成 AI 视频分镜、做 Seedance 分镜，或将剧本内容转化为结构化分镜脚本时使用。"
-version: 1.0.0
+version: 1.1.0
 platforms: [linux, macos, windows]
 metadata:
   hermes:
@@ -245,7 +245,6 @@ metadata:
 
 - `references/segment-rules.md` — 段落划分规则详解与案例
 - `references/translation-guide.md` — 对白翻译指南与多语种对照
-- 同时可参考 `storyboard-director` 技能的以下参考资料：
-  - `references/cinematography-vocab.md` — 景别/机位/运镜专业词表
-  - `references/emotion-library.md` — 情绪三维拆解法与词库
-  - `references/negative-constraints.md` — AI 视频通病负面约束清单
+- `references/cinematography-vocab.md` — 景别/机位/运镜专业词表
+- `references/emotion-library.md` — 情绪三维拆解法与词库
+- `references/negative-constraints.md` — AI 视频通病负面约束清单

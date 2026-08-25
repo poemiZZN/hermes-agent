@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-14",
-  "preparedAt": "2026-08-25T04:19:26.466128+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-15",
+  "preparedAt": "2026-08-25T08:15:03.483039+00:00",
   "files": [
     {
       "path": "agent/agent_runtime_helpers.py",
@@ -920,6 +920,18 @@
       "sha256": "faf2de9bc989c7238fe2ae447c46bc99bdb6940707789dd68107998e8e01a59d"
     },
     {
+      "path": "storyboard_integration/skills/storyboard-script-generator/references/cinematography-vocab.md",
+      "sha256": "12e95581b4e51d9248f0d3ed5dfa3a9e186a39cad0d620d7f3ecafb2426fe926"
+    },
+    {
+      "path": "storyboard_integration/skills/storyboard-script-generator/references/emotion-library.md",
+      "sha256": "69984eac645c93e15a537abd2b843bf198a450d88fb79e34f71dca2516d1734b"
+    },
+    {
+      "path": "storyboard_integration/skills/storyboard-script-generator/references/negative-constraints.md",
+      "sha256": "cb5247b2c304b2651d1a7a378ddd9dc8f95a2dafdbfc95e78c19060f9d3cf2ce"
+    },
+    {
       "path": "storyboard_integration/skills/storyboard-script-generator/references/segment-rules.md",
       "sha256": "9625e4e637010a9539743c59f56dc88193ff9d57dc88c151953e43e0ae9b04f7"
     },
@@ -929,7 +941,7 @@
     },
     {
       "path": "storyboard_integration/skills/storyboard-script-generator/SKILL.md",
-      "sha256": "26d98ad442290b3982bbae8abb7e09f8619971f779af7ca38b223c44b123b97a"
+      "sha256": "b779be74b9d3582c242d9a4c6941f44aefe58e87b6b67e1d7e1f425a6fbcce85"
     },
     {
       "path": "tools/scriptmaker_agent_tool.py",
