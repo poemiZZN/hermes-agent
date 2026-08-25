@@ -145,6 +145,8 @@ TOOLSETS = {
         "description": "Scriptmaker conversational script platform operations",
         "tools": [
             "ask_choice",
+            "read_attachment",
+            "write_attachment_draft",
             "prepare_script_generation",
             "confirm_script_generation",
             "list_projects",
