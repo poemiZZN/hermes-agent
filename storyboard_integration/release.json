@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-13",
-  "preparedAt": "2026-08-25T04:13:34.398579+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-14",
+  "preparedAt": "2026-08-25T04:19:26.466128+00:00",
   "files": [
     {
       "path": "agent/agent_runtime_helpers.py",
@@ -945,7 +945,7 @@
     },
     {
       "path": "toolsets.py",
-      "sha256": "04ceb06c330cc3f1d0421a915ceb19ea797ee401fa11e616261237d12ca25d00"
+      "sha256": "661127c6b0ff338fcb849054776cf5f9d68f4645417db13f459749e6445c1428"
     }
   ]
 }
