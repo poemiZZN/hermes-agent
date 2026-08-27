@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-16",
-  "preparedAt": "2026-08-25T09:26:30.979359+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-17",
+  "preparedAt": "2026-08-27T07:36:09.024087+00:00",
   "files": [
     {
       "path": "agent/agent_runtime_helpers.py",
@@ -942,6 +942,38 @@
     {
       "path": "storyboard_integration/skills/storyboard-script-generator/SKILL.md",
       "sha256": "0e04588261011135deecb4c24f4fa073397f7ffd68adc64125251aab087355ef"
+    },
+    {
+      "path": "storyboard_integration/skills/wan3-drama-prompt-v2/references/drama-diagnosis.md",
+      "sha256": "43127d057f3b7bf1d62867aadbb6631aa31ece7426a8a640622cb28950577b31"
+    },
+    {
+      "path": "storyboard_integration/skills/wan3-drama-prompt-v2/references/drama-templates.md",
+      "sha256": "de8a434bde5f97986eaea818ed35a680bf7da17e1df4e3dd796417a901dcbb3c"
+    },
+    {
+      "path": "storyboard_integration/skills/wan3-drama-prompt-v2/references/exemplars.md",
+      "sha256": "2ebda4bd281e9dad621df79fd0e2de0fd6b2445f3e916cef384525cc3c859da6"
+    },
+    {
+      "path": "storyboard_integration/skills/wan3-drama-prompt-v2/references/prompt-craft-discipline.md",
+      "sha256": "a58d5af86cb2724d9bccea3e556ed34ad0f16060e0bce0c7af1342a62dec95d6"
+    },
+    {
+      "path": "storyboard_integration/skills/wan3-drama-prompt-v2/references/shot-language.md",
+      "sha256": "782d6def1cf262ac36f256be6cd2bab2a96c396f1dcb440ed2e4740df9ae9ae2"
+    },
+    {
+      "path": "storyboard_integration/skills/wan3-drama-prompt-v2/references/wan3-formulas.md",
+      "sha256": "d46d98b8175b57dba68b6dd2f9a34173b40d59ecd3240e48e923b5535200c108"
+    },
+    {
+      "path": "storyboard_integration/skills/wan3-drama-prompt-v2/references/wan3-protocol.md",
+      "sha256": "48fc8b80e3feef35130034ac0675884a51c9c5344a54de6ac4d9ee1c715cdddc"
+    },
+    {
+      "path": "storyboard_integration/skills/wan3-drama-prompt-v2/SKILL.md",
+      "sha256": "7d848a853280aa758f5989d41791856376cb02b2d2754e5a695b159505e2114c"
     },
     {
       "path": "tools/scriptmaker_agent_tool.py",
