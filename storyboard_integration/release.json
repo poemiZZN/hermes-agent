@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-18",
-  "preparedAt": "2026-08-31T03:37:48.639186+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-19",
+  "preparedAt": "2026-08-31T03:40:24.317034+00:00",
   "files": [
     {
       "path": "agent/agent_runtime_helpers.py",
@@ -25,7 +25,7 @@
     },
     {
       "path": "storyboard_integration/install_runtime.py",
-      "sha256": "d00593411a5ec501594e58734472629f1a5a3917dddbf4030b826f450df6645e"
+      "sha256": "e9bf2233f2a360fea77cfeacceebc4c1f0b4dece51a470d98fbad81aac419899"
     },
     {
       "path": "storyboard_integration/skills/art-asset-production/references/character-assets.md",

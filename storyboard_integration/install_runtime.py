@@ -175,16 +175,39 @@ def remove_readonly(func, path: str, _error) -> None:
     func(path)
 
 
+def backup_and_remove_skill(destination: Path, backup_root: Path) -> None:
+    backup_root.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(destination, backup_root / destination.name)
+    shutil.rmtree(destination, onerror=remove_readonly)
+
+
 def install_skill(source: Path, skills_root: Path, backup_root: Path) -> Path:
     destination = (skills_root / source.name).resolve()
     if destination.parent != skills_root.resolve():
         fail(f"Unsafe skill destination: {destination}")
     if destination.exists():
-        backup_root.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(destination, backup_root / source.name)
-        shutil.rmtree(destination, onerror=remove_readonly)
+        backup_and_remove_skill(destination, backup_root)
     shutil.copytree(source, destination)
     return destination
+
+
+def stale_managed_skills(state_path: Path, skills_root: Path, desired_names: set[str]) -> list[Path]:
+    if not state_path.is_file():
+        return []
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError) as error:
+        fail(f"Unable to read previous integration state: {state_path}: {error}")
+
+    resolved_root = skills_root.resolve()
+    stale: list[Path] = []
+    for raw_path in state.get("skills") or []:
+        destination = Path(str(raw_path)).expanduser().resolve()
+        if destination.parent != resolved_root:
+            fail(f"Unsafe managed skill path in previous integration state: {destination}")
+        if destination.name not in desired_names and destination.exists():
+            stale.append(destination)
+    return sorted(set(stale))
 
 
 def verify_installed_skill(source: Path, destination: Path) -> None:
@@ -232,6 +255,22 @@ def main() -> int:
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     backup_root = hermes_home / "integration-backups" / f"fork-{timestamp}" / "skills"
+    state_root = hermes_home / "integration-state"
+    state_path = state_root / "storyboard-platform-fork.json"
+    stale_skills = stale_managed_skills(
+        state_path,
+        skills_root,
+        {source.name for source in skill_sources},
+    )
+    if args.check and stale_skills:
+        fail(
+            "Stale managed Skills are still installed: "
+            + ", ".join(path.name for path in stale_skills)
+        )
+    if not args.check:
+        for destination in stale_skills:
+            backup_and_remove_skill(destination, backup_root)
+
     installed: list[Path] = []
     skills_root.mkdir(parents=True, exist_ok=True)
     for source in skill_sources:
@@ -252,7 +291,6 @@ def main() -> int:
         if missing:
             fail(f"Required Hermes environment variables are missing: {', '.join(missing)}")
 
-    state_root = hermes_home / "integration-state"
     state_root.mkdir(parents=True, exist_ok=True)
     state = {
         "name": release.get("name"),
@@ -263,7 +301,7 @@ def main() -> int:
         "skills": [str(path) for path in installed],
         "checkOnly": bool(args.check),
     }
-    (state_root / "storyboard-platform-fork.json").write_text(
+    state_path.write_text(
         json.dumps(state, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
