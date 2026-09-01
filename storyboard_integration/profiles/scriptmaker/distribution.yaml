@@ -1,6 +1,6 @@
 name: scriptmaker
-version: 1.0.0
-description: IDEA TO SCRIPT profile for conversational script generation, attachment adaptation, task control, review, and export.
+version: 1.1.0
+description: IDEA TO SCRIPT profile for full-cycle script development, adaptation, language polishing, review, task control, and export.
 hermes_requires: ">=0.20.0,<0.21.0"
 author: storyboard-web
 env_requires:

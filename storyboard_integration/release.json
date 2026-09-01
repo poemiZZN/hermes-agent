@@ -4,8 +4,8 @@
   "hermesVersion": "0.20.0",
   "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-21",
-  "preparedAt": "2026-09-01T07:41:48.673033+00:00",
+  "releaseTag": "storyboard-hermes-v0.20.0-22",
+  "preparedAt": "2026-09-01T08:08:26.100874+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -16,7 +16,13 @@
       "routes": [],
       "skills": [
         "scriptmaker-platform",
-        "scriptmaker-baokuan-outline"
+        "scriptmaker-baokuan-outline",
+        "换壳",
+        "剧本-故事大纲",
+        "剧本全流程",
+        "剧本语言梳理",
+        "剧本自检",
+        "融合剧"
       ]
     },
     {
@@ -80,7 +86,7 @@
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/distribution.yaml",
-      "sha256": "031af890ef834327c79c56d624f08a1cb5676295abfe637032fe4b8154e82ba8"
+      "sha256": "1c755164cf2be206fd0b80acb89a448a0491258a48f28356a5ecb00cc4a63f7a"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/references/baokuan-gongshi.md",
@@ -109,6 +115,70 @@
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/task-control/SKILL.md",
       "sha256": "80296e89896e537b2dcd76dd04434b3c060f3c78495dbec45a03585598a4148d"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本-故事大纲/references/baokuan-gongshi.md",
+      "sha256": "ff7cd5b1ce526a84e06e83d9e8a88c0e2114e3ff534321b25400b4ed09bf46b9"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本-故事大纲/SKILL.md",
+      "sha256": "6961773d39aa4308231f6ef688a98fb689b2c715de7feb215b38fa847426ae68"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/references/api_reference.md",
+      "sha256": "3b41d643f5cad82ce99f5a7711ba9c817e6f74d02d219d4814d6085b3bbba81b"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/references/底层逻辑记忆.md",
+      "sha256": "b56c1655c7b17af1787bf41731cfd0ca73a340100be924c9c6e401755355cbe1"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/references/润色_狼王模板_动作表情写作手法.md",
+      "sha256": "d7918291839ed0ae5e4ad7cf6c064062c59316e34031b0e350508c12f265ea40"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/references/网感_单身狗系统_细节标准分析.md",
+      "sha256": "40c0fdd7edce94b17d5873f6559da4d29cffaa8cb215d7ef00315ae5cb9022df"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/SKILL.md",
+      "sha256": "6b1473bbcdf7c99813ae9e1954e41204ad0b80267fb2d7452b7743d69ac6944d"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本自检/SKILL.md",
+      "sha256": "af0aa7cf62a07a52ac19770e5bf725edd06f85e4c2c03dea771972d46e7075aa"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本语言梳理/references/humanizing_rules.md",
+      "sha256": "d4d1bf60a83298a0ac97900f6b3cddf6f53168a1bdbb48047d800a2f2adb8130"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本语言梳理/SKILL.md",
+      "sha256": "9da439e9f74e00811c572308508236cda3c346d87b8a64113d670db5ab563a80"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/references/adaptation-engine.md",
+      "sha256": "f289d40ab9d51367bb3f0831757bb93109ab210df9079c6478a3fbb2ad99fd63"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/references/quality-checklist.md",
+      "sha256": "aebbee4f12b6c797f35351d3fc1343c4d8c538795c23e8ad581a0c8dc50d23eb"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/references/tag-matrix.md",
+      "sha256": "e51bdb167d01620f1352c9aaf27857b436098c2f948bf28b54e86099651c1db2"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/references/us-drama-conventions.md",
+      "sha256": "b544bef915966a98e99add4fea8dfb6eadb911c359df2febfad2ce48392f3729"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/SKILL.md",
+      "sha256": "1bc574f26ae446ccfd9948eebadad6fc8516d38e6ef6b3d3d49c990f4e2f28bd"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/融合剧/SKILL.md",
+      "sha256": "482007b8c160ef60843833210365edc78aa322792c7592113086d78470641526"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/SOUL.md",
