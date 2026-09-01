@@ -21,7 +21,16 @@ def fail(message: str) -> None:
 
 def sha256(path: Path) -> str:
     data = path.read_bytes()
-    if path.suffix.lower() in {".json", ".md", ".py", ".toml", ".yaml", ".yml"}:
+    if path.suffix.lower() in {
+        ".example",
+        ".json",
+        ".md",
+        ".py",
+        ".template",
+        ".toml",
+        ".yaml",
+        ".yml",
+    }:
         try:
             text = data.decode("utf-8")
             data = text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
