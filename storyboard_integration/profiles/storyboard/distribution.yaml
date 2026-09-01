@@ -1,0 +1,26 @@
+name: storyboard
+version: 1.0.0
+description: Storyboard production profile for script ingestion, visual asset planning, image generation, and video prompt authoring.
+hermes_requires: ">=0.20.0,<0.21.0"
+author: storyboard-web
+env_requires:
+  - name: API_SERVER_KEY
+    description: Distinct profile-scoped key (at least 16 characters) used to authenticate /p/storyboard API requests.
+    required: true
+  - name: STORYBOARD_API_BASE
+    description: Base URL of the Storyboard platform API.
+    required: true
+  - name: HERMES_AGENT_CLIENT_ID
+    description: OAuth client ID for non-embedded Storyboard entry points.
+    required: true
+  - name: HERMES_AGENT_CLIENT_SECRET
+    description: OAuth client secret for non-embedded Storyboard entry points.
+    required: true
+  - name: ZENMUX_API_KEY
+    description: Optional API key for ZenMux video analysis.
+    required: false
+distribution_owned:
+  - SOUL.md
+  - config.yaml
+  - .env.template
+  - skills/

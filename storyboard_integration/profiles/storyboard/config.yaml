@@ -1,0 +1,23 @@
+toolsets:
+  - hermes-cli
+
+platform_toolsets:
+  api_server:
+    - skills
+    - memory
+    - session_search
+    - storyboard
+  wecom:
+    - skills
+    - memory
+    - session_search
+    - storyboard
+  wecom_callback:
+    - skills
+    - memory
+    - session_search
+    - storyboard
+
+agent:
+  disabled_toolsets:
+    - scriptmaker

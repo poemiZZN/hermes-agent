@@ -156,10 +156,6 @@ def gui_toolset_label(label: str) -> str:
 # setup. The tool's check_fn means the schema still won't appear to the
 # model if the credential later goes missing or expires.
 _DEFAULT_OFF_TOOLSETS = {"homeassistant", "spotify", "discord", "discord_admin", "video", "video_gen", "x_search", "a2a"}
-_STORYBOARD_AUTO_PLATFORMS = {"api_server", "wecom", "wecom_callback"}
-# Scriptmaker reaches Hermes only through the authenticated API server, and
-# its tools need a turn ticket that no other entry point can supply.
-_SCRIPTMAKER_AUTO_PLATFORMS = {"api_server"}
 
 
 # Config-only capabilities: they appear in `hermes tools` for provider/API-key
@@ -2485,15 +2481,6 @@ def _get_platform_tools(
             enabled_toolsets.update(enabled_mcp_servers)
     else:
         enabled_toolsets.update(explicit_mcp_servers)
-
-    # Storyboard sessions enter through the platform API or enterprise WeChat.
-    # Keep this integration available even when an existing installation has
-    # an explicit per-platform toolset list created before Storyboard existed.
-    if platform in _STORYBOARD_AUTO_PLATFORMS:
-        enabled_toolsets.add("storyboard")
-
-    if platform in _SCRIPTMAKER_AUTO_PLATFORMS:
-        enabled_toolsets.add("scriptmaker")
 
     # Honor agent.disabled_toolsets from config.yaml — allows users to
     # globally suppress specific toolsets (e.g. "memory") across all

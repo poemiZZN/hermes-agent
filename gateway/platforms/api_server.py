@@ -2048,10 +2048,10 @@ class APIServerAdapter(BasePlatformAdapter):
 
         return raw, None
 
-    def _parse_storyboard_session_headers(
+    def _parse_platform_session_headers(
         self, request: "web.Request"
     ) -> tuple[Dict[str, str], Optional["web.Response"]]:
-        """Snapshot authenticated storyboard headers for one agent run."""
+        """Snapshot authenticated platform headers for one profile-scoped run."""
         user_id = request.headers.get("X-Hermes-Session-User-Id", "").strip()
         user_name = request.headers.get("X-Hermes-Session-User-Name", "").strip()
         platform_token = request.headers.get("X-Platform-Token", "").strip()
@@ -2082,6 +2082,28 @@ class APIServerAdapter(BasePlatformAdapter):
                     _openai_error(f"Invalid {label}", code="invalid_session_context"),
                     status=400,
                 )
+
+        request_profile = _api_request_profile.get()
+        if request_profile == "storyboard" and (
+            platform_turn_ticket or platform_api_base
+        ):
+            return {}, web.json_response(
+                _openai_error(
+                    "Scriptmaker context is not valid for storyboard profile",
+                    code="profile_context_mismatch",
+                ),
+                status=400,
+            )
+        if request_profile == "scriptmaker" and (
+            encoded_script_name or encoded_cos_path
+        ):
+            return {}, web.json_response(
+                _openai_error(
+                    "Storyboard context is not valid for scriptmaker profile",
+                    code="profile_context_mismatch",
+                ),
+                status=400,
+            )
 
         script_name = ""
         if encoded_script_name:
@@ -3561,7 +3583,7 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
-        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        api_session_context, context_err = self._parse_platform_session_headers(request)
         if context_err is not None:
             return context_err
         session_id = request.match_info["session_id"]
@@ -3682,7 +3704,7 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
-        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        api_session_context, context_err = self._parse_platform_session_headers(request)
         if context_err is not None:
             return context_err
         session_id = request.match_info["session_id"]
@@ -4001,7 +4023,7 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
-        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        api_session_context, context_err = self._parse_platform_session_headers(request)
         if context_err is not None:
             return context_err
 
@@ -5124,7 +5146,7 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
-        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        api_session_context, context_err = self._parse_platform_session_headers(request)
         if context_err is not None:
             return context_err
 
@@ -6464,7 +6486,7 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
-        api_session_context, context_err = self._parse_storyboard_session_headers(request)
+        api_session_context, context_err = self._parse_platform_session_headers(request)
         if context_err is not None:
             return context_err
 
