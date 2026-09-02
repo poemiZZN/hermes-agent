@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
   "name": "storyboard-scriptmaker-hermes-integration",
-  "hermesVersion": "0.20.0",
-  "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
+  "hermesVersion": "0.21.0",
+  "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.20.0-22",
-  "preparedAt": "2026-09-01T08:08:26.100874+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-1",
+  "preparedAt": "2026-09-02T01:50:43.848517+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -57,20 +57,24 @@
   ],
   "files": [
     {
-      "path": "agent/agent_runtime_helpers.py",
-      "sha256": "c8dea88baca9b1521bd74058b71578c44a4c61d8322eb2beb4de51a58031affe"
+      "path": "gateway/platforms/api_server.py",
+      "sha256": "519d47043a11c478daaf75fc95ca876457b416116d44d122ae6c555e72716a4b"
     },
     {
-      "path": "gateway/platforms/api_server.py",
-      "sha256": "857f61550ec8a8d4e0e5cea4fd8cdf5098c20a8a6686381879a795aad5ec7395"
+      "path": "gateway/platforms/api_server_runs.py",
+      "sha256": "207f7b2c922ec74834458a5e01003b36a8675322c5d017e6d48915ea0587d2e1"
     },
     {
       "path": "gateway/session_context.py",
-      "sha256": "0cdc9e4376382973e79d0f81a68e712525b3a94435850f74fd4631ffd88f5ef3"
+      "sha256": "98133bfc32f68c37dae6e9ecc14be4c19e49fe552623a22b5737c6b81f036613"
+    },
+    {
+      "path": "hermes_cli/stdio.py",
+      "sha256": "57972693c04f81cd640d8527d675ba7d237ae5048324d940fad7971b7eaefa8b"
     },
     {
       "path": "hermes_cli/tools_config.py",
-      "sha256": "0e8e00b876d63f055356be9d011897dbdc1312ef76bae3ec2b0dbf31e49daab9"
+      "sha256": "8c5fa8049a0fe22954389ad54825bfc1def355e0f23139a77e0cbc00c9cb1c51"
     },
     {
       "path": "storyboard_integration/install_runtime.py",
@@ -86,7 +90,7 @@
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/distribution.yaml",
-      "sha256": "1c755164cf2be206fd0b80acb89a448a0491258a48f28356a5ecb00cc4a63f7a"
+      "sha256": "546540a3477ff57997542f5e2e405c07dbbd0e6056f7c27ab1a67450879f43af"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/references/baokuan-gongshi.md",
@@ -194,7 +198,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "1313ffb00a639f7d0b17f3e5daf3b3cb41a966ed822392a4689ea1b2de8ed59b"
+      "sha256": "261a3ad7061239d14849aaefa42abb38aaea0839f5d0db6a9cbf8fa9d0417b19"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -317,6 +321,10 @@
       "sha256": "de46de1486585f9b02073a06873dbb21804cdaefee52129e9a6cd3d21071205b"
     },
     {
+      "path": "tests/tools/test_windows_native_support.py",
+      "sha256": "34958aa644cf1c9755fa862b110759a20bfa0411865a888ba733f404d06cc8ae"
+    },
+    {
       "path": "tools/scriptmaker_agent_tool.py",
       "sha256": "595b0e7cd868ec6993db81bf0f18faa45a7d3e11496b1e484283de83c32e8275"
     },
@@ -330,7 +338,7 @@
     },
     {
       "path": "toolsets.py",
-      "sha256": "661127c6b0ff338fcb849054776cf5f9d68f4645417db13f459749e6445c1428"
+      "sha256": "a91434df789f82f15ac2a533fd91b487e82a397bf2b1aa9edba217c83b318d58"
     }
   ]
 }
