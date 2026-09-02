@@ -427,6 +427,9 @@ async def _handle_runs(
     gateway_session_key, key_err = self._parse_session_key_header(request)
     if key_err is not None:
         return key_err
+    api_session_context, context_err = self._parse_platform_session_headers(request)
+    if context_err is not None:
+        return context_err
 
     try:
         body = await request.json()
@@ -799,6 +802,23 @@ async def _handle_runs(
                             ),
                             browser_control_transport_family=(
                                 request_browser_control_transport_family
+                            ),
+                            user_id=api_session_context.get("user_id", ""),
+                            user_name=api_session_context.get("user_name", ""),
+                            storyboard_platform_token=api_session_context.get(
+                                "storyboard_platform_token", ""
+                            ),
+                            storyboard_script_name=api_session_context.get(
+                                "storyboard_script_name", ""
+                            ),
+                            storyboard_cos_path=api_session_context.get(
+                                "storyboard_cos_path", ""
+                            ),
+                            platform_turn_ticket=api_session_context.get(
+                                "platform_turn_ticket", ""
+                            ),
+                            platform_api_base=api_session_context.get(
+                                "platform_api_base", ""
                             ),
                         )
                         if room_dispatch is not None:

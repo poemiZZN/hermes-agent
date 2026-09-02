@@ -66,6 +66,155 @@ class TestConfigureWindowsStdio:
         # Second call returns False because _CONFIGURED is set
         assert stdio.configure_windows_stdio() is False
 
+    def test_windows_path_sets_env_and_reconfigures_streams(self, monkeypatch):
+        from hermes_cli import stdio
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        # Pretend the user has no prior setting
+        monkeypatch.delenv("PYTHONIOENCODING", raising=False)
+        monkeypatch.delenv("PYTHONUTF8", raising=False)
+        monkeypatch.delenv("HERMES_DISABLE_WINDOWS_UTF8", raising=False)
+        monkeypatch.delenv("EDITOR", raising=False)
+        monkeypatch.delenv("VISUAL", raising=False)
+
+        reconfigure_calls = []
+
+        def fake_reconfigure(stream, *, encoding="utf-8", errors="replace"):
+            reconfigure_calls.append((stream, encoding, errors))
+
+        cp_calls = []
+
+        def fake_flip():
+            cp_calls.append(True)
+
+        monkeypatch.setattr(stdio, "_reconfigure_stream", fake_reconfigure)
+        monkeypatch.setattr(stdio, "_flip_console_code_page_to_utf8", fake_flip)
+        # Pretend notepad.exe is on PATH (it always is on real Windows hosts,
+        # but not on the Linux CI runner — mock it so the editor default
+        # survives).
+        monkeypatch.setattr(stdio, "_default_windows_editor", lambda: "notepad")
+
+        result = stdio.configure_windows_stdio()
+        assert result is True
+        assert os.environ.get("PYTHONIOENCODING") == "utf-8"
+        assert os.environ.get("PYTHONUTF8") == "1"
+        # EDITOR must be set so prompt_toolkit's open_in_editor finds
+        # a working program on Windows (it defaults to /usr/bin/nano).
+        assert os.environ.get("EDITOR") == "notepad"
+        assert len(cp_calls) == 1  # SetConsoleOutputCP path hit
+        assert len(reconfigure_calls) == 3  # stdout, stderr, stdin
+
+    def test_running_venv_precedes_stale_hermes_venv(self, monkeypatch):
+        from hermes_cli import stdio
+
+        own_venv = os.path.join("", "fork", ".venv")
+        own_scripts = os.path.join(own_venv, "Scripts")
+        stale_scripts = os.path.join("", "stock", "venv", "Scripts")
+        system_scripts = os.path.join("", "system", "bin")
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        monkeypatch.setattr(stdio.sys, "prefix", own_venv)
+        monkeypatch.setattr(
+            stdio.os.path,
+            "isdir",
+            lambda path: os.path.normpath(path) == os.path.normpath(own_scripts),
+        )
+        monkeypatch.setenv("LOCALAPPDATA", os.path.join("", "local"))
+        monkeypatch.setenv(
+            "PATH",
+            os.pathsep.join([stale_scripts, own_scripts, system_scripts]),
+        )
+
+        stdio._augment_path_with_known_tools()
+
+        entries = os.environ["PATH"].split(os.pathsep)
+        assert entries[0] == os.path.normpath(own_scripts)
+        assert entries.count(os.path.normpath(own_scripts)) == 1
+        assert entries.index(stale_scripts) > entries.index(own_scripts)
+
+    def test_known_tools_still_prepend_without_interpreter_scripts(
+        self, monkeypatch
+    ):
+        from hermes_cli import stdio
+
+        local_appdata = os.path.join("", "local")
+        git_cmd = os.path.join(local_appdata, "hermes", "git", "cmd")
+        system_scripts = os.path.join("", "system", "bin")
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        monkeypatch.setattr(stdio.sys, "prefix", os.path.join("", "missing"))
+        monkeypatch.setattr(
+            stdio.os.path,
+            "isdir",
+            lambda path: os.path.normpath(path) == os.path.normpath(git_cmd),
+        )
+        monkeypatch.setenv("LOCALAPPDATA", local_appdata)
+        monkeypatch.setenv("PATH", system_scripts)
+
+        stdio._augment_path_with_known_tools()
+
+        assert os.environ["PATH"].split(os.pathsep) == [git_cmd, system_scripts]
+
+    def test_respects_existing_editor_var(self, monkeypatch):
+        """User's explicit EDITOR wins over our default."""
+        from hermes_cli import stdio
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        monkeypatch.setenv("EDITOR", "code --wait")
+        monkeypatch.setattr(stdio, "_reconfigure_stream", lambda *a, **kw: None)
+        monkeypatch.setattr(stdio, "_flip_console_code_page_to_utf8", lambda: None)
+        monkeypatch.setattr(stdio, "_default_windows_editor", lambda: "notepad")
+
+        stdio.configure_windows_stdio()
+        assert os.environ["EDITOR"] == "code --wait"
+
+    def test_respects_existing_visual_var(self, monkeypatch):
+        """VISUAL takes precedence over our EDITOR default too."""
+        from hermes_cli import stdio
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        monkeypatch.delenv("EDITOR", raising=False)
+        monkeypatch.setenv("VISUAL", "nvim")
+        monkeypatch.setattr(stdio, "_reconfigure_stream", lambda *a, **kw: None)
+        monkeypatch.setattr(stdio, "_flip_console_code_page_to_utf8", lambda: None)
+        monkeypatch.setattr(stdio, "_default_windows_editor", lambda: "notepad")
+
+        stdio.configure_windows_stdio()
+        # EDITOR should NOT be set when VISUAL already is (prompt_toolkit
+        # checks VISUAL first anyway, but we also shouldn't override it).
+        assert os.environ.get("EDITOR", "") != "notepad"
+        assert os.environ["VISUAL"] == "nvim"
+
+    def test_respects_existing_env_var(self, monkeypatch):
+        """User's explicit PYTHONIOENCODING wins over our default."""
+        from hermes_cli import stdio
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        monkeypatch.setenv("PYTHONIOENCODING", "latin-1")
+        monkeypatch.setattr(stdio, "_reconfigure_stream", lambda *a, **kw: None)
+        monkeypatch.setattr(stdio, "_flip_console_code_page_to_utf8", lambda: None)
+
+        stdio.configure_windows_stdio()
+        assert os.environ["PYTHONIOENCODING"] == "latin-1"
+
+    @pytest.mark.parametrize("optout", ["1", "true", "True", "yes"])
+    def test_disable_flag_short_circuits(self, monkeypatch, optout):
+        from hermes_cli import stdio
+
+        monkeypatch.setattr(stdio, "is_windows", lambda: True)
+        monkeypatch.setenv("HERMES_DISABLE_WINDOWS_UTF8", optout)
+
+        reconfigure_hit = []
+        monkeypatch.setattr(
+            stdio,
+            "_reconfigure_stream",
+            lambda *a, **kw: reconfigure_hit.append(True),
+        )
+
+        result = stdio.configure_windows_stdio()
+        assert result is False
+        assert reconfigure_hit == [], "opt-out must skip stream reconfiguration"
+
 
     def test_reconfigure_stream_handles_missing_method(self, monkeypatch):
         """StringIO-like objects without .reconfigure() must not blow up."""

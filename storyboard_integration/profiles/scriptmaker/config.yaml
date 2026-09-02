@@ -1,0 +1,13 @@
+toolsets:
+  - hermes-cli
+
+platform_toolsets:
+  api_server:
+    - skills
+    - memory
+    - session_search
+    - scriptmaker
+
+agent:
+  disabled_toolsets:
+    - storyboard

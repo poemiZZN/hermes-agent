@@ -100,6 +100,17 @@ _SESSION_UI_SESSION_ID: ContextVar = ContextVar("HERMES_UI_SESSION_ID", default=
 # so background-process notifications stay inside the originating Telegram
 # private-chat topic (those lanes route only with thread id + reply anchor).
 _SESSION_MESSAGE_ID: ContextVar = ContextVar("HERMES_SESSION_MESSAGE_ID", default=_UNSET)
+# Storyboard platform values forwarded by the authenticated API adapter. These
+# stay task-local so concurrent platform users and scripts cannot share state.
+_STORYBOARD_PLATFORM_TOKEN: ContextVar = ContextVar("HERMES_STORYBOARD_PLATFORM_TOKEN", default=_UNSET)
+_STORYBOARD_SCRIPT_NAME: ContextVar = ContextVar("HERMES_STORYBOARD_SCRIPT_NAME", default=_UNSET)
+_STORYBOARD_COS_PATH: ContextVar = ContextVar("HERMES_STORYBOARD_COS_PATH", default=_UNSET)
+# Scriptmaker platform values forwarded by the authenticated API adapter.
+# The turn ticket binds one conversation turn on the calling platform, so it
+# MUST stay task-local: two concurrent users would otherwise execute platform
+# operations against each other's turn context.
+_PLATFORM_TURN_TICKET: ContextVar = ContextVar("HERMES_PLATFORM_TURN_TICKET", default=_UNSET)
+_PLATFORM_API_BASE: ContextVar = ContextVar("HERMES_PLATFORM_API_BASE", default=_UNSET)
 
 _SESSION_PROFILE: ContextVar = ContextVar("HERMES_SESSION_PROFILE", default=_UNSET)
 _BROWSER_CONTROL_PRINCIPAL: ContextVar = ContextVar(
@@ -156,6 +167,11 @@ _VAR_MAP = {
     "HERMES_SESSION_ID": _SESSION_ID,
     "HERMES_UI_SESSION_ID": _SESSION_UI_SESSION_ID,
     "HERMES_SESSION_MESSAGE_ID": _SESSION_MESSAGE_ID,
+    "HERMES_STORYBOARD_PLATFORM_TOKEN": _STORYBOARD_PLATFORM_TOKEN,
+    "HERMES_STORYBOARD_SCRIPT_NAME": _STORYBOARD_SCRIPT_NAME,
+    "HERMES_STORYBOARD_COS_PATH": _STORYBOARD_COS_PATH,
+    "HERMES_PLATFORM_TURN_TICKET": _PLATFORM_TURN_TICKET,
+    "HERMES_PLATFORM_API_BASE": _PLATFORM_API_BASE,
     "HERMES_SESSION_PROFILE": _SESSION_PROFILE,
     "HERMES_BROWSER_CONTROL_PRINCIPAL": _BROWSER_CONTROL_PRINCIPAL,
     "HERMES_BROWSER_CONTROL_TRANSPORT_FAMILY": _BROWSER_CONTROL_TRANSPORT_FAMILY,
@@ -241,6 +257,11 @@ def set_session_vars(
     cwd: str = "",
     async_delivery: bool = True,
     ui_session_id: str = "",
+    storyboard_platform_token: str = "",
+    storyboard_script_name: str = "",
+    storyboard_cos_path: str = "",
+    platform_turn_ticket: str = "",
+    platform_api_base: str = "",
     cron_session: Any = _UNSET,
 ) -> list:
     """Set all session context variables and return reset tokens.
@@ -287,6 +308,11 @@ def set_session_vars(
         _BROWSER_CONTROL_TRANSPORT_FAMILY.set(browser_control_transport_family),
         _CRON_SESSION.set(cron_session),
         _SESSION_ASYNC_DELIVERY.set(bool(async_delivery)),
+        _STORYBOARD_PLATFORM_TOKEN.set(storyboard_platform_token),
+        _STORYBOARD_SCRIPT_NAME.set(storyboard_script_name),
+        _STORYBOARD_COS_PATH.set(storyboard_cos_path),
+        _PLATFORM_TURN_TICKET.set(platform_turn_ticket),
+        _PLATFORM_API_BASE.set(platform_api_base),
     ]
     try:
         from agent.runtime_cwd import set_session_cwd
@@ -326,6 +352,11 @@ def clear_session_vars(tokens: list) -> None:
         _SESSION_PROFILE,
         _BROWSER_CONTROL_PRINCIPAL,
         _BROWSER_CONTROL_TRANSPORT_FAMILY,
+        _STORYBOARD_PLATFORM_TOKEN,
+        _STORYBOARD_SCRIPT_NAME,
+        _STORYBOARD_COS_PATH,
+        _PLATFORM_TURN_TICKET,
+        _PLATFORM_API_BASE,
         _CRON_SESSION,
     ):
         var.set("")

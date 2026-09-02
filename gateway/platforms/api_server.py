@@ -41,6 +41,7 @@ Requires:
 """
 
 import asyncio
+import base64
 import concurrent.futures
 import errno
 import hashlib
@@ -2334,6 +2335,119 @@ class APIServerAdapter(BasePlatformAdapter):
 
         return raw, None
 
+    def _parse_platform_session_headers(
+        self, request: "web.Request"
+    ) -> tuple[Dict[str, str], Optional["web.Response"]]:
+        """Snapshot authenticated platform headers for one profile-scoped run."""
+        user_id = request.headers.get("X-Hermes-Session-User-Id", "").strip()
+        user_name = request.headers.get("X-Hermes-Session-User-Name", "").strip()
+        platform_token = request.headers.get("X-Platform-Token", "").strip()
+        encoded_script_name = request.headers.get(
+            "X-Hermes-Storyboard-Script-Name-B64", ""
+        ).strip()
+        encoded_cos_path = request.headers.get(
+            "X-Hermes-Storyboard-Cos-Path-B64", ""
+        ).strip()
+        platform_turn_ticket = request.headers.get(
+            "X-Hermes-Platform-Turn-Ticket", ""
+        ).strip()
+        platform_api_base = request.headers.get(
+            "X-Hermes-Platform-Api-Base", ""
+        ).strip()
+
+        for label, value, limit in (
+            ("session user ID", user_id, self._MAX_SESSION_HEADER_LEN),
+            ("session user name", user_name, self._MAX_SESSION_HEADER_LEN),
+            ("platform token", platform_token, 8192),
+            ("encoded script name", encoded_script_name, 4096),
+            ("encoded COS path", encoded_cos_path, 4096),
+            ("platform turn ticket", platform_turn_ticket, 256),
+            ("platform API base", platform_api_base, 512),
+        ):
+            if len(value) > limit or re.search(r"[\r\n\x00]", value):
+                return {}, web.json_response(
+                    _openai_error(f"Invalid {label}", code="invalid_session_context"),
+                    status=400,
+                )
+
+        request_profile = _api_request_profile.get()
+        if request_profile == "storyboard" and (
+            platform_turn_ticket or platform_api_base
+        ):
+            return {}, web.json_response(
+                _openai_error(
+                    "Scriptmaker context is not valid for storyboard profile",
+                    code="profile_context_mismatch",
+                ),
+                status=400,
+            )
+        if request_profile == "scriptmaker" and (
+            encoded_script_name or encoded_cos_path
+        ):
+            return {}, web.json_response(
+                _openai_error(
+                    "Storyboard context is not valid for scriptmaker profile",
+                    code="profile_context_mismatch",
+                ),
+                status=400,
+            )
+
+        script_name = ""
+        if encoded_script_name:
+            try:
+                script_name = base64.b64decode(
+                    encoded_script_name, validate=True
+                ).decode("utf-8").strip()
+            except (ValueError, UnicodeDecodeError):
+                return {}, web.json_response(
+                    _openai_error(
+                        "Invalid storyboard script name",
+                        code="invalid_session_context",
+                    ),
+                    status=400,
+                )
+            if len(script_name) > 512 or re.search(r"[\r\n\x00]", script_name):
+                return {}, web.json_response(
+                    _openai_error(
+                        "Invalid storyboard script name",
+                        code="invalid_session_context",
+                    ),
+                    status=400,
+                )
+
+        cos_path = ""
+        if encoded_cos_path:
+            try:
+                cos_path = base64.b64decode(
+                    encoded_cos_path, validate=True
+                ).decode("utf-8").strip()
+            except (ValueError, UnicodeDecodeError):
+                return {}, web.json_response(
+                    _openai_error(
+                        "Invalid storyboard COS path",
+                        code="invalid_session_context",
+                    ),
+                    status=400,
+                )
+            if len(cos_path) > 2048 or re.search(r"[\r\n\x00]", cos_path):
+                return {}, web.json_response(
+                    _openai_error(
+                        "Invalid storyboard COS path",
+                        code="invalid_session_context",
+                    ),
+                    status=400,
+                )
+
+        return {
+            "user_id": user_id,
+            "user_name": user_name,
+            "storyboard_platform_token": platform_token,
+            "storyboard_script_name": script_name,
+            "storyboard_cos_path": cos_path,
+            "platform_turn_ticket": platform_turn_ticket,
+            "platform_api_base": platform_api_base,
+        }, None
+
     # ------------------------------------------------------------------
     # Session DB helper
     # ------------------------------------------------------------------
@@ -4607,6 +4721,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_platform_session_headers(request)
+        if context_err is not None:
+            return context_err
         session_id = request.match_info["session_id"]
         session, err = await self._get_existing_session_or_404(session_id)
         if err:
@@ -4678,6 +4795,7 @@ class APIServerAdapter(BasePlatformAdapter):
             ephemeral_system_prompt=system_prompt,
             session_id=session_id,
             gateway_session_key=gateway_session_key,
+            api_session_context=api_session_context,
             route=route,
             session_model=session_model,
             requested_runtime=runtime_request.get("requested") or {},
@@ -4724,6 +4842,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_platform_session_headers(request)
+        if context_err is not None:
+            return context_err
         session_id = request.match_info["session_id"]
         session, err = await self._get_existing_session_or_404(session_id)
         if err:
@@ -4851,6 +4972,7 @@ class APIServerAdapter(BasePlatformAdapter):
                     tool_progress_callback=_tool_progress,
                     active_run_id=run_id,
                     gateway_session_key=gateway_session_key,
+                    api_session_context=api_session_context,
                     route=route,
                     session_model=session_model,
                     requested_runtime=runtime_request.get("requested") or {},
@@ -5107,6 +5229,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_platform_session_headers(request)
+        if context_err is not None:
+            return context_err
 
         # Allow caller to continue an existing session by passing X-Hermes-Session-Id.
         # When provided, history is loaded from state.db instead of from the request body.
@@ -5275,6 +5400,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 gateway_session_key=gateway_session_key,
                 **agent_overrides,
                 route=route,
+                api_session_context=api_session_context,
             ))
             # Ensure SSE drain loops can terminate without relying on polling
             # agent_task.done(), which can race with queue timeout checks.
@@ -5296,6 +5422,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 gateway_session_key=gateway_session_key,
                 **agent_overrides,
                 route=route,
+                api_session_context=api_session_context,
             )
 
         idempotency_key = request.headers.get("Idempotency-Key")
@@ -6028,7 +6155,11 @@ class APIServerAdapter(BasePlatformAdapter):
                     await _emit_text_delta(agent_final)
                 if agent_final and not final_response_text:
                     final_response_text = agent_final
-                if isinstance(result, dict) and result.get("error") and not final_response_text:
+                if self._is_empty_tool_calls_failure(result):
+                    agent_error = _redact_api_error_text(
+                        result.get("error") or agent_final or "Agent request failed"
+                    )
+                elif isinstance(result, dict) and result.get("error") and not final_response_text:
                     agent_error = _redact_api_error_text(result["error"])
             except Exception as e:  # noqa: BLE001
                 logger.error("Error running agent for streaming responses: %s", e, exc_info=True)
@@ -6233,6 +6364,9 @@ class APIServerAdapter(BasePlatformAdapter):
         gateway_session_key, key_err = self._parse_session_key_header(request)
         if key_err is not None:
             return key_err
+        api_session_context, context_err = self._parse_platform_session_headers(request)
+        if context_err is not None:
+            return context_err
 
         # Parse request body
         try:
@@ -6404,6 +6538,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 gateway_session_key=gateway_session_key,
                 **agent_overrides,
                 route=route,
+                api_session_context=api_session_context,
             ))
             # Ensure SSE drain loops can terminate without relying on polling
             # agent_task.done(), which can race with queue timeout checks.
@@ -6439,6 +6574,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 gateway_session_key=gateway_session_key,
                 **agent_overrides,
                 route=route,
+                api_session_context=api_session_context,
             )
 
         idempotency_key = request.headers.get("Idempotency-Key")
@@ -6477,6 +6613,20 @@ class APIServerAdapter(BasePlatformAdapter):
                     _openai_error(f"Internal server error: {e}", err_type="server_error"),
                     status=500,
                 )
+
+        if self._is_empty_tool_calls_failure(result):
+            error_text = (
+                result.get("error")
+                or result.get("final_response")
+                or "Agent request failed"
+            )
+            return web.json_response(
+                _openai_error(
+                    _redact_api_error_text(error_text),
+                    err_type="server_error",
+                ),
+                status=502,
+            )
 
         final_response = _resolve_media_to_data_urls(result.get("final_response", ""))
         if not final_response:
@@ -6998,6 +7148,19 @@ class APIServerAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     @staticmethod
+    def _is_empty_tool_calls_failure(result: Any) -> bool:
+        """Identify the strict-provider error fixed by message sanitization."""
+        if not isinstance(result, dict) or not (
+            result.get("failed")
+            or (result.get("error") and result.get("completed") is False)
+        ):
+            return False
+        error_text = str(result.get("error") or result.get("final_response") or "").lower()
+        return "tool_calls" in error_text and (
+            "empty" in error_text or "minimum length" in error_text
+        )
+
+    @staticmethod
     def _build_response_conversation_history(
         conversation_history: List[Dict[str, Any]],
         user_message: Any,
@@ -7019,6 +7182,14 @@ class APIServerAdapter(BasePlatformAdapter):
         agent_messages = result.get("messages") if isinstance(result, dict) else None
 
         if isinstance(agent_messages, list) and agent_messages:
+            # The real AIAgent path returns the complete (and sometimes
+            # repaired/normalized) transcript. Exact prefix comparison is
+            # not reliable after that repair, so trust the explicit marker
+            # stamped by _run_agent instead of concatenating prior history a
+            # second time.
+            if result.get("_messages_are_full_transcript"):
+                return list(agent_messages)
+
             turn_start = APIServerAdapter._response_messages_turn_start_index(
                 conversation_history,
                 user_message,
@@ -7057,6 +7228,14 @@ class APIServerAdapter(BasePlatformAdapter):
         agent_messages = result.get("messages") if isinstance(result, dict) else None
         if not isinstance(agent_messages, list) or not agent_messages:
             return 0
+
+        marked_turn_start = result.get("_response_turn_start_index")
+        if (
+            isinstance(marked_turn_start, int)
+            and not isinstance(marked_turn_start, bool)
+            and 0 <= marked_turn_start <= len(agent_messages)
+        ):
+            return marked_turn_start
 
         prior = list(conversation_history)
         current_user = {"role": "user", "content": user_message}
@@ -7215,6 +7394,13 @@ class APIServerAdapter(BasePlatformAdapter):
         session_id: str = "",
         browser_control_principal: str = "",
         browser_control_transport_family: str = "",
+        user_id: str = "",
+        user_name: str = "",
+        storyboard_platform_token: str = "",
+        storyboard_script_name: str = "",
+        storyboard_cos_path: str = "",
+        platform_turn_ticket: str = "",
+        platform_api_base: str = "",
     ) -> list:
         """Bind session contextvars for an API-server agent run.
 
@@ -7240,6 +7426,13 @@ class APIServerAdapter(BasePlatformAdapter):
             session_id=session_id,
             browser_control_principal=browser_control_principal,
             browser_control_transport_family=browser_control_transport_family,
+            user_id=user_id,
+            user_name=user_name,
+            storyboard_platform_token=storyboard_platform_token,
+            storyboard_script_name=storyboard_script_name,
+            storyboard_cos_path=storyboard_cos_path,
+            platform_turn_ticket=platform_turn_ticket,
+            platform_api_base=platform_api_base,
             async_delivery=False,
             cron_session="",
         )
@@ -7261,6 +7454,7 @@ class APIServerAdapter(BasePlatformAdapter):
         requested_provider: Optional[str] = None,
         model_options: Optional[Dict[str, Any]] = None,
         route: Optional[Dict[str, Any]] = None,
+        api_session_context: Optional[Dict[str, str]] = None,
         session_model: Optional[str] = None,
         requested_runtime: Optional[Dict[str, Any]] = None,
         route_source: str = "global",
@@ -7311,6 +7505,7 @@ class APIServerAdapter(BasePlatformAdapter):
             from gateway.session_context import clear_session_vars
 
             with self._profile_scope(request_profile):
+                session_context = api_session_context or {}
                 tokens = self._bind_api_server_session(
                     chat_id=session_id or "",
                     session_key=gateway_session_key or session_id or "",
@@ -7319,6 +7514,17 @@ class APIServerAdapter(BasePlatformAdapter):
                     browser_control_transport_family=(
                         request_browser_control_transport_family
                     ),
+                    user_id=session_context.get("user_id", ""),
+                    user_name=session_context.get("user_name", ""),
+                    storyboard_platform_token=session_context.get(
+                        "storyboard_platform_token", ""
+                    ),
+                    storyboard_script_name=session_context.get(
+                        "storyboard_script_name", ""
+                    ),
+                    storyboard_cos_path=session_context.get("storyboard_cos_path", ""),
+                    platform_turn_ticket=session_context.get("platform_turn_ticket", ""),
+                    platform_api_base=session_context.get("platform_api_base", ""),
                 )
                 agent = None
                 try:
@@ -7360,6 +7566,27 @@ class APIServerAdapter(BasePlatformAdapter):
                         conversation_history=conversation_history,
                         task_id=effective_task_id,
                     )
+                    if isinstance(result, dict):
+                        # AIAgent returns its complete transcript, not merely
+                        # the current-turn suffix. Mark that contract so the
+                        # Responses store does not duplicate history when
+                        # repair_message_sequence normalized older messages.
+                        result["_messages_are_full_transcript"] = True
+                        result_messages = result.get("messages")
+                        if isinstance(result_messages, list):
+                            # Locate the caller's user turn from the end. The
+                            # loop may add synthetic continuation users later,
+                            # so matching the original input is safer than
+                            # simply selecting the last user role.
+                            for index in range(len(result_messages) - 1, -1, -1):
+                                message = result_messages[index]
+                                if (
+                                    isinstance(message, dict)
+                                    and message.get("role") == "user"
+                                    and message.get("content") == user_message
+                                ):
+                                    result["_response_turn_start_index"] = index + 1
+                                    break
                     usage = {
                         "input_tokens": getattr(agent, "session_prompt_tokens", 0) or 0,
                         "output_tokens": getattr(agent, "session_completion_tokens", 0) or 0,

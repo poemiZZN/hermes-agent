@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 2,
+  "name": "storyboard-scriptmaker-hermes-integration",
+  "hermesVersion": "0.20.0",
+  "upstreamCommit": "3c27eb6234bf91b8ceee9e9071591b31e9b148cb",
+  "integrationBranch": "storyboard-integration",
+  "releaseTag": "storyboard-hermes-v0.20.0-22",
+  "preparedAt": "2026-09-01T08:08:26.100874+00:00",
+  "profiles": [
+    {
+      "name": "scriptmaker",
+      "path": "storyboard_integration/profiles/scriptmaker",
+      "toolsets": [
+        "scriptmaker"
+      ],
+      "routes": [],
+      "skills": [
+        "scriptmaker-platform",
+        "scriptmaker-baokuan-outline",
+        "换壳",
+        "剧本-故事大纲",
+        "剧本全流程",
+        "剧本语言梳理",
+        "剧本自检",
+        "融合剧"
+      ]
+    },
+    {
+      "name": "storyboard",
+      "path": "storyboard_integration/profiles/storyboard",
+      "toolsets": [
+        "storyboard"
+      ],
+      "routes": [
+        {
+          "name": "integration-storyboard-wecom",
+          "platform": "wecom",
+          "profile": "storyboard"
+        },
+        {
+          "name": "integration-storyboard-wecom-callback",
+          "platform": "wecom_callback",
+          "profile": "storyboard"
+        }
+      ],
+      "skills": [
+        "script-platform-api",
+        "sd2-prompt-builder",
+        "character-design-prompt",
+        "art-asset-production",
+        "character-three-view",
+        "minimax-h3-video-prompt",
+        "storyboard-script-generator",
+        "wan3-drama-prompt-v2"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "agent/agent_runtime_helpers.py",
+      "sha256": "c8dea88baca9b1521bd74058b71578c44a4c61d8322eb2beb4de51a58031affe"
+    },
+    {
+      "path": "gateway/platforms/api_server.py",
+      "sha256": "857f61550ec8a8d4e0e5cea4fd8cdf5098c20a8a6686381879a795aad5ec7395"
+    },
+    {
+      "path": "gateway/session_context.py",
+      "sha256": "0cdc9e4376382973e79d0f81a68e712525b3a94435850f74fd4631ffd88f5ef3"
+    },
+    {
+      "path": "hermes_cli/tools_config.py",
+      "sha256": "0e8e00b876d63f055356be9d011897dbdc1312ef76bae3ec2b0dbf31e49daab9"
+    },
+    {
+      "path": "storyboard_integration/install_runtime.py",
+      "sha256": "83c81e8dd28388dfa7a7dc395eba175893b8729e8bab73bebc9b0096a2b245ae"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/.env.template",
+      "sha256": "725987fb46f5b7a07182420232e4f57ca013fa5272ad480bd66036686f18d923"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/config.yaml",
+      "sha256": "6f6379895ff512a5ca0a4e7f12c8440f082cf04d3829d8c70bb66a2dc0bb2c17"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/distribution.yaml",
+      "sha256": "1c755164cf2be206fd0b80acb89a448a0491258a48f28356a5ecb00cc4a63f7a"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/references/baokuan-gongshi.md",
+      "sha256": "ff7cd5b1ce526a84e06e83d9e8a88c0e2114e3ff534321b25400b4ed09bf46b9"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/SKILL.md",
+      "sha256": "91a2e3df65bdb1f9384aa881596f38d33d778940eb4817ac3a8c3329a3b43ccc"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/attachment-adaptation/SKILL.md",
+      "sha256": "751de3419157df9e66e625c9abd2eef185695c77b90349e0e575b940f1d2afd9"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/DESCRIPTION.md",
+      "sha256": "dd8fde635ee2babc61bb25b98496542b91ba393bdc7cbe0b042e38c95f6dfb51"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/doctor-and-export/SKILL.md",
+      "sha256": "3d9fc22e50a08aecd50f000ce8bfdc9bf38a252f32f7c822909f263269676362"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/script-generation/SKILL.md",
+      "sha256": "43ee9e257a913d4e28921b3278a0822f862b490267132478634126862ec75960"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/task-control/SKILL.md",
+      "sha256": "80296e89896e537b2dcd76dd04434b3c060f3c78495dbec45a03585598a4148d"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本-故事大纲/references/baokuan-gongshi.md",
+      "sha256": "ff7cd5b1ce526a84e06e83d9e8a88c0e2114e3ff534321b25400b4ed09bf46b9"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本-故事大纲/SKILL.md",
+      "sha256": "6961773d39aa4308231f6ef688a98fb689b2c715de7feb215b38fa847426ae68"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/references/api_reference.md",
+      "sha256": "3b41d643f5cad82ce99f5a7711ba9c817e6f74d02d219d4814d6085b3bbba81b"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/references/底层逻辑记忆.md",
+      "sha256": "b56c1655c7b17af1787bf41731cfd0ca73a340100be924c9c6e401755355cbe1"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/references/润色_狼王模板_动作表情写作手法.md",
+      "sha256": "d7918291839ed0ae5e4ad7cf6c064062c59316e34031b0e350508c12f265ea40"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/references/网感_单身狗系统_细节标准分析.md",
+      "sha256": "40c0fdd7edce94b17d5873f6559da4d29cffaa8cb215d7ef00315ae5cb9022df"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本全流程/SKILL.md",
+      "sha256": "6b1473bbcdf7c99813ae9e1954e41204ad0b80267fb2d7452b7743d69ac6944d"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本自检/SKILL.md",
+      "sha256": "af0aa7cf62a07a52ac19770e5bf725edd06f85e4c2c03dea771972d46e7075aa"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本语言梳理/references/humanizing_rules.md",
+      "sha256": "d4d1bf60a83298a0ac97900f6b3cddf6f53168a1bdbb48047d800a2f2adb8130"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/剧本语言梳理/SKILL.md",
+      "sha256": "9da439e9f74e00811c572308508236cda3c346d87b8a64113d670db5ab563a80"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/references/adaptation-engine.md",
+      "sha256": "f289d40ab9d51367bb3f0831757bb93109ab210df9079c6478a3fbb2ad99fd63"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/references/quality-checklist.md",
+      "sha256": "aebbee4f12b6c797f35351d3fc1343c4d8c538795c23e8ad581a0c8dc50d23eb"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/references/tag-matrix.md",
+      "sha256": "e51bdb167d01620f1352c9aaf27857b436098c2f948bf28b54e86099651c1db2"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/references/us-drama-conventions.md",
+      "sha256": "b544bef915966a98e99add4fea8dfb6eadb911c359df2febfad2ce48392f3729"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/换壳/SKILL.md",
+      "sha256": "1bc574f26ae446ccfd9948eebadad6fc8516d38e6ef6b3d3d49c990f4e2f28bd"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/融合剧/SKILL.md",
+      "sha256": "482007b8c160ef60843833210365edc78aa322792c7592113086d78470641526"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/SOUL.md",
+      "sha256": "5520977fc141c34e346c871dc9971552f41c36b19bce53dff5ff3a510540579a"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/.env.template",
+      "sha256": "94d1dd34c0b6872b0ea59f05d348a869848234c8afcea4d4d824754571261eb6"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/config.yaml",
+      "sha256": "528c8b051f3c1565f8ed42818012f4d24a38751ed6e64219f8a7398e996ca23f"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
+      "sha256": "1313ffb00a639f7d0b17f3e5daf3b3cb41a966ed822392a4689ea1b2de8ed59b"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
+      "sha256": "b58334582f7d19d6c1902c4681dce98ccaa0f81d80067d654e8f33939285d6cb"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/quality-control.md",
+      "sha256": "43b3776d2fa2d6d263339d97183fe0cb2bd9204671497b595611ae5453f8e72f"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/scene-and-prop-assets.md",
+      "sha256": "2d183210251b98a42f9b3a9dffb70772bb840b5728b7dee7b8508a627a3e34c0"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/script-extraction.md",
+      "sha256": "7aec3434fec4f07c3033fc2981ec6da68a690322b3792a309e537748170a73a4"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/SKILL.md",
+      "sha256": "258265e1ee4deb775098e0689f7ab72c40c0dbab683fbd3b23634a4c2d6919ee"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/character-design-prompt/references/prompt-templates.md",
+      "sha256": "23477e09adea0594f0b75d4fb17a82fc346d1f816256c7fe9d0c15a7229a18b6"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/character-design-prompt/SKILL.md",
+      "sha256": "5a9127e7b3db2e136798816e527277195808b488c25e9fd0570f339b36d886e5"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/character-three-view/SKILL.md",
+      "sha256": "a7c05f25ba2e29b4a215d9458bf3034d9dbfb7e1ece948fbb6cf898bcde842ad"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-video-prompt/references/base-prompt-format.md",
+      "sha256": "4dcc81ef8ab2c9c021037d01be12e430fb38e27f29c44362ab2833f20802ec0b"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-video-prompt/references/full-reference-format.md",
+      "sha256": "9fb164b6185963a3a94e62f2003f81b21aa11c71c77994f5ce0351f68f9315bc"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-video-prompt/SKILL.md",
+      "sha256": "016847c43275ae191e6fedb4fb2610289883b2a3c43fad2b6d3bcc2d476cd288"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/script-platform-api/DESCRIPTION.md",
+      "sha256": "076e0f30817e925995c4aaa2e9a8b66f18e872247034bc10342665b316f91764"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/script-platform-api/script-upload/SKILL.md",
+      "sha256": "eaa3e39c1b8f7d92b1d37343e3affd971728449711045d1ac866c21a03f6c8c4"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/script-platform-api/storyboard-text/SKILL.md",
+      "sha256": "4c16f155851906adc0123cd6ade748cbca8a0458da5b6ca00f2473ae6a9bc391"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/sd2-prompt-builder/SKILL.md",
+      "sha256": "8836cdb2bc4f7d8a329c4ecd33cca19efdcfc71afdd927e8defe6e1f9a2e2b3c"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/cinematography-vocab.md",
+      "sha256": "12e95581b4e51d9248f0d3ed5dfa3a9e186a39cad0d620d7f3ecafb2426fe926"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/emotion-library.md",
+      "sha256": "69984eac645c93e15a537abd2b843bf198a450d88fb79e34f71dca2516d1734b"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/negative-constraints.md",
+      "sha256": "cb5247b2c304b2651d1a7a378ddd9dc8f95a2dafdbfc95e78c19060f9d3cf2ce"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/segment-rules.md",
+      "sha256": "9625e4e637010a9539743c59f56dc88193ff9d57dc88c151953e43e0ae9b04f7"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/translation-guide.md",
+      "sha256": "37f312ef72b44d42c8352c8ae9203f1a76ae175657ee01404e2d7970949861fa"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/SKILL.md",
+      "sha256": "0e04588261011135deecb4c24f4fa073397f7ffd68adc64125251aab087355ef"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/wan3-drama-prompt-v2/references/drama-diagnosis.md",
+      "sha256": "43127d057f3b7bf1d62867aadbb6631aa31ece7426a8a640622cb28950577b31"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/wan3-drama-prompt-v2/references/drama-templates.md",
+      "sha256": "de8a434bde5f97986eaea818ed35a680bf7da17e1df4e3dd796417a901dcbb3c"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/wan3-drama-prompt-v2/references/exemplars.md",
+      "sha256": "2ebda4bd281e9dad621df79fd0e2de0fd6b2445f3e916cef384525cc3c859da6"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/wan3-drama-prompt-v2/references/prompt-craft-discipline.md",
+      "sha256": "a58d5af86cb2724d9bccea3e556ed34ad0f16060e0bce0c7af1342a62dec95d6"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/wan3-drama-prompt-v2/references/shot-language.md",
+      "sha256": "782d6def1cf262ac36f256be6cd2bab2a96c396f1dcb440ed2e4740df9ae9ae2"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/wan3-drama-prompt-v2/references/wan3-formulas.md",
+      "sha256": "d46d98b8175b57dba68b6dd2f9a34173b40d59ecd3240e48e923b5535200c108"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/wan3-drama-prompt-v2/references/wan3-protocol.md",
+      "sha256": "48fc8b80e3feef35130034ac0675884a51c9c5344a54de6ac4d9ee1c715cdddc"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/wan3-drama-prompt-v2/SKILL.md",
+      "sha256": "7d848a853280aa758f5989d41791856376cb02b2d2754e5a695b159505e2114c"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/SOUL.md",
+      "sha256": "de46de1486585f9b02073a06873dbb21804cdaefee52129e9a6cd3d21071205b"
+    },
+    {
+      "path": "tools/scriptmaker_agent_tool.py",
+      "sha256": "595b0e7cd868ec6993db81bf0f18faa45a7d3e11496b1e484283de83c32e8275"
+    },
+    {
+      "path": "tools/storyboard_api_tool.py",
+      "sha256": "e659f196a587c7ed71933f89cf075fe63e360065ff54ed0f28f18968c014df61"
+    },
+    {
+      "path": "tools/zenmux_video_analyze_tool.py",
+      "sha256": "bb52f1ed28c0d2d48542e954204062e4cae1c05a532cb3ed8701e68b73b53513"
+    },
+    {
+      "path": "toolsets.py",
+      "sha256": "661127c6b0ff338fcb849054776cf5f9d68f4645417db13f459749e6445c1428"
+    }
+  ]
+}

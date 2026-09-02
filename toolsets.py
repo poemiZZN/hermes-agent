@@ -133,6 +133,38 @@ TOOLSETS = {
         "includes": []
     },
 
+    "storyboard": {
+        "description": "Storyboard platform APIs with session-scoped authentication",
+        "tools": [
+            "storyboard_api",
+            "canvas_image_generate",
+            "zenmux_video_analyze",
+        ],
+        "includes": []
+    },
+
+    "scriptmaker": {
+        "description": "Scriptmaker conversational script platform operations",
+        "tools": [
+            "ask_choice",
+            "read_attachment",
+            "write_attachment_draft",
+            "prepare_script_generation",
+            "confirm_script_generation",
+            "list_projects",
+            "select_project",
+            "get_project_status",
+            "pause_task",
+            "resume_task",
+            "retry_task",
+            "terminate_task",
+            "run_project_doctor",
+            "export_project",
+            "open_feature",
+        ],
+        "includes": []
+    },
+
     "video": {
         "description": "Video analysis and understanding tools (opt-in, not in default toolset)",
         "tools": ["video_analyze"],
