@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-1",
-  "preparedAt": "2026-09-02T01:50:43.848517+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-2",
+  "preparedAt": "2026-09-03T03:42:55.956177+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -51,7 +51,8 @@
         "character-three-view",
         "minimax-h3-video-prompt",
         "storyboard-script-generator",
-        "wan3-drama-prompt-v2"
+        "wan3-drama-prompt-v2",
+        "duanju-art-prompt"
       ]
     }
   ],
@@ -198,7 +199,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "261a3ad7061239d14849aaefa42abb38aaea0839f5d0db6a9cbf8fa9d0417b19"
+      "sha256": "67da0d4855949fe18a37f56c26414863c64b979eef0a49b423163d240b941930"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -231,6 +232,14 @@
     {
       "path": "storyboard_integration/profiles/storyboard/skills/character-three-view/SKILL.md",
       "sha256": "a7c05f25ba2e29b4a215d9458bf3034d9dbfb7e1ece948fbb6cf898bcde842ad"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/duanju-art-prompt/references/templates.md",
+      "sha256": "c6f0c4ed14658d197c4f43129c5af85d9da81e7b46d4cd165a75fa81f1b502c7"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/duanju-art-prompt/SKILL.md",
+      "sha256": "087b6e5fdd74197ce30669b354cc7a3bbda95aa39a880d028500ff960e9ee7eb"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-video-prompt/references/base-prompt-format.md",
