@@ -26,6 +26,7 @@ _ENDPOINT_RE = re.compile(r"^/api/[A-Za-z0-9_./:-]+$")
 _BLOCKED_ENDPOINT_PREFIXES = ("/api/auth", "/api/admin", "/api/hermes/auth")
 _DEFAULT_TIMEOUT_SECONDS = 120
 _MAX_CANVAS_IMAGE_PROMPTS = 10
+_MAX_QUESTION_OPTIONS = 20
 _CHARACTER_SHEET_RESOLUTIONS = {"1k": "1K", "2k": "2K"}
 _CANVAS_IMAGE_EXTENSION_RE = re.compile(r"\.(?:png|jpe?g|webp|gif|bmp)$", re.IGNORECASE)
 _CANVAS_IMAGE_VERSION_RE = re.compile(r"^(?P<stem>.+)_v(?P<version>[1-9]\d*)$", re.IGNORECASE)
@@ -711,6 +712,229 @@ def _canvas_image_generate(args: Dict[str, Any], **kwargs) -> str:
     return tool_result(batch_result)
 
 
+def _normalize_canvas_video_reference_assets(raw_assets: Any) -> list[Dict[str, Any]]:
+    if not isinstance(raw_assets, list):
+        return []
+    normalized: list[Dict[str, Any]] = []
+    for asset in raw_assets:
+        if isinstance(asset, dict):
+            normalized.append(asset)
+            continue
+        if isinstance(asset, str) and asset.strip():
+            normalized.append({"url": asset.strip()})
+    return normalized
+
+
+def _canvas_video_generate(args: Dict[str, Any], **kwargs) -> str:
+    """Submit one asynchronous canvas video task without waiting for completion."""
+    script_name = _resolve_script_name(args)
+    prompt = str(args.get("prompt") or "").strip()
+    model = str(args.get("model") or "sd2").strip() or "sd2"
+    multi_prompt = args.get("multi_prompt")
+    multi_prompt = multi_prompt if isinstance(multi_prompt, list) else []
+
+    if not script_name:
+        return tool_error("scriptName is required", success=False)
+    if not prompt and not multi_prompt:
+        return tool_error(
+            "prompt or multi_prompt must contain video generation content",
+            success=False,
+        )
+
+    try:
+        duration = int(args.get("duration") or 4)
+    except (TypeError, ValueError):
+        return tool_error("duration must be an integer", success=False)
+    if duration <= 0:
+        return tool_error("duration must be greater than 0", success=False)
+    normalized_model = model.lower()
+    if (
+        normalized_model == "minimax-h3"
+        or normalized_model.startswith("minimax-h3-")
+    ) and duration != 15:
+        return tool_error(
+            "MiniMax H3 generation requires duration=15 for each segment",
+            success=False,
+        )
+
+    try:
+        timeout = max(
+            1,
+            min(int(args.get("timeout_seconds") or _DEFAULT_TIMEOUT_SECONDS), 300),
+        )
+    except (TypeError, ValueError):
+        return tool_error("timeout_seconds must be an integer", success=False)
+
+    body: Dict[str, Any] = {
+        "scriptName": script_name,
+        "prompt": prompt,
+        "model": model,
+        "ratio": str(args.get("ratio") or "16:9").strip() or "16:9",
+        "duration": duration,
+        "reference_images": _normalize_canvas_video_reference_assets(
+            args.get("reference_images")
+        ),
+        "reference_videos": _normalize_canvas_video_reference_assets(
+            args.get("reference_videos")
+        ),
+        "reference_audios": _normalize_canvas_video_reference_assets(
+            args.get("reference_audios")
+        ),
+        "reference_elements": (
+            args.get("reference_elements")
+            if isinstance(args.get("reference_elements"), list)
+            else []
+        ),
+    }
+
+    # Keep this an explicit allow-list. In particular, callbackUrl is deliberately
+    # not accepted from model arguments because the platform owns callback routing.
+    optional_fields = (
+        "resolution",
+        "sound",
+        "minimax_h3_acceleration",
+        "prompt_extend",
+        "refer_type",
+        "keep_original_sound",
+        "multi_shot",
+        "shot_type",
+        "multi_prompt",
+    )
+    for field in optional_fields:
+        if args.get(field) is not None:
+            body[field] = args[field]
+
+    raw_result = _request_json(
+        {
+            "endpoint": "/api/canvas/generate-video",
+            "method": "POST",
+            "timeout_seconds": timeout,
+            "body": body,
+        }
+    )
+    result = _parse_tool_result(raw_result)
+    if result.get("needsLogin") or result.get("success") is not True:
+        return raw_result
+
+    payload = result.get("data")
+    if not isinstance(payload, dict):
+        return raw_result
+    if payload.get("success") is not True:
+        return tool_error(
+            str(payload.get("error") or "Video task submission failed"),
+            success=False,
+        )
+
+    # The endpoint response also includes upstream payloads and a full log record.
+    # Returning only task-tracking fields keeps the model context small while the
+    # authenticated web UI follows the task through the status endpoint.
+    task_id = str(payload.get("task_id") or "").strip()
+    if not task_id:
+        return tool_error("Video task submission returned no task ID", success=False)
+
+    return tool_result(
+        {
+            "success": True,
+            "submitted": True,
+            "status": str(payload.get("status") or "pending"),
+            "task_id": task_id,
+            "callback_mode": bool(payload.get("callback_mode")),
+            "event_stream": bool(payload.get("event_stream")),
+            "message": "视频任务已提交，平台将继续跟踪生成结果。",
+        }
+    )
+
+
+def _ask_question(args: Dict[str, Any], **kwargs) -> str:
+    """Return a structured decision request for the Storyboard chat UI."""
+    del kwargs
+    question = str(args.get("question") or "").strip()
+    if not question:
+        return tool_error("question is required", success=False)
+
+    selection_type = str(args.get("selection_type") or "single").strip().lower()
+    if selection_type not in {"single", "multiple"}:
+        return tool_error(
+            "selection_type must be 'single' or 'multiple'",
+            success=False,
+        )
+
+    raw_options = args.get("options")
+    if not isinstance(raw_options, list) or not raw_options:
+        return tool_error("options must be a non-empty array", success=False)
+    if len(raw_options) > _MAX_QUESTION_OPTIONS:
+        return tool_error(
+            f"options supports at most {_MAX_QUESTION_OPTIONS} items",
+            success=False,
+        )
+
+    options: list[dict[str, str]] = []
+    seen_values: set[str] = set()
+    for index, raw_option in enumerate(raw_options):
+        if isinstance(raw_option, str):
+            label = raw_option.strip()
+            value = label
+            description = ""
+        elif isinstance(raw_option, dict):
+            label = str(
+                raw_option.get("label")
+                or raw_option.get("title")
+                or raw_option.get("value")
+                or ""
+            ).strip()
+            value = str(raw_option.get("value") or label).strip()
+            description = str(
+                raw_option.get("description") or raw_option.get("help") or ""
+            ).strip()
+        else:
+            return tool_error(
+                f"options[{index}] must be a string or object",
+                success=False,
+            )
+        if not label or not value:
+            return tool_error(
+                f"options[{index}] requires a non-empty label and value",
+                success=False,
+            )
+        if value in seen_values:
+            return tool_error(
+                f"options[{index}] duplicates value {value!r}",
+                success=False,
+            )
+        seen_values.add(value)
+        options.append(
+            {
+                "label": label[:200],
+                "value": value[:200],
+                "description": description[:500],
+            }
+        )
+
+    return tool_result(
+        {
+            "success": True,
+            "status": "awaiting_user_input",
+            "ui": {
+                "kind": "question",
+                "question": question[:2000],
+                "selection_type": selection_type,
+                "options": options,
+                "allow_other": args.get("allow_other") is not False,
+                "allow_skip": args.get("allow_skip") is not False,
+                "other_label": str(args.get("other_label") or "其他（可自行填写）")[:100],
+                "placeholder": str(args.get("placeholder") or "输入自定义指令")[:200],
+                "submit_label": str(args.get("submit_label") or "提交")[:40],
+                "skip_label": str(args.get("skip_label") or "跳过")[:40],
+            },
+            "message": (
+                "The question card is waiting for the user's decision. Stop this turn "
+                "without choosing on the user's behalf. The platform will inject the "
+                "submitted or skipped decision in the next turn."
+            ),
+        }
+    )
+
+
 CANVAS_IMAGE_GENERATE_SCHEMA = {
     "name": "canvas_image_generate",
     "description": (
@@ -778,6 +1002,173 @@ CANVAS_IMAGE_GENERATE_SCHEMA = {
 }
 
 
+CANVAS_VIDEO_GENERATE_SCHEMA = {
+    "name": "canvas_video_generate",
+    "description": (
+        "Submit one asynchronous video generation task through the storyboard platform "
+        "/api/canvas/generate-video endpoint using internal session auth. Use this for "
+        "storyboard platform video generation instead of generic video tools. The platform "
+        "tracks the task after submission. In API-server embedded sessions, the current page "
+        "scriptName overrides any model-provided value. After successful submission, never "
+        "mention task IDs, route IDs, upstream IDs, or model IDs in the assistant reply."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "scriptName": {
+                "type": "string",
+                "description": "Optional script name. Embedded sessions use the current page scriptName.",
+            },
+            "prompt": {
+                "type": "string",
+                "description": "Video generation prompt. May be empty only when multi_prompt supplies the content.",
+            },
+            "model": {
+                "type": "string",
+                "description": "Storyboard platform video model ID. Defaults to sd2.",
+            },
+            "ratio": {
+                "type": "string",
+                "description": "Requested aspect ratio, for example 16:9 or 9:16. Defaults to 16:9.",
+            },
+            "duration": {
+                "type": "integer",
+                "minimum": 1,
+                "description": (
+                    "Requested duration in seconds. MiniMax H3 and its variants require "
+                    "duration=15 for every independently submitted segment. Other "
+                    "model-specific limits are validated by the platform."
+                ),
+            },
+            "resolution": {
+                "type": "string",
+                "description": "Optional model-specific resolution such as 480p, 720p, or 1080p.",
+            },
+            "sound": {
+                "type": "boolean",
+                "description": "Generate sound when the selected model supports it.",
+            },
+            "minimax_h3_acceleration": {
+                "type": "boolean",
+                "description": "Optional MiniMax H3 acceleration switch.",
+            },
+            "prompt_extend": {
+                "type": "boolean",
+                "description": "Optional Wan prompt extension switch.",
+            },
+            "refer_type": {
+                "type": "string",
+                "description": "Optional Kling reference mode.",
+            },
+            "keep_original_sound": {
+                "type": "string",
+                "description": "Optional Kling original-sound setting.",
+            },
+            "multi_shot": {
+                "type": "boolean",
+                "description": "Enable a model-specific multi-shot request.",
+            },
+            "shot_type": {
+                "type": "string",
+                "description": "Optional model-specific shot type.",
+            },
+            "multi_prompt": {
+                "type": "array",
+                "description": "Optional model-specific multi-shot prompt objects.",
+                "items": {"type": "object"},
+            },
+            "reference_images": {
+                "type": "array",
+                "description": "Optional reference image asset objects or URLs.",
+                "items": {},
+            },
+            "reference_videos": {
+                "type": "array",
+                "description": "Optional reference video asset objects or URLs.",
+                "items": {},
+            },
+            "reference_audios": {
+                "type": "array",
+                "description": "Optional reference audio asset objects or URLs.",
+                "items": {},
+            },
+            "reference_elements": {
+                "type": "array",
+                "description": "Optional Kling element references.",
+                "items": {},
+            },
+            "timeout_seconds": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 300,
+                "description": "Submission request timeout. This does not wait for video completion.",
+            },
+        },
+        "anyOf": [
+            {"required": ["prompt"]},
+            {"required": ["multi_prompt"]},
+        ],
+    },
+}
+
+
+ASK_QUESTION_SCHEMA = {
+    "name": "ask_question",
+    "description": (
+        "Ask the user one clear decision question in an interactive Storyboard card. "
+        "Use single selection for mutually exclusive alternatives and multiple selection "
+        "for optional features that may be combined. The card includes an optional custom "
+        "write-in field plus Submit and Skip actions. Call this instead of asking a plain-text "
+        "choice question when work cannot safely continue without the user's preference. "
+        "After the tool returns awaiting_user_input, stop the turn and never select an option "
+        "for the user; the platform resumes the same conversation after the response."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "minLength": 1,
+                "description": "A concise explanation of the decision or disagreement that must be resolved.",
+            },
+            "selection_type": {
+                "type": "string",
+                "enum": ["single", "multiple"],
+                "description": "single renders radio buttons; multiple renders checkboxes.",
+            },
+            "options": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": _MAX_QUESTION_OPTIONS,
+                "description": "Preset choices shown in the question card.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "label": {"type": "string", "minLength": 1},
+                        "value": {"type": "string", "minLength": 1},
+                        "description": {"type": "string"},
+                    },
+                    "required": ["label", "value"],
+                },
+            },
+            "allow_other": {
+                "type": "boolean",
+                "description": "Whether to show the custom write-in field. Defaults to true.",
+            },
+            "allow_skip": {
+                "type": "boolean",
+                "description": "Whether to show the Skip action. Defaults to true.",
+            },
+            "other_label": {"type": "string"},
+            "placeholder": {"type": "string"},
+            "submit_label": {"type": "string"},
+            "skip_label": {"type": "string"},
+        },
+        "required": ["question", "selection_type", "options"],
+    },
+}
+
+
 registry.register(
     name="storyboard_api",
     toolset="storyboard",
@@ -793,6 +1184,24 @@ registry.register(
     schema=CANVAS_IMAGE_GENERATE_SCHEMA,
     handler=_canvas_image_generate,
     emoji="IMG",
+    max_result_size_chars=12000,
+)
+
+registry.register(
+    name="ask_question",
+    toolset="storyboard",
+    schema=ASK_QUESTION_SCHEMA,
+    handler=_ask_question,
+    emoji="ASK",
+    max_result_size_chars=12000,
+)
+
+registry.register(
+    name="canvas_video_generate",
+    toolset="storyboard",
+    schema=CANVAS_VIDEO_GENERATE_SCHEMA,
+    handler=_canvas_video_generate,
+    emoji="VID",
     max_result_size_chars=12000,
 )
 

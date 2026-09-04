@@ -130,7 +130,9 @@ def assert_core_integration(fork_root: Path) -> None:
 
 _STORYBOARD_TOOLS = {
     "storyboard_api",
+    "ask_question",
     "canvas_image_generate",
+    "canvas_video_generate",
     "character_three_view_generate",
     "zenmux_video_analyze",
 }

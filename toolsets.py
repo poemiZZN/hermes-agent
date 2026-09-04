@@ -137,6 +137,7 @@ TOOLSETS = {
         "description": "Storyboard platform APIs with session-scoped authentication",
         "tools": [
             "storyboard_api",
+            "ask_question",
             "canvas_image_generate",
             "zenmux_video_analyze",
         ],

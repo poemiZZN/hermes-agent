@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-2",
-  "preparedAt": "2026-09-03T03:42:55.956177+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-7",
+  "preparedAt": "2026-09-04T06:06:09.239570+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -49,6 +49,7 @@
         "character-design-prompt",
         "art-asset-production",
         "character-three-view",
+        "kids-fantasy-vs-reality-video",
         "minimax-h3-video-prompt",
         "storyboard-script-generator",
         "wan3-drama-prompt-v2",
@@ -79,7 +80,7 @@
     },
     {
       "path": "storyboard_integration/install_runtime.py",
-      "sha256": "83c81e8dd28388dfa7a7dc395eba175893b8729e8bab73bebc9b0096a2b245ae"
+      "sha256": "e81d34f94e0d803e816c4fa8df527ec9c9ec9998a65c73572a7ed4c6d1f73426"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/.env.template",
@@ -199,7 +200,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "67da0d4855949fe18a37f56c26414863c64b979eef0a49b423163d240b941930"
+      "sha256": "b15cf92ba75e1fd00d316d74c797079228341feb6602894469293899b75647cc"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -240,6 +241,50 @@
     {
       "path": "storyboard_integration/profiles/storyboard/skills/duanju-art-prompt/SKILL.md",
       "sha256": "087b6e5fdd74197ce30669b354cc7a3bbda95aa39a880d028500ff960e9ee7eb"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/5-storylines.md",
+      "sha256": "0293a3a56d6d2089e99a835e571c7727d9de10e44089e67321a1893a33191306"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-1-all-20.md",
+      "sha256": "7a29785dbf0e519031a579d618056560ba894acf1cc7fd80c18d3e5c1e6104fc"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-2-all-20.md",
+      "sha256": "a96078220b952f1afa17d2a24e917b0eb1dcc7b8a83e4908626a9e8593851c01"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-2-growing-up.md",
+      "sha256": "775d1177a52ba569aa06fe5f32cb651da8c4e3325208fe7d0d26afee8cba1938"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-3-all-20.md",
+      "sha256": "72f5e7a5413e875f8c25832f49ecebac1d10171344b233c7b37b74acbd261c83"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-3-progression.md",
+      "sha256": "e4016970be270ff278ec13b662f100298b8cbb4c0cc57f2fa0165a66037e1561"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-4-all-20.md",
+      "sha256": "893ed07e5d8698e44319f771408e231e728ab7873275ef112d34f560c0cd91da"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-4-childhood-fears.md",
+      "sha256": "eaa9ba546fd766fb27cafe5fc41f642a29fc50d47c62e9a40123c071d4058c4a"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-5-all-20.md",
+      "sha256": "13a5af06083b0ffc81271e5493f2cc3424e655fef9f3fd66a738ccc95b57a8a7"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/references/category-5-sneaky-wins.md",
+      "sha256": "564e0e02137080473a53e581ed4452f308abdbc708541764877ee25583f9e07d"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/kids-fantasy-vs-reality-video/SKILL.md",
+      "sha256": "1b330bb5eb0fcb4378933c9a49b88ed66fbb2ac8c1ac0f2565ac0bbbe317c524"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-video-prompt/references/base-prompt-format.md",
@@ -339,7 +384,7 @@
     },
     {
       "path": "tools/storyboard_api_tool.py",
-      "sha256": "e659f196a587c7ed71933f89cf075fe63e360065ff54ed0f28f18968c014df61"
+      "sha256": "3fac7e2f15b97d343e6c85721a28a08d0748e08e367e8fbc73f130f06f2a330a"
     },
     {
       "path": "tools/zenmux_video_analyze_tool.py",
@@ -347,7 +392,7 @@
     },
     {
       "path": "toolsets.py",
-      "sha256": "a91434df789f82f15ac2a533fd91b487e82a397bf2b1aa9edba217c83b318d58"
+      "sha256": "9b4adeed231505a35f940989c6d5e99988de216c023a543259e4955833310257"
     }
   ]
 }
