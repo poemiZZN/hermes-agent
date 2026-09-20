@@ -393,6 +393,100 @@ _TOOL_SCHEMAS: List[Dict[str, Any]] = [
         }
     },
     {
+        "name": "read_script_artifact",
+        "description": "读取当前对话绑定的剧本任务里某个节点已经产出的正文。支持查看产物清单、按字符偏移分块读取和关键词搜索。只读，不会启动或重跑任何节点。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "operation": {
+                    "type": "string",
+                    "enum": ["list", "read", "search"],
+                    "description": "list查看有哪些节点产物及各自字数；read按offset分块读取；search查找关键词"
+                },
+                "artifact_key": {
+                    "type": "string",
+                    "enum": [
+                        "contract",
+                        "story",
+                        "characters",
+                        "episodes",
+                        "draft",
+                        "story_state",
+                        "final_script"
+                    ],
+                    "description": "read 和 search 必填，要读取的节点产物"
+                },
+                "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "read 的起始字符位置"
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 500,
+                    "maximum": 8000,
+                    "description": "单次最多读取8000字符，默认6000"
+                },
+                "query": {
+                    "type": "string",
+                    "description": "search 使用的关键词"
+                }
+            },
+            "required": [
+                "operation"
+            ]
+        }
+    },
+    {
+        "name": "propose_artifact_edit",
+        "description": "为当前剧本任务的某个节点产物提出改写，只生成确认卡，不写入。改写会让依赖它的下游节点产物失效并需要重新生成，所以必须先经用户确认。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "artifact_key": {
+                    "type": "string",
+                    "enum": [
+                        "contract",
+                        "story",
+                        "characters",
+                        "episodes",
+                        "draft",
+                        "story_state",
+                        "final_script"
+                    ],
+                    "description": "要改写的节点产物"
+                },
+                "content": {
+                    "type": "string",
+                    "description": "改写后的完整正文，必须是整篇内容而不是差异片段"
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "改了什么、为什么改，用于确认卡"
+                }
+            },
+            "required": [
+                "artifact_key",
+                "content"
+            ]
+        }
+    },
+    {
+        "name": "confirm_artifact_edit",
+        "description": "用户明确确认后，把上一次准备好的节点产物改写真正写入任务。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "confirmed": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "confirmed"
+            ]
+        }
+    },
+    {
         "name": "pause_task",
         "description": "暂停当前或指定任务。",
         "parameters": {
@@ -470,10 +564,8 @@ _TOOL_SCHEMAS: List[Dict[str, Any]] = [
                 "skill": {
                     "type": "string",
                     "enum": [
-                        "overall_dispatcher",
-                        "character_continuity",
+                        "skeleton_continuity",
                         "hook_rhythm",
-                        "logic_holes",
                         "character_humanity"
                     ]
                 },
@@ -577,6 +669,30 @@ registry.register(
     toolset="scriptmaker",
     schema=_SCHEMA_BY_NAME["confirm_script_generation"],
     handler=_make_handler("confirm_script_generation"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="read_script_artifact",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["read_script_artifact"],
+    handler=_make_handler("read_script_artifact"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="propose_artifact_edit",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["propose_artifact_edit"],
+    handler=_make_handler("propose_artifact_edit"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="confirm_artifact_edit",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["confirm_artifact_edit"],
+    handler=_make_handler("confirm_artifact_edit"),
     emoji="SM",
     max_result_size_chars=_MAX_RESULT_CHARS,
 )
