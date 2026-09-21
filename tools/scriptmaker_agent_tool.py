@@ -360,6 +360,46 @@ _TOOL_SCHEMAS: List[Dict[str, Any]] = [
                     "type": "string",
                     "description": "standard或waibao，默认standard"
                 },
+                "locked_facts": {
+                    "type": "array",
+                    "description": "用户明确要求全程不得违反的规则：核心人设、世界观规则、人物关系、必须保留的冲突、结局边界。只收用户自己说过的，不要代为发挥；用户没提就不要传。",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "rule": {
+                                "type": "string",
+                                "description": "一条规则，一句话写清"
+                            },
+                            "quote": {
+                                "type": "string",
+                                "description": "用户原话片段，供用户在确认卡上回溯这条是从哪句来的"
+                            }
+                        },
+                        "required": [
+                            "rule"
+                        ]
+                    }
+                },
+                "style_directions": {
+                    "type": "array",
+                    "description": "用户对风格、节奏、语言和禁忌的要求。这些是偏好，优先级低于 locked_facts，与集数字数冲突时以数值为准；用户没提就不要传。",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "direction": {
+                                "type": "string",
+                                "description": "一条要求，一句话写清"
+                            },
+                            "quote": {
+                                "type": "string",
+                                "description": "用户原话片段，供用户在确认卡上回溯这条是从哪句来的"
+                            }
+                        },
+                        "required": [
+                            "direction"
+                        ]
+                    }
+                },
                 "execution_scope": {
                     "type": "string",
                     "enum": [
