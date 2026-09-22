@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-9",
-  "preparedAt": "2026-09-21T09:55:33.613452+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-10",
+  "preparedAt": "2026-09-22T07:32:51.996728+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -59,12 +59,20 @@
   ],
   "files": [
     {
+      "path": "agent/secret_scope.py",
+      "sha256": "ae76820e32eb566481537ee3d269f26e6d056b41278f9c448d95aead65d3a871"
+    },
+    {
       "path": "gateway/platforms/api_server.py",
-      "sha256": "519d47043a11c478daaf75fc95ca876457b416116d44d122ae6c555e72716a4b"
+      "sha256": "066621a1c524e42b5985e9e28c408e0adccff0fefaa448768e6ec412fc11052b"
     },
     {
       "path": "gateway/platforms/api_server_runs.py",
       "sha256": "207f7b2c922ec74834458a5e01003b36a8675322c5d017e6d48915ea0587d2e1"
+    },
+    {
+      "path": "gateway/run.py",
+      "sha256": "b9e0507fc96c59d9c4399993394b8e85ddeaf58199727e9a35e919364ab837cf"
     },
     {
       "path": "gateway/session_context.py",
