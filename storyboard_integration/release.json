@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-10",
-  "preparedAt": "2026-09-22T07:32:51.996728+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-11",
+  "preparedAt": "2026-09-22T07:48:18.279612+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -77,6 +77,10 @@
     {
       "path": "gateway/session_context.py",
       "sha256": "98133bfc32f68c37dae6e9ecc14be4c19e49fe552623a22b5737c6b81f036613"
+    },
+    {
+      "path": "hermes_cli/config.py",
+      "sha256": "c3a83aad7982a1c0a0317f0865a17b678265939364ed6db5dc0cff15c6ccdda2"
     },
     {
       "path": "hermes_cli/stdio.py",
