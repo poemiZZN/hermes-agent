@@ -4833,7 +4833,28 @@ def get_env_value_prefer_dotenv(key: str) -> Optional[str]:
     that, under an active profile scope (multiplexed gateway turn), this read
     is scope-checked rather than leaking another profile's raw ``os.environ``
     value — matching the credential-pool seeding path's behaviour.
+
+    An installed scope is consulted BEFORE the file. Under multiplexing the
+    scope is authoritative — that is the contract ``get_secret`` documents —
+    and the scope is built from this same ``.env``, so for an ordinary key the
+    two agree and nothing changes. The difference is a value the scope holds
+    and the file cannot: a credential bound to one request, such as the
+    caller's own model key. Reading the file first made such a key
+    unreachable whenever the profile also had one of its own. The .env-first
+    rule below is about beating a STALE value inherited from the parent shell,
+    not one deliberately installed for this turn.
     """
+    try:
+        from agent.secret_scope import current_secret_scope
+
+        scope = current_secret_scope()
+    except Exception:
+        scope = None
+    if scope is not None:
+        scoped = scope.get(key)
+        if scoped:
+            return scoped
+
     env_vars = load_env()
     val = env_vars.get(key)
     if val:
