@@ -177,6 +177,7 @@ from gateway.browser_control_broker import (
 
 from agent.secret_scope import UnscopedSecretError as _UnscopedSecretError
 from agent.secret_scope import get_secret as _scoped_get_secret
+from agent.secret_scope import reset_platform_model_key, set_platform_model_key
 
 
 def _get_scoped_secret(name, default=None):
@@ -2177,6 +2178,43 @@ class APIServerAdapter(BasePlatformAdapter):
 
         return _profile_runtime_scope(get_profile_dir(profile))
 
+    def _parse_platform_model_key(
+        self, request: "web.Request"
+    ) -> tuple[str, Optional["web.Response"]]:
+        """Read the caller's own upstream model key for this one request.
+
+        Validated like every other platform header: control characters would let
+        a value forge a header on any echo path, and an unbounded one is a cheap
+        way to push work into every downstream string operation. The value is
+        never echoed, logged, or written to the environment — it goes into a
+        contextvar that ``_profile_runtime_scope`` overlays onto the profile's
+        secret scope for the life of this request.
+        """
+        raw = request.headers.get("X-Hermes-Platform-Model-Key", "").strip()
+        if not raw:
+            return "", None
+        if re.search(r'[\r\n\x00]', raw):
+            return "", web.json_response(
+                {
+                    "error": {
+                        "message": "Invalid platform model key",
+                        "type": "invalid_request_error",
+                    }
+                },
+                status=400,
+            )
+        if len(raw) > self._MAX_SESSION_HEADER_LEN:
+            return "", web.json_response(
+                {
+                    "error": {
+                        "message": "Platform model key too long",
+                        "type": "invalid_request_error",
+                    }
+                },
+                status=400,
+            )
+        return raw, None
+
     def _make_profile_prefix_middleware(self):
         """Reject unknown /p/<profile>/ prefixes and scope the request home."""
 
@@ -2189,6 +2227,15 @@ class APIServerAdapter(BasePlatformAdapter):
                     status=404,
                 )
             token = _api_request_profile.set(profile)
+            # Read BEFORE entering the profile scope. That scope is where the
+            # key is overlaid onto the profile's secrets, so a key parsed later
+            # — with the rest of the platform headers, inside the handler —
+            # would arrive after its only reader had already run.
+            model_key, model_key_error = self._parse_platform_model_key(request)
+            if model_key_error is not None:
+                _api_request_profile.reset(token)
+                return model_key_error
+            model_key_token = set_platform_model_key(model_key)
             try:
                 with self._profile_scope(profile):
                     resolved_profile = profile or "default"
@@ -2204,6 +2251,9 @@ class APIServerAdapter(BasePlatformAdapter):
                         _api_request_browser_control_transport_family.reset(family_token)
                         _api_request_browser_control_principal.reset(principal_token)
             finally:
+                # Unbind first: a key that outlives its request would be spent
+                # by whichever request inherits this context next.
+                reset_platform_model_key(model_key_token)
                 _api_request_profile.reset(token)
 
         return profile_prefix_middleware

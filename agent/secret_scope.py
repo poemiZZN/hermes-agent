@@ -87,6 +87,36 @@ def current_secret_scope() -> Optional[Mapping[str, str]]:
     return _SECRET_SCOPE.get()
 
 
+# ── the caller's own model credential for one turn ───────────────────────
+# Deliberately NOT in gateway.session_context._VAR_MAP. Everything in that map
+# is a string ``HERMES_SESSION_*`` value that ``get_session_env`` will happily
+# fall back to ``os.environ`` for — which for a credential means a stray process
+# env var would silently pay for every turn. This one is read by
+# ``_profile_runtime_scope`` alone, overlaid onto the profile scope, and never
+# written anywhere a later turn could find it.
+_PLATFORM_MODEL_KEY: ContextVar[str] = ContextVar("_PLATFORM_MODEL_KEY", default="")
+
+
+def set_platform_model_key(value: Optional[str]) -> Token:
+    """Bind the calling user's upstream model key to this request.
+
+    Returns a token for ``reset_platform_model_key``. Must be paired in a
+    ``finally``: a key left bound outlives its turn and would be spent by
+    whichever request inherits the context next.
+    """
+    return _PLATFORM_MODEL_KEY.set(str(value or ""))
+
+
+def reset_platform_model_key(token: Token) -> None:
+    """Unbind the per-request model key."""
+    _PLATFORM_MODEL_KEY.reset(token)
+
+
+def current_platform_model_key() -> str:
+    """The caller's own model key for this request, or "" when none was sent."""
+    return _PLATFORM_MODEL_KEY.get() or ""
+
+
 # ── genuinely-global env vars (NOT per-profile secrets) ──────────────────
 # These are process/deployment-level settings, not profile credentials. They
 # legitimately live in os.environ and must keep reading from it even in

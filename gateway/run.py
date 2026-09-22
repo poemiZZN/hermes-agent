@@ -2542,6 +2542,29 @@ async def _reclaim_stale(runner: object) -> None:
         )
 
 
+def _profile_model_key_env(profile_home: "Path") -> str:
+    """The env var a profile's ``model.api_key`` placeholder refers to.
+
+    Read from the profile's own ``config.yaml`` rather than hard-coded, so
+    changing provider (or naming the key differently) needs no change here. A
+    profile whose ``api_key`` is a literal rather than a ``${VAR}`` placeholder
+    has nothing to override, and returns "".
+    """
+    try:
+        import yaml
+
+        raw = (Path(profile_home) / "config.yaml").read_text(encoding="utf-8")
+        parsed = yaml.safe_load(raw) or {}
+        model = parsed.get("model") if isinstance(parsed, dict) else None
+        api_key = (model or {}).get("api_key") if isinstance(model, dict) else ""
+        text = str(api_key or "").strip()
+    except Exception:
+        return ""
+    if text.startswith("${") and text.endswith("}"):
+        return text[2:-1].strip()
+    return ""
+
+
 @_contextmanager
 def _profile_runtime_scope(profile_home: "Path"):
     """Scope config/skills/memory AND credentials to a profile for one turn.
@@ -2555,6 +2578,12 @@ def _profile_runtime_scope(profile_home: "Path"):
          keys and never the process-global ``os.environ`` (which in a
          multiplexer may hold another profile's values).
 
+    When the caller supplied its own upstream model key for this request, that
+    key is overlaid on top of the profile's — so the upstream gateway meters the
+    turn against whoever asked for it rather than against one shared pool. The
+    overlay is a new dict: mutating the profile scope in place would leak one
+    caller's key into every later turn that reused it.
+
     Only used on the multiplexed inbound path. Single-profile gateways never
     enter this scope, so their behavior is unchanged. Loading the profile's
     ``.env`` here does NOT mutate ``os.environ`` — ``build_profile_secret_scope``
@@ -2564,6 +2593,7 @@ def _profile_runtime_scope(profile_home: "Path"):
     from hermes_constants import set_hermes_home_override, reset_hermes_home_override
     from agent.secret_scope import (
         build_profile_secret_scope,
+        current_platform_model_key,
         set_secret_scope,
         reset_secret_scope,
     )
@@ -2571,7 +2601,17 @@ def _profile_runtime_scope(profile_home: "Path"):
 
     home_token = set_hermes_home_override(str(profile_home))
     hydrate_profile_secret_sources(Path(profile_home))
-    secret_token = set_secret_scope(build_profile_secret_scope(Path(profile_home)))
+    scope = build_profile_secret_scope(Path(profile_home))
+    caller_model_key = current_platform_model_key()
+    if caller_model_key:
+        key_env = _profile_model_key_env(profile_home)
+        if key_env:
+            # A copy, never an in-place write: the profile scope is rebuilt per
+            # request but this dict is the one the agent thread reads through
+            # copy_context(), and one caller's key must not survive into the next
+            # request's turn.
+            scope = {**scope, key_env: caller_model_key}
+    secret_token = set_secret_scope(scope)
     try:
         yield
     finally:
