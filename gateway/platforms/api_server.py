@@ -2197,6 +2197,18 @@ class APIServerAdapter(BasePlatformAdapter):
         raw = request.headers.get("X-Hermes-Platform-Model-Key", "").strip()
         if not raw:
             return "", None
+        # Profile-scoped like the turn ticket and API base: a credential meant
+        # for one platform must not be accepted — let alone spent — by another.
+        # Rejecting is louder than ignoring, so a misrouted integration finds
+        # out here instead of silently billing the wrong account.
+        if _api_request_profile.get() != "scriptmaker":
+            return "", web.json_response(
+                _openai_error(
+                    "Scriptmaker context is not valid for this profile",
+                    code="profile_context_mismatch",
+                ),
+                status=400,
+            )
         if re.search(r'[\r\n\x00]', raw):
             return "", web.json_response(
                 {

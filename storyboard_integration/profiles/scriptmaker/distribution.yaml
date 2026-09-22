@@ -1,5 +1,5 @@
 name: scriptmaker
-version: 1.2.0
+version: 1.3.0
 description: IDEA TO SCRIPT profile for full-cycle script development, adaptation, language polishing, review, task control, and export.
 hermes_requires: ">=0.21.0,<0.22.0"
 author: storyboard-web
