@@ -27,3 +27,25 @@ agent:
 tools:
   tool_search:
     enabled: "off"
+
+# scriptmaker 启用了 web toolset，后端必须随之带上：Hermes 的默认值是
+# backend: "" + provider_tier: {}，会落回 keyless 环，而环里的 exa 和 firecrawl
+# 在本构建上是坏的，全新安装的第一次搜索就会失败。
+#
+# 多路复用下每个 profile 的 config.yaml 相互独立，根目录 ~/.hermes/config.yaml
+# 的 web 段不会被继承 —— 这里必须自带一份。
+#
+# tavily 在本构建里没有 provider，历史全局配置 backend: tavily 是死配置。
+# 2026-09-22 实测：keyless 四家里只有 parallel 和 keenable 可用（exa 返回
+# Unrecognized MCP response shape，firecrawl 403）。search_with_failover() 只在
+# 限流类错误时才换下一家，所以环的起点必须钉死。端点恢复后可重新评估这几行。
+web:
+  backend: parallel
+  search_backend: parallel
+  extract_backend: parallel
+  keyless_fallback: true
+  provider_tier:
+    parallel: free      # 强制 keyless（无 key 也走公共端点），并 pin 为环起点
+    keenable: free      # 限流时的故障转移目标
+    exa: paid           # 端点已坏，用 paid 把它排除出 keyless 环
+    firecrawl: paid     # 同上（403）
