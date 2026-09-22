@@ -177,7 +177,11 @@ from gateway.browser_control_broker import (
 
 from agent.secret_scope import UnscopedSecretError as _UnscopedSecretError
 from agent.secret_scope import get_secret as _scoped_get_secret
-from agent.secret_scope import reset_platform_model_key, set_platform_model_key
+from agent.secret_scope import (
+    current_platform_model_key,
+    reset_platform_model_key,
+    set_platform_model_key,
+)
 
 
 def _get_scoped_secret(name, default=None):
@@ -7544,6 +7548,11 @@ class APIServerAdapter(BasePlatformAdapter):
         # run_in_executor threads, so the profile scope must be re-entered
         # inside _run() from this explicit value.
         request_profile = _api_request_profile.get()
+        # Same reason as request_profile: the caller's own model key is bound to
+        # the request context, and the profile scope re-entered below overlays it
+        # onto the profile's secrets. Without capturing it here the overlay runs
+        # with nothing to overlay and the turn is billed to the profile instead.
+        request_model_key = current_platform_model_key()
         request_browser_control_principal = (
             _api_request_browser_control_principal.get()
         )
@@ -7552,6 +7561,16 @@ class APIServerAdapter(BasePlatformAdapter):
         )
 
         def _run():
+            # Executor threads are pooled, so this is bound for the duration of
+            # one turn and unbound in the finally. Leaving it set would hand
+            # this caller's key to whatever turn reuses the thread next.
+            model_key_token = set_platform_model_key(request_model_key)
+            try:
+                return _run_scoped()
+            finally:
+                reset_platform_model_key(model_key_token)
+
+        def _run_scoped():
             from gateway.session_context import clear_session_vars
 
             with self._profile_scope(request_profile):

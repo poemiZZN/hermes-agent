@@ -3247,6 +3247,21 @@ def _seed_from_singletons(provider: str, entries: List[PooledCredential]) -> Tup
 # per-call reads (pool seeding, per-turn credential refresh) cost a stat()
 # when the file is unchanged.
 def get_env_prefer_dotenv(key: str) -> str:
+    # An installed scope wins outright. Under multiplexing the scope is
+    # authoritative (the contract get_secret documents, and what
+    # gateway.config._getenv already does), and it is built from this same
+    # .env — so for an ordinary key the two agree and nothing changes. What
+    # only the scope can carry is a credential bound to one request, such as
+    # the caller's own model key: reading .env first made that unreachable
+    # whenever the profile also had a key of its own, and the turn was billed
+    # to the profile instead with nothing to show it had happened.
+    from agent.secret_scope import current_secret_scope
+
+    if current_secret_scope() is not None:
+        scoped = (_get_secret(key, "") or "").strip()
+        if scoped:
+            return scoped
+
     env_file = load_env()
     raw = env_file.get(key, "").strip()
     scoped_value = (_get_secret(key, "") or "").strip()
