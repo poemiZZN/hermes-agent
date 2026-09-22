@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-13",
-  "preparedAt": "2026-09-22T08:41:08.811679+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-14",
+  "preparedAt": "2026-09-22T10:32:34.250380+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -104,11 +104,11 @@
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/config.yaml",
-      "sha256": "a056ec8ab37ec4ace4040ea566745e7e31045a5bd7e64c6780a712a11f8940f4"
+      "sha256": "e4955b86ecbf8a160546f17e015e77612a87e8c902dd851d05cab266f7b1da36"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/distribution.yaml",
-      "sha256": "3ba58b9d2e6cfd1dafaecef626602a7ea9319b8e7c3e3ecb6931b2ca02492f33"
+      "sha256": "53cfce8973df8527b136344111592f5bbae23bff66c0f8179ca43e42abbd7438"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/references/baokuan-gongshi.md",

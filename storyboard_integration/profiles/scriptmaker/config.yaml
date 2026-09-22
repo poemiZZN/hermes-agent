@@ -12,3 +12,18 @@ platform_toolsets:
 agent:
   disabled_toolsets:
     - storyboard
+
+# 本 profile 的 15 个平台工具（ask_choice、prepare_script_generation 等）默认会被
+# tool_search 延迟披露：它们不在模型可见的工具数组里，模型必须先花一轮
+# tool_describe 取 schema 才能调用。2026-09-22 实测一次这样的取 schema 往返要多花
+# 约 25k 输入 token 和 27 秒，而把全部延迟 schema 常驻只要约 1.7k token —— 净省。
+#
+# 注意 should_activate() 的语义：只要存在任何可延迟工具就会激活桥接，threshold_pct
+# 只控制清单预算、不控制激活。所以"只把某几个工具提升为常驻"在配置层面做不到，
+# 只能整体关掉，或改 fork 往 toolsets._HERMES_CORE_TOOLS 里加。
+#
+# web_search / web_extract 本来就在 _HERMES_CORE_TOOLS 里，任何时候都不会被延迟，
+# 不受这一项影响。
+tools:
+  tool_search:
+    enabled: "off"
