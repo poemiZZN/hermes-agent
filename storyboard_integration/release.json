@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-15",
-  "preparedAt": "2026-09-22T10:38:01.871126+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-16",
+  "preparedAt": "2026-09-22T10:49:22.290973+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -108,7 +108,7 @@
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/distribution.yaml",
-      "sha256": "9645ad7d5aeaaec543a0e8d1ed5049d579804204bc447506ad1fb65f9761b2ff"
+      "sha256": "3f41649129447093bb7a05e7e3b578ca0344c3016d2d7d050259d4da74cecbdb"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/references/baokuan-gongshi.md",
@@ -124,7 +124,7 @@
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/DESCRIPTION.md",
-      "sha256": "dd8fde635ee2babc61bb25b98496542b91ba393bdc7cbe0b042e38c95f6dfb51"
+      "sha256": "0c66f1dcc00d9b754683a28c0e0a2f17d828c097595b0997b82140a7d277dd0b"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/doctor-and-export/SKILL.md",
