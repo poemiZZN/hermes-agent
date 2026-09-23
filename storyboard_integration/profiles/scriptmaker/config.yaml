@@ -22,7 +22,10 @@ agent:
 # （见 corePatch），不会回落到下面这个共享令牌。SCRIPTMAKER_MODEL_API_KEY
 # 只服务没有带用户令牌的调用（平台关掉一用户一 Key 时）。
 model:
-  default: deepseek-v4-pro
+  # 平台发来的 model 字段在 /v1/responses 上会被忽略（没开 direct_model_requests，
+  # 也没有 model_routes），实际计费的模型只看这里。New API 需在 default 分组
+  # （用户令牌所在分组）为该模型配置渠道，否则每一轮都会 503 model_not_found。
+  default: deepseek-v4-pro-idea
   provider: custom
   base_url: http://127.0.0.1:3000/v1
   api_key: ${SCRIPTMAKER_MODEL_API_KEY}
