@@ -1795,6 +1795,14 @@ def spawn_background_review_thread(
         prompt = getattr(agent, "_MEMORY_REVIEW_PROMPT", _MEMORY_REVIEW_PROMPT)
     else:
         prompt = getattr(agent, "_SKILL_REVIEW_PROMPT", _SKILL_REVIEW_PROMPT)
+        # The stock prompt is written for one user: it asks the fork to embed
+        # that user's style preferences in SKILL.md. On a profile shared by
+        # many users (the platform API server) that turns one user's taste into
+        # everyone's rule, so such a profile supplies its own contract here.
+        # Skills-only reviews only: a combined review keeps its stock prompt.
+        configured = str(_background_review_task_config(task_cfg).get("skill_prompt") or "").strip()
+        if configured:
+            prompt = configured
 
     focus = (focus or "").strip()
     if focus:

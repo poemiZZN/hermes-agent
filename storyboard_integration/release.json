@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-19",
-  "preparedAt": "2026-09-23T05:39:25.193591+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-20",
+  "preparedAt": "2026-09-23T08:04:31.155595+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -59,6 +59,10 @@
   ],
   "files": [
     {
+      "path": "agent/background_review.py",
+      "sha256": "3d66a07638cff18c0b3389c3e3fbe18c34b96786a538109b59ff4970e7df309d"
+    },
+    {
       "path": "agent/credential_pool.py",
       "sha256": "80027433c2ca99d3ef8d53e25cf191edf97d3d962d16d0399c0f85c5bcfa4611"
     },
@@ -100,15 +104,15 @@
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/.env.template",
-      "sha256": "b6277d63d56186b98ce4fefd10f01e933ede7e7391a33f42913d0d14230c79e7"
+      "sha256": "186bfb0fafa783450afef862bcb1beea23974d1a5b9ecb3558584c894e4051f3"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/config.yaml",
-      "sha256": "cf56c24a44ea466a47a663327ea13b5cd29acb8646f1e5dbf851837069830d7b"
+      "sha256": "afd91c304a914ec8b8744e68198227481eaae5ea00bd02bf1a7bed37d761b449"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/distribution.yaml",
-      "sha256": "340141d233b0e587fe15deafb5ae07462569661f4f5d80041321b09312f13c67"
+      "sha256": "afa668bf05b5ac823b461a3fcafd8c072d39ec3372c15ba26a3018f39d023138"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/references/baokuan-gongshi.md",
@@ -212,11 +216,11 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/config.yaml",
-      "sha256": "528c8b051f3c1565f8ed42818012f4d24a38751ed6e64219f8a7398e996ca23f"
+      "sha256": "402e6436ca177cf4e5a25013fcea5664286c2f5773ade9588a412fa384288b44"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "b15cf92ba75e1fd00d316d74c797079228341feb6602894469293899b75647cc"
+      "sha256": "4fa66153a68d4c2f6111bcbb2d4324167b27553bfff705857521916b8d8376b8"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",

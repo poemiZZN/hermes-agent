@@ -5,13 +5,20 @@ platform_toolsets:
   api_server:
     - skills
     - memory
-    - session_search
     - scriptmaker
     - web
 
+# session_search 能列出、全文搜索本 profile 的所有会话——也就是所有平台用户的
+# 对话，带 profile 参数还能读其他 profile。平台自己按用户保存对话，Hermes 不需要
+# 跨会话回忆，所以关掉。
+#
+# 只从上面的 platform_toolsets 删掉不够：安装器合并配置时列表只补缺不删，现场
+# 已有的 session_search 会留着。disabled_toolsets 在 _get_platform_tools 里最后
+# 执行、压过 platform_toolsets，而列表合并会把新项补进现场，所以写在这里才生效。
 agent:
   disabled_toolsets:
     - storyboard
+    - session_search
 
 # 模型必须经过 New API：平台按用户计费靠的是 X-Hermes-Platform-Model-Key 里
 # 该用户自己的 New API 令牌，只有请求真正打到 New API 才会记到这个令牌上。
@@ -30,6 +37,61 @@ model:
   base_url: http://127.0.0.1:3000/v1
   api_key: ${SCRIPTMAKER_MODEL_API_KEY}
   api_mode: chat_completions
+
+# 通用方法复盘：打开后台复盘，但只沉淀技能，而且每次写技能都先进人工审批队列。
+#
+# - 本 profile 由所有平台用户共用。内置记忆 MEMORY.md / USER.md 按 profile 共享，
+#   9/2 出过跨用户泄漏，所以记忆保持关闭；用户级偏好由平台按 user_id 自己存。
+#   记忆关闭后复盘只剩技能这一条路，复盘 fork 也拿不到 memory 工具。
+# - 自带的技能复盘提示词要求把"这位用户"的风格偏好写进 SKILL.md，在共享 profile
+#   上会把一个人的口味变成所有人的规则，所以用 skill_prompt 换成多用户版本
+#   （需要 corePatch v12，旧 fork 会忽略这个键、退回自带提示词）。
+# - 复盘走单独的模型和平台自己的 New API 令牌。模型与 model.default 不同才算
+#   routed；routed 的复盘不继承平台系统提示（里面有会话上下文和用户的长期偏好），
+#   费用也不会记到触发它的那个用户头上。model 必须保持与 model.default 不同。
+# - api_server 每个请求新建 agent，工具调用计数按单轮算。2026-09-23 统计线上
+#   142 轮，没有一轮达到默认阈值 10；阈值 3 约覆盖 9% 的轮次。
+# - write_approval 让前台和后台的技能写入都先进 pending/skills/。管理员在
+#   `hermes -p scriptmaker` 里用 /skills pending、diff、approve、reject 审批；
+#   没人审批时提案只会堆着，不会生效。
+auxiliary:
+  background_review:
+    enabled: true
+    provider: custom
+    base_url: http://127.0.0.1:3000/v1
+    model: deepseek-v4-pro-hermes
+    api_key: ${SCRIPTMAKER_REVIEW_API_KEY}
+    skill_prompt: |
+      复盘上面的对话，决定是否更新技能库。这是多个用户共用的剧本平台：技能库对所有用户生效，
+      所以只能沉淀与具体用户无关、在这次对话里被验证有效的通用方法。你的每一次写入都会先进入
+      人工审核队列，管理员通过后才生效。
+
+      可以沉淀：
+      - 平台工具的正确用法和调用顺序（如 ask_choice、prepare_script_generation、
+        read_script_artifact），以及这次发现的坑和确实有效的修正办法；
+      - 检索同类作品、整理题材写法的有效方法；
+      - 跨项目通用的剧本创作技巧（结构、节奏、钩子等）。
+
+      不得写入：
+      - 任何用户的个人偏好、文风要求或合作习惯（这些由平台按用户单独保存）；
+      - 具体的故事、角色名、剧情、世界观设定、用户原话、附件内容；
+      - 用户身份信息、账号、密钥、平台内部数据；
+      - 环境或网络导致的一次性失败，以及"某工具不能用"之类的否定结论。
+
+      优先修改已有的、由复盘创建的通用技能，只有确实没有覆盖时才新建技能，名称必须是
+      类别级别，不能指向具体项目或用户。发布版本自带的技能和用户拥有的技能不要修改。
+      修改已有技能前先用 skill_view 读取它。
+
+      大多数对话不需要更新技能。没有可沉淀的通用方法时，只回复 "Nothing to save." 并结束。
+
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+  nudge_interval: 0
+
+skills:
+  write_approval: true
+  creation_nudge_interval: 3
 
 # 本 profile 的 15 个平台工具（ask_choice、prepare_script_generation 等）默认会被
 # tool_search 延迟披露：它们不在模型可见的工具数组里，模型必须先花一轮

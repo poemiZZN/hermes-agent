@@ -5,19 +5,24 @@ platform_toolsets:
   api_server:
     - skills
     - memory
-    - session_search
     - storyboard
   wecom:
     - skills
     - memory
-    - session_search
     - storyboard
   wecom_callback:
     - skills
     - memory
-    - session_search
     - storyboard
 
+# session_search 能列出、全文搜索本 profile 的所有会话——平台用户和企业微信用户
+# 的对话都在里面，带 profile 参数还能读其他 profile。它不区分用户，所以三个入口
+# 都关掉。
+#
+# 只从上面的 platform_toolsets 删掉不够：安装器合并配置时列表只补缺不删，现场
+# 已有的 session_search 会留着。disabled_toolsets 在 _get_platform_tools 里最后
+# 执行、压过 platform_toolsets，而列表合并会把新项补进现场，所以写在这里才生效。
 agent:
   disabled_toolsets:
     - scriptmaker
+    - session_search

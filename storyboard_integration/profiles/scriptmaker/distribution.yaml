@@ -1,5 +1,5 @@
 name: scriptmaker
-version: 1.7.2
+version: 1.8.0
 description: IDEA TO SCRIPT profile for full-cycle script development, adaptation, language polishing, review, task control, and export.
 hermes_requires: ">=0.21.0,<0.22.0"
 author: storyboard-web
@@ -13,6 +13,11 @@ env_requires:
   - name: SCRIPTMAKER_MODEL_API_KEY
     description: Shared New API token for model calls that carry no per-user X-Hermes-Platform-Model-Key.
     required: false
+  # Required: auxiliary.background_review routes to it, and without it a review
+  # would silently fall back to the triggering user's own key.
+  - name: SCRIPTMAKER_REVIEW_API_KEY
+    description: Platform-owned New API token used only by background skill review.
+    required: true
 distribution_owned:
   - SOUL.md
   - config.yaml
