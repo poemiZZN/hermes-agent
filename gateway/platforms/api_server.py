@@ -3214,6 +3214,18 @@ class APIServerAdapter(BasePlatformAdapter):
                     request_provider or "",
                 )
 
+        # The caller's own model key is the credential for this turn, full stop.
+        # The profile scope overlay alone never reached the model call: the
+        # config's ``model.api_key`` is expanded once against os.environ and
+        # cached, and a credential pool seeded from it keeps that literal in
+        # auth.json — both handed over the profile's shared key while the
+        # header looked accepted. Dropping the pool also stops a 401/429 from
+        # rotating onto the shared key mid-turn.
+        caller_model_key = current_platform_model_key()
+        if caller_model_key:
+            runtime_kwargs["api_key"] = caller_model_key
+            runtime_kwargs["credential_pool"] = None
+
         # When the config has no model.default but a provider was resolved
         # (e.g. user ran `hermes auth add openai-codex` without `hermes model`),
         # fall back to the provider's first catalog model so the API call
@@ -3276,9 +3288,13 @@ class APIServerAdapter(BasePlatformAdapter):
 
         # Load fallback provider chain so the API server platform has the
         # same fallback behaviour as Telegram/Discord/Slack (fixes #4954).
+        # A turn paid for with the caller's key has no fallback: every
+        # configured fallback runs on the profile's credentials, which would
+        # bill someone else for a turn the platform already charged this
+        # caller for.
         fallback_model = (
             None
-            if confirmed_runtime_lock
+            if confirmed_runtime_lock or caller_model_key
             else GatewayRunner._load_fallback_model()
         )
 

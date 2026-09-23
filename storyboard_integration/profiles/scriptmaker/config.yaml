@@ -13,6 +13,21 @@ agent:
   disabled_toolsets:
     - storyboard
 
+# 模型必须经过 New API：平台按用户计费靠的是 X-Hermes-Platform-Model-Key 里
+# 该用户自己的 New API 令牌，只有请求真正打到 New API 才会记到这个令牌上。
+# 此前现场 profile 直连阿里云 DashScope，12 个会话全部记在共享账号上，
+# New API 一条记录也没有。
+#
+# 有用户令牌的一轮，api_server 直接用它替换 api_key 并丢弃凭据池和 fallback
+# （见 corePatch），不会回落到下面这个共享令牌。SCRIPTMAKER_MODEL_API_KEY
+# 只服务没有带用户令牌的调用（平台关掉一用户一 Key 时）。
+model:
+  default: deepseek-v4-pro
+  provider: custom
+  base_url: http://127.0.0.1:3000/v1
+  api_key: ${SCRIPTMAKER_MODEL_API_KEY}
+  api_mode: chat_completions
+
 # 本 profile 的 15 个平台工具（ask_choice、prepare_script_generation 等）默认会被
 # tool_search 延迟披露：它们不在模型可见的工具数组里，模型必须先花一轮
 # tool_describe 取 schema 才能调用。2026-09-22 实测一次这样的取 schema 往返要多花

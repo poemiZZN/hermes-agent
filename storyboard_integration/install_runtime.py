@@ -338,10 +338,7 @@ def install_managed_file(
     backup_root: Path,
     *,
     check: bool,
-    preserve_existing: bool = False,
 ) -> None:
-    if preserve_existing and destination.exists():
-        return
     if check:
         if not destination.is_file() or sha256(source) != sha256(destination):
             fail(f"Installed profile file differs from Fork bundle: {destination}")
@@ -350,6 +347,61 @@ def install_managed_file(
     if destination.is_file() and sha256(source) != sha256(destination):
         backup_file(destination, backup_root / destination.name)
     shutil.copy2(source, destination)
+
+
+def merge_release_config(
+    live: dict, release: dict, prefix: str = ""
+) -> tuple[dict, list[str]]:
+    """Overlay the release profile config onto the site's copy.
+
+    A preserved config.yaml used to be skipped wholesale, so a release that
+    added a section (the scriptmaker ``web`` toolset and its backend) never
+    reached an existing install, and ``--check`` passed anyway. The release
+    owns every key it ships; the site keeps the ones it does not (model,
+    providers, ``agent.max_turns``). Mappings merge per key, release scalars
+    win, and lists gain missing release entries while keeping site extras.
+
+    Returns the merged mapping and the dotted paths that changed.
+    """
+    merged = dict(live)
+    changed: list[str] = []
+    for key, release_value in release.items():
+        path = f"{prefix}{key}"
+        live_value = live.get(key)
+        if isinstance(release_value, dict) and isinstance(live_value, dict):
+            merged[key], nested = merge_release_config(live_value, release_value, f"{path}.")
+            changed.extend(nested)
+        elif isinstance(release_value, list) and isinstance(live_value, list):
+            missing = [item for item in release_value if item not in live_value]
+            if missing:
+                merged[key] = live_value + missing
+                changed.append(path)
+        elif key not in live or live_value != release_value:
+            merged[key] = release_value
+            changed.append(path)
+    return merged, changed
+
+
+def reconcile_profile_config(
+    source: Path,
+    destination: Path,
+    backup_root: Path,
+    *,
+    check: bool,
+) -> None:
+    """Bring a preserved profile config.yaml up to the release's sections."""
+    live = load_yaml_mapping(destination)
+    merged, changed = merge_release_config(live, load_yaml_mapping(source))
+    if not changed:
+        return
+    if check:
+        fail(
+            f"Installed profile config is missing release settings: {destination} "
+            f"({', '.join(changed)}); rerun install_runtime.py without --check"
+        )
+    backup_file(destination, backup_root / destination.name)
+    write_yaml_mapping(destination, merged)
+    print(f"Merged release settings into {destination}: {', '.join(changed)}")
 
 
 def assert_profile_toolset_config(
@@ -535,13 +587,20 @@ def install_profile(
         profile_backup,
         check=check,
     )
-    install_managed_file(
-        source / "config.yaml",
-        profile_home / "config.yaml",
-        profile_backup,
-        check=check,
-        preserve_existing=not force_profile_config,
-    )
+    if force_profile_config or not (profile_home / "config.yaml").exists():
+        install_managed_file(
+            source / "config.yaml",
+            profile_home / "config.yaml",
+            profile_backup,
+            check=check,
+        )
+    else:
+        reconcile_profile_config(
+            source / "config.yaml",
+            profile_home / "config.yaml",
+            profile_backup,
+            check=check,
+        )
 
     expected_toolsets = {str(item) for item in record.get("toolsets") or []}
     assert_profile_toolset_config(
