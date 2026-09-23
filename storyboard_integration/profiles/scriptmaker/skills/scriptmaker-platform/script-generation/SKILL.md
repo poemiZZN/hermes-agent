@@ -51,15 +51,27 @@ Ask for **only the missing values**, at most three in one turn, and never re-ask
 
 ## Asking with `ask_choice`
 
-When a required field is missing or genuinely ambiguous, call `ask_choice` to render a selection card:
+When required fields are missing or genuinely ambiguous, call `ask_choice` once to render a selection card that asks all of them:
 
 ```text
 ask_choice(
-  field="total_episodes",
-  question="这部剧计划做多少集？",
-  options=[
-    {"label":"20 集","prompt":"总集数：20 集","description":"常见短剧长度"},
-    {"label":"30 集","prompt":"总集数：30 集","description":"更完整的情节容量"}
+  questions=[
+    {
+      "field": "total_episodes",
+      "question": "这部剧计划做多少集？",
+      "options": [
+        {"label":"20 集","prompt":"总集数：20 集","description":"常见短剧长度"},
+        {"label":"30 集","prompt":"总集数：30 集","description":"更完整的情节容量"}
+      ]
+    },
+    {
+      "field": "character_count",
+      "question": "主要角色大概几个？",
+      "options": [
+        {"label":"3 个","prompt":"主要角色 3 个"},
+        {"label":"5 个","prompt":"主要角色 5 个"}
+      ]
+    }
   ]
 )
 ```
@@ -67,11 +79,12 @@ ask_choice(
 Rules:
 
 - **`ask_choice` must be the only tool call in its turn.** Never pair it with an operation tool. The card stops the turn and waits for the user; anything called alongside it is discarded.
-- Two to five options. Fewer than two is rejected — use a short plain-language question instead.
-- One question per card, the single most decision-changing one.
+- Up to three questions per card, most decision-changing first. Ask everything that is missing on one card rather than one question per turn — each turn is a paid model call.
+- Two to five options per question. A question with fewer than two is rejected — fix it, or ask that one in plain language instead.
 - The user may always answer freely instead of picking an option.
+- With several questions the answers come back as one message, one line per question: `【问题】答案`.
 
-After the tool returns `awaiting_user_input: true`, present the question and stop. Do not guess the answer and continue.
+After the tool returns `awaiting_user_input: true`, stop. The card already shows the questions; do not guess the answers and continue.
 
 ## Understanding the user
 

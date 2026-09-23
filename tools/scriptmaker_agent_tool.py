@@ -184,51 +184,65 @@ def _make_handler(tool_name: str) -> Callable[..., str]:
 _TOOL_SCHEMAS: List[Dict[str, Any]] = [
     {
         "name": "ask_choice",
-        "description": "只有关键条件无法从用户原话和上下文可靠推断时，向用户展示一个语义化选择卡。一次只问一个问题，不要用它重复询问已知信息。",
+        "description": "只有关键条件无法从用户原话和上下文可靠推断时，向用户展示一张语义化选择卡。缺几项就在同一张卡里一次问完（最多3个问题），每个问题各自给选项；不要把能一起问的问题拆成多轮，也不要用它重复询问已知信息。",
         "parameters": {
             "type": "object",
             "properties": {
-                "field": {
-                    "type": "string",
-                    "description": "稳定字段名，例如 total_episodes、character_count、execution_scope、target_project"
-                },
-                "question": {
-                    "type": "string",
-                    "description": "简短自然的问题"
-                },
-                "options": {
+                "questions": {
                     "type": "array",
-                    "minItems": 2,
-                    "maxItems": 5,
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "description": "本轮要问的问题，按重要程度排序。只有一个问题时，用户点选项即发送；有多个问题时，用户逐项作答后一次提交，答案按“【问题】答案”逐行发回。",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "label": {
-                                "type": "string"
-                            },
-                            "prompt": {
+                            "field": {
                                 "type": "string",
-                                "description": "用户选择后作为下一条消息发送的完整语义"
+                                "description": "稳定字段名，例如 total_episodes、character_count、execution_scope、target_project"
                             },
-                            "description": {
-                                "type": "string"
+                            "question": {
+                                "type": "string",
+                                "description": "简短自然的问题"
+                            },
+                            "options": {
+                                "type": "array",
+                                "minItems": 2,
+                                "maxItems": 5,
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "label": {
+                                            "type": "string"
+                                        },
+                                        "prompt": {
+                                            "type": "string",
+                                            "description": "用户选中这个选项所表达的完整语义"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "label",
+                                        "prompt"
+                                    ]
+                                }
+                            },
+                            "custom_prefix": {
+                                "type": "string",
+                                "description": "用户自定义答案的可选前缀"
                             }
                         },
                         "required": [
-                            "label",
-                            "prompt"
+                            "field",
+                            "question",
+                            "options"
                         ]
                     }
-                },
-                "custom_prefix": {
-                    "type": "string",
-                    "description": "用户自定义答案的可选前缀"
                 }
             },
             "required": [
-                "field",
-                "question",
-                "options"
+                "questions"
             ]
         }
     },
