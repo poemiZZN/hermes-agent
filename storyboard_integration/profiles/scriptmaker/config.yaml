@@ -91,7 +91,7 @@ memory:
 
 skills:
   write_approval: true
-  creation_nudge_interval: 3
+  creation_nudge_interval: 4
 
 # 本 profile 的 15 个平台工具（ask_choice、prepare_script_generation 等）默认会被
 # tool_search 延迟披露：它们不在模型可见的工具数组里，模型必须先花一轮

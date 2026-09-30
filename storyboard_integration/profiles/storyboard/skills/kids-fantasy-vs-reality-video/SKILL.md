@@ -17,7 +17,7 @@ description: >-
   video concepts.
 metadata:
   agent_created: true
-  version: 1.3.0
+  version: 1.3.1
 ---
 
 # Childhood Memory Video Script Generator
@@ -113,7 +113,7 @@ This skill supports two AI video generation formats. Choose based on the user's 
 
 ### wan3.0 Format (Multi-shot, 30s single prompt)
 
-Use when the target is wan3.0-video. Read and follow the sibling [`wan3-drama-prompt-v2` skill](../wan3-drama-prompt-v2/SKILL.md) for the multi-shot structure and formatting rules.
+Use when the target is wan3.0-video. Read and follow the sibling [`wan3-pe` skill](../wan3-pe/SKILL.md) for the request structure and formatting rules.
 
 - Category 1: 6-shot structure for a single 30s story.
 - Categories 2, 4: 4-shot structure for a single 30s story.
@@ -243,7 +243,7 @@ No fixed maximum — the skill can generate any number of original stories.
 
 After creative generation:
 
-1. If model is **wan3.0**: create exactly one 30s video prompt per story, then read and follow the [`wan3-drama-prompt-v2` skill](../wan3-drama-prompt-v2/SKILL.md) for its multi-shot and timestamp rules.
+1. If model is **wan3.0**: create exactly one 30s video prompt per story, then format it with the [`wan3-pe` skill](../wan3-pe/SKILL.md). Give every shot a time range yourself (e.g. `镜头1 0-5秒`), continuous and together covering 0-30s: wan3-pe keeps timestamps that are already written but does not add them. wan3-pe only governs formatting; submission still follows *Video Generation Tool Calls* below.
 2. If model is **MiniMax H3**: create exactly two 15s prompts per story, then read and follow the [`minimax-h3-video-prompt` skill](../minimax-h3-video-prompt/SKILL.md) for H3 T2VA formatting. Segment 2 must continue from Segment 1's ending state without repeating its events.
 3. Output all prompts with fixed generation parameters: wan3.0 uses one `duration=30` task; MiniMax H3 uses two separate `duration=15` tasks.
 4. Include a summary table of all generated stories.
@@ -319,5 +319,5 @@ The reference files below contain **100+ example storylines** for inspiration an
 
 Prompt-formatting guidance is maintained by these sibling skills rather than duplicated locally:
 
-- [`../wan3-drama-prompt-v2/SKILL.md`](../wan3-drama-prompt-v2/SKILL.md) — wan3.0 multi-shot prompt structure and formatting rules
+- [`../wan3-pe/SKILL.md`](../wan3-pe/SKILL.md) — wan3.0 request structure and formatting rules
 - [`../minimax-h3-video-prompt/SKILL.md`](../minimax-h3-video-prompt/SKILL.md) — MiniMax H3 T2VA prompt structure and formatting rules
