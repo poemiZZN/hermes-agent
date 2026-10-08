@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-21",
-  "preparedAt": "2026-09-30T04:02:01.601581+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-22",
+  "preparedAt": "2026-10-08T10:05:16.680455+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -22,7 +22,8 @@
         "剧本全流程",
         "剧本语言梳理",
         "剧本自检",
-        "融合剧"
+        "融合剧",
+        "scriptmaker-overseas-topic"
       ]
     },
     {
@@ -51,7 +52,7 @@
         "art-asset-production",
         "character-three-view",
         "kids-fantasy-vs-reality-video",
-        "minimax-h3-video-prompt",
+        "minimax-h3-pe",
         "storyboard-script-generator",
         "wan3-pe",
         "duanju-art-prompt"
@@ -113,7 +114,7 @@
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/distribution.yaml",
-      "sha256": "89ea7a849db0a3574805e7d24972cbc0ed70637ab5b04e7994915a243e54245c"
+      "sha256": "e7f5b2dc7cbba3dd08bfe5242239a0d641c274f57351b9c0a0769aa7b91e2d9f"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/references/baokuan-gongshi.md",
@@ -122,6 +123,10 @@
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-baokuan-outline/SKILL.md",
       "sha256": "91a2e3df65bdb1f9384aa881596f38d33d778940eb4817ac3a8c3329a3b43ccc"
+    },
+    {
+      "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-overseas-topic/SKILL.md",
+      "sha256": "d65025b76aee4dd188ee57eb620496fe53b861ef7d7126944e509972bd48031c"
     },
     {
       "path": "storyboard_integration/profiles/scriptmaker/skills/scriptmaker-platform/attachment-adaptation/SKILL.md",
@@ -221,7 +226,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "b2a398150f108326d7198100295e02ebacb9137f7829c24ed275faaea27fe236"
+      "sha256": "8eb651c939d8e68031dffd75c7c058c8de8ebb981598718b5715c2e8cdd811ba"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -308,16 +313,16 @@
       "sha256": "d04a52ac5c355d276e89151795f79b586772d3de4c1f0ece2df23b50cdbdee32"
     },
     {
-      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-video-prompt/references/base-prompt-format.md",
-      "sha256": "4dcc81ef8ab2c9c021037d01be12e430fb38e27f29c44362ab2833f20802ec0b"
+      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-pe/references/base-en.md",
+      "sha256": "8ebb9f1e7f444621c403c7ed3a94164b70aa3722ae43f2b12826b18091b95656"
     },
     {
-      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-video-prompt/references/full-reference-format.md",
-      "sha256": "9fb164b6185963a3a94e62f2003f81b21aa11c71c77994f5ce0351f68f9315bc"
+      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-pe/references/ref-en.md",
+      "sha256": "ac11ebecde3e4961ccee6cf96b3f985ae4746bf2bc66109598b483add0f44d7d"
     },
     {
-      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-video-prompt/SKILL.md",
-      "sha256": "016847c43275ae191e6fedb4fb2610289883b2a3c43fad2b6d3bcc2d476cd288"
+      "path": "storyboard_integration/profiles/storyboard/skills/minimax-h3-pe/SKILL.md",
+      "sha256": "629a3e5f02a5ea258ea3a7339339a90064285f043d1f43e760e213b423a8afa9"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/script-platform-api/DESCRIPTION.md",
@@ -377,7 +382,7 @@
     },
     {
       "path": "tools/scriptmaker_agent_tool.py",
-      "sha256": "75960fe6185df01aef487b68a5c32a4ff6531f01a789026239f7b5c3c92d657f"
+      "sha256": "b716103114ef2b2bbba20cf39362badb55d412b699c416e99ab308e53afe25ef"
     },
     {
       "path": "tools/storyboard_api_tool.py",

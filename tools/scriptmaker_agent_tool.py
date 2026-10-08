@@ -651,6 +651,28 @@ _TOOL_SCHEMAS: List[Dict[str, Any]] = [
                 "feature"
             ]
         }
+    },
+    {
+        "name": "read_market_reports",
+        "description": "读取数据榜最近一期的海外短剧分析报告（日报、周报、月报），包含语种市场、热门题材、爆款套路、新爆款作品和选材建议。只读。仅在用户确认要做海外题材后，为选材提供数据依据。",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "periods": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "day",
+                            "week",
+                            "month"
+                        ]
+                    },
+                    "description": "要读取的报告，默认日报、周报、月报各取最近一期"
+                }
+            },
+            "required": []
+        }
     }
 ]
 
@@ -803,6 +825,14 @@ registry.register(
     toolset="scriptmaker",
     schema=_SCHEMA_BY_NAME["open_feature"],
     handler=_make_handler("open_feature"),
+    emoji="SM",
+    max_result_size_chars=_MAX_RESULT_CHARS,
+)
+registry.register(
+    name="read_market_reports",
+    toolset="scriptmaker",
+    schema=_SCHEMA_BY_NAME["read_market_reports"],
+    handler=_make_handler("read_market_reports"),
     emoji="SM",
     max_result_size_chars=_MAX_RESULT_CHARS,
 )
