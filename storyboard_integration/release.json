@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-22",
-  "preparedAt": "2026-10-08T10:05:16.680455+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-23",
+  "preparedAt": "2026-10-10T05:52:47.670434+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -226,7 +226,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "8eb651c939d8e68031dffd75c7c058c8de8ebb981598718b5715c2e8cdd811ba"
+      "sha256": "4059e68cfc2f16f69462c45bf7c745367b4d5308cae44c22cb6d0f0a99177d48"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -345,28 +345,112 @@
       "sha256": "677bd2db6842eeccdfbdc901fb2e08b2d5c64dc0a513ca2044abab91b9dacc01"
     },
     {
-      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/cinematography-vocab.md",
-      "sha256": "12e95581b4e51d9248f0d3ed5dfa3a9e186a39cad0d620d7f3ecafb2426fe926"
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/action-scene-rules.md",
+      "sha256": "03e859ddf2ce850ec91d8984a19bf7e53bd578a96f94709137c3baa66d2ce053"
     },
     {
-      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/emotion-library.md",
-      "sha256": "69984eac645c93e15a537abd2b843bf198a450d88fb79e34f71dca2516d1734b"
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/action-sports-rules.md",
+      "sha256": "2627b53952e3a8e1d530a8a1ddf4f8f7cabae334c7608de2a45612f4ea3d6994"
     },
     {
-      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/negative-constraints.md",
-      "sha256": "cb5247b2c304b2651d1a7a378ddd9dc8f95a2dafdbfc95e78c19060f9d3cf2ce"
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/asset-naming-rules.md",
+      "sha256": "d8513b823f9b74d460de5d39a8f5211e00cebc6dcbbf36047206d2305b98e043"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/atmosphere-scene-rules.md",
+      "sha256": "6948b00e311f0a1a38522c4d33eff11f10d6a5aaa7af09f6209020ca929605fe"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/camera-movement-library.md",
+      "sha256": "bf89b48bfa6881c14fd4d13fb1b6d1276ab829848018ea7794cecab0381781ed"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/character-corpus-rules.md",
+      "sha256": "1a41e5361f1a71ab26e6fe4904894300e29a650706c64c63a5255d9526df7be3"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/cinematic-fight-analysis.md",
+      "sha256": "ccbf40c494c5b6d57c38ac51ecfb39373c54511cd0ad0a6e896cf39974fd1412"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/dialogue-scene-rules.md",
+      "sha256": "4f027ec33277a7148f10928024c111d11fa02283adcddcf18d6db3d921af541e"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/emotional-scene-rules.md",
+      "sha256": "fcb4531bc36e334b947e8ccad086c800b6ec3171c683d7100912343ff0945711"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-chase-rules.md",
+      "sha256": "514087b074774df70321c8eb3ea8dcd007963c15ff62ac63781d4fb3d062ce2a"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-giant-rules.md",
+      "sha256": "226ca4005c213df8bf3efe3c0621642c69560f0c8aa0928d6c2b459d1024b1b5"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-group-rules.md",
+      "sha256": "8e530c1041416fca95c033a7928ff020ebfeaaf033a8b05cadb23085f8f0cefb"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-gunfight-rules.md",
+      "sha256": "9537188955cf3881894a90654630862c92adecace8365bdf89c035d50afd4568"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-style-library.md",
+      "sha256": "7f5ac3ef8c9fecd1cf34e5bc3b7085f7c7466d8ebfd1560179b83d9be576a02b"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-vfx-rules.md",
+      "sha256": "cc613e9c786013988546a8562300521dbabf54dbd2e95195641219c58090ba59"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-wuxia-rules.md",
+      "sha256": "0a5c95cbe83b8c42f677659b30c484d2f7a74fa7017e583b92e64bf5ccf043e1"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/focal-length-guide.md",
+      "sha256": "597e698ed3b7deebd112f490efe89c7d84d39b1add91fee54402b7cebaa69063"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/performance-chain.md",
+      "sha256": "0dd72a5b5a3ab44d4776d6920228076633fa5da7e5e28eb3f7ea1fb212159548"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/performance-system.md",
+      "sha256": "31203175011e93b1f41704ca35d094db8cf998c69fca29725fc988d4a6c72f11"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/segment-rules.md",
-      "sha256": "9625e4e637010a9539743c59f56dc88193ff9d57dc88c151953e43e0ae9b04f7"
+      "sha256": "48b437c44094de0f65a9f8dab0270fd3d91ebada4db8a2394c751287a4eec08d"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/series-bible-rules.md",
+      "sha256": "a567bc8e213178d8f4b42a349bfe6f70ac6df764e00e249371ec1ebdf97feecf"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/speech-rate-table.md",
+      "sha256": "ef35ce753eb15fc2dc9a4d75439591049f79997993aec588763b6715d8a74685"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/translation-guide.md",
-      "sha256": "37f312ef72b44d42c8352c8ae9203f1a76ae175657ee01404e2d7970949861fa"
+      "sha256": "9bbcd050bf67bfa56e66987689c748293cb49827f866613827291243a615acef"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/variation-rules.md",
+      "sha256": "2e720ecad0c725c0b0adb453bf3136d1d095615ac29b11b40206cae73c40753b"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/verify_storyboard.py",
+      "sha256": "7e4d54163510a3fe34eacc40b1c04ee9987e4affa9040ea50d683aba42547bf4"
+    },
+    {
+      "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/yuen-woo-ping-philosophy.md",
+      "sha256": "f66b51c985c1d14635b795f7a47f9956ac4c3728517e0bc6de8299519ead755a"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/SKILL.md",
-      "sha256": "0e04588261011135deecb4c24f4fa073397f7ffd68adc64125251aab087355ef"
+      "sha256": "8b515dbe6978a863a0d9c928aec81f7175d21a1de803f3b0de484b8d17dd9242"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/wan3-pe/SKILL.md",
