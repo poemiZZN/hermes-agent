@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-23",
-  "preparedAt": "2026-10-10T05:52:47.670434+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-24",
+  "preparedAt": "2026-10-10T06:28:13.948501+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -226,7 +226,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "4059e68cfc2f16f69462c45bf7c745367b4d5308cae44c22cb6d0f0a99177d48"
+      "sha256": "e0ca6d05e8021934be006dbbcd76597182de4575d8ce56fa4e68ca1d68335e86"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -450,7 +450,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/SKILL.md",
-      "sha256": "8b515dbe6978a863a0d9c928aec81f7175d21a1de803f3b0de484b8d17dd9242"
+      "sha256": "4137c4a41ed96d05b27a165c9bb1ad8e768b9efb8fd8d284ec37cdf760dc87de"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/wan3-pe/SKILL.md",
