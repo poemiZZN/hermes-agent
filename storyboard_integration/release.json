@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-24",
-  "preparedAt": "2026-10-10T06:28:13.948501+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-25",
+  "preparedAt": "2026-10-10T06:41:48.967427+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -226,7 +226,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "e0ca6d05e8021934be006dbbcd76597182de4575d8ce56fa4e68ca1d68335e86"
+      "sha256": "bb17ad18bab6765a9a4674a22528bb0c9db33212936d462eb986e50167c946d5"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -442,7 +442,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/verify_storyboard.py",
-      "sha256": "7e4d54163510a3fe34eacc40b1c04ee9987e4affa9040ea50d683aba42547bf4"
+      "sha256": "8c9ea26320754f439456a1bafb8282c793920822cb09928f13ad1d7c1814ff28"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/yuen-woo-ping-philosophy.md",
@@ -450,7 +450,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/SKILL.md",
-      "sha256": "4137c4a41ed96d05b27a165c9bb1ad8e768b9efb8fd8d284ec37cdf760dc87de"
+      "sha256": "07c901d7218fe308277bd3919eb61cc0b9b282b697643a17d161e909dfc820bd"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/wan3-pe/SKILL.md",
