@@ -4,8 +4,8 @@
   "hermesVersion": "0.21.0",
   "upstreamCommit": "29112bef099274229cadff79cdff7bf7b99c4b77",
   "integrationBranch": "storyboard-integration",
-  "releaseTag": "storyboard-hermes-v0.21.0-26",
-  "preparedAt": "2026-10-12T05:38:38.593685+00:00",
+  "releaseTag": "storyboard-hermes-v0.21.0-27",
+  "preparedAt": "2026-10-13T07:35:14.171953+00:00",
   "profiles": [
     {
       "name": "scriptmaker",
@@ -226,7 +226,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "f4cceeb1e1f8d6aa896204d71a12605092d6a803a822b424b64b892d07caca6c"
+      "sha256": "556e78beb9f0ce220e9b3503d9e7907ea4a137abf6b2f323bc82e7bd9eaab8bf"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -354,7 +354,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/asset-naming-rules.md",
-      "sha256": "cd3061ad2b7487103a4815c67adb1059c75b723f5ecd1a93c9cdca63146bfa8f"
+      "sha256": "9c53544e7bb195ed3c6cdfb3fcec8275488f4bd83fc90c9bac65a2af3bedd396"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/atmosphere-scene-rules.md",
@@ -386,7 +386,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-giant-rules.md",
-      "sha256": "226ca4005c213df8bf3efe3c0621642c69560f0c8aa0928d6c2b459d1024b1b5"
+      "sha256": "4e9d8a76c3c0aa3e0936d0046a583638105f08c47f59bd63a57b644cfc62929b"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/fight-group-rules.md",
@@ -442,7 +442,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/verify_storyboard.py",
-      "sha256": "8c9ea26320754f439456a1bafb8282c793920822cb09928f13ad1d7c1814ff28"
+      "sha256": "7e4d54163510a3fe34eacc40b1c04ee9987e4affa9040ea50d683aba42547bf4"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/references/yuen-woo-ping-philosophy.md",
@@ -450,7 +450,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/storyboard-script-generator/SKILL.md",
-      "sha256": "686fd1324107f625cb8d17f4ada0daba33d0940b68d71b2eda12fac5e4dbd2b6"
+      "sha256": "c7ff3a11f125c494c1f0b4d10e05404ae9b561c1936313ec008702ac1b184d5c"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/wan3-pe/SKILL.md",
