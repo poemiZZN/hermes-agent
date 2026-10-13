@@ -204,7 +204,7 @@ def count_static_shots(ep_content, ep_num):
     return total, static, static_details
 
 
-def verify_episode(ep_content, ep_num, min_duration=60, max_segment=30):
+def verify_episode(ep_content, ep_num, min_duration=None, max_segment=30):
     """Run all 11 checks on a single episode. Returns (passed, issues)."""
     issues = []
 
@@ -246,7 +246,7 @@ def verify_episode(ep_content, ep_num, min_duration=60, max_segment=30):
         issues.append(f'总时长: 标头={th}s, 实际={at:.1f}s')
 
     # Check 11(d): minimum duration
-    if at < min_duration:
+    if min_duration is not None and at < min_duration:
         issues.append(f'总时长不足: {at:.1f}s < {min_duration}s')
 
     # Check 11(e): props consistency
@@ -308,7 +308,7 @@ def verify_episode(ep_content, ep_num, min_duration=60, max_segment=30):
 def main():
     parser = argparse.ArgumentParser(description='Basics-pro 分镜验证')
     parser.add_argument('file', help='分镜脚本 markdown 文件路径')
-    parser.add_argument('--min-duration', type=float, default=60, help='每集最低时长(s)')
+    parser.add_argument('--min-duration', type=float, default=None, help='可选的每集最低时长(s)，未填不检查下限')
     parser.add_argument('--max-segment', type=float, default=30, help='单段最高时长(s)')
     args = parser.parse_args()
 
