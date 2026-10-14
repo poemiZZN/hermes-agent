@@ -4,8 +4,8 @@
   "hermesVersion": "0.22.0",
   "upstreamCommit": "e06df9c2eae6901f4c88f464e0ae6e753c0428b8",
   "integrationBranch": "storyboard-integration-0.22",
-  "releaseTag": "storyboard-hermes-v0.22.0-1",
-  "preparedAt": "2026-10-14T06:47:18.385425+00:00",
+  "releaseTag": "storyboard-hermes-v0.22.0-2",
+  "preparedAt": "2026-10-14T06:57:19.606662+00:00",
   "plugins": [
     "storyboard-platform",
     "scriptmaker-platform"
@@ -80,7 +80,7 @@
     },
     {
       "path": "gateway/platforms/api_server.py",
-      "sha256": "f1c46388b85512c554ff52cd7b383325e1af91706cf4a03719e4d10e2babab65"
+      "sha256": "527c7af73ec9ff79d022d207a1bcfa5425cc616f62741e175f861a3d6da4edaf"
     },
     {
       "path": "gateway/platforms/api_server_openai_routes.py",
