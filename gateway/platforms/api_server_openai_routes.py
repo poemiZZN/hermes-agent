@@ -67,6 +67,18 @@ def _result_flags(result: Any) -> tuple:
             bool(result.get("failed")), result.get("error"))
 
 
+def _is_empty_tool_calls_failure(result: Any) -> bool:
+    """A strict provider's rejection of an empty ``tool_calls`` array (message sanitization's target).
+
+    Such a turn failed even when the agent wrapped the error in final text; /v1/responses must say so
+    rather than store the error as the assistant's answer."""
+    if not isinstance(result, dict) or not (
+            result.get("failed") or (result.get("error") and result.get("completed") is False)):
+        return False
+    error_text = str(result.get("error") or result.get("final_response") or "").lower()
+    return "tool_calls" in error_text and ("empty" in error_text or "minimum length" in error_text)
+
+
 def _finish_reason(completed, is_partial, is_failed, err_msg, agent_error=None) -> str:
     """OpenAI ``finish_reason``: "length" for truncation, "error" for failure, else "stop"."""
     # OpenAI uses "length" for truncation, "stop" for normal completion, and downstream SDKs accept "error"
@@ -486,7 +498,10 @@ class _ResponsesStream:
                 await self.emit_text_delta(agent_final)
             if agent_final and not self.final_response_text:
                 self.final_response_text = agent_final
-            if isinstance(result, dict) and result.get("error") and not self.final_response_text:
+            if _is_empty_tool_calls_failure(result):
+                self.agent_error = self._api._redact_api_error_text(
+                    result.get("error") or agent_final or "Agent request failed")
+            elif isinstance(result, dict) and result.get("error") and not self.final_response_text:
                 self.agent_error = self._api._redact_api_error_text(result["error"])
         except Exception as e:
             logger.error("Error running agent for streaming responses: %s", e, exc_info=True)
@@ -1179,6 +1194,11 @@ class OpenAICompatRoutesMixin:
         if err is not None:
             return err
         result, usage = outcome
+        if _is_empty_tool_calls_failure(result):
+            return _error_response(
+                _redact_api_error_text(
+                    result.get("error") or result.get("final_response") or "Agent request failed"),
+                502, err_type="server_error")
         final_response = _resolve_media_to_data_urls(result.get("final_response", ""))
         if not final_response:
             final_response = _redact_api_error_text(result.get("error", "(No response generated)"))

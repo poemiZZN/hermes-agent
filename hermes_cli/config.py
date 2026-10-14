@@ -2900,9 +2900,13 @@ def get_env_value_prefer_dotenv(key: str) -> Optional[str]:
     An unresolved ``op://`` reference left in .env yields to the already-resolved value from the
     active secret scope (set by the 1Password secret source) — otherwise a provider auth attempt
     would receive a URL instead of a key. Same carve-out as
-    ``agent.credential_pool.get_env_prefer_dotenv``."""
+    ``agent.credential_pool.get_env_prefer_dotenv``, and the same rule that an installed scope wins
+    outright: the .env-first order beats a STALE inherited value, not a credential deliberately
+    bound to this turn (the caller's own model key), which only the scope can carry."""
+    from agent.secret_scope import current_secret_scope
+
     raw = load_env().get(key) or ""
-    if str(raw).lstrip().startswith("op://"):
+    if str(raw).lstrip().startswith("op://") or current_secret_scope() is not None:
         scoped = _scoped_environ_get(key)
         if scoped:
             return scoped

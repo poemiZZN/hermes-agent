@@ -159,6 +159,9 @@ from gateway.browser_control_broker import (
 from gateway.platforms._shared import coerce_port as _coerce_port
 from gateway.platforms._shared import get_scoped_secret as _get_scoped_secret
 from gateway.platforms.tcp_site import start_tcp_site
+from gateway.storyboard_platform_context import (
+    PlatformContextError, bind_platform_context, bound_platform_context, current_platform_context,
+    current_platform_model_key, parse_platform_headers, reset_platform_context)
 from hermes_state_errors import SessionActiveWriteGuardError
 
 
@@ -1699,6 +1702,15 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
             if profile is _PROFILE_REJECTED:
                 return web.json_response({"error": "Unknown or unconfigured profile"}, status=404)
             token = _api_request_profile.set(profile)
+            # Storyboard/Scriptmaker platform headers, parsed once for every route and BEFORE the
+            # profile scope: entering it overlays the caller's model key onto the profile secrets.
+            try:
+                platform_context = parse_platform_headers(request.headers, profile)
+            except PlatformContextError as exc:
+                _api_request_profile.reset(token)
+                return (_error_response(exc.message, 400, code=exc.code) if exc.code
+                        else _invalid_request(exc.message))
+            platform_token = bind_platform_context(platform_context)
             try:
                 with self._profile_scope(profile):
                     resolved_profile = profile or "default"
@@ -1712,6 +1724,7 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
                         _api_request_browser_control_transport_family.reset(family_token)
                         _api_request_browser_control_principal.reset(principal_token)
             finally:
+                reset_platform_context(platform_token)
                 _api_request_profile.reset(token)
         return profile_prefix_middleware
 
@@ -2370,6 +2383,12 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
             requested_model=requested_model, requested_provider=requested_provider, route=route,
             session_model=session_model, confirmed_runtime_lock=confirmed_runtime_lock,
             gateway_session_key=gateway_session_key, session_id=session_id)
+        # The caller's own model key (scriptmaker) is this turn's credential, full stop: model.api_key
+        # was expanded and cached before any scope overlay, and a pool seeded from it would rotate a
+        # 401/429 onto the profile's shared key. No fallback either: it runs on profile credentials.
+        caller_model_key = current_platform_model_key()
+        if caller_model_key:
+            runtime_kwargs.update(api_key=caller_model_key, credential_pool=None)
         user_config = _load_gateway_config()
         enabled_toolsets = sorted(_get_platform_tools(user_config, "api_server"))
         # Same gate the messaging gateway and TUI apply: ``display.interim_assistant_messages``
@@ -2401,7 +2420,8 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
             "status_callback": status_callback,
             "session_db": self._ensure_session_db(),
             # Same fallback provider chain as Telegram/Discord/Slack.
-            "fallback_model": None if confirmed_runtime_lock else GatewayRunner._load_fallback_model(),
+            "fallback_model": (
+                None if confirmed_runtime_lock or caller_model_key else GatewayRunner._load_fallback_model()),
             "reasoning_config": request_reasoning_config,
             "gateway_session_key": gateway_session_key,
             # The session's provider from the previous request, so its queued recall reaches this turn
@@ -4098,7 +4118,7 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
     def _bind_api_server_session(
         *, chat_id: str = "", session_key: str = "", session_id: str = "", profile: str = "",
         browser_control_principal: str = "", browser_control_transport_family: str = "",
-        session_history_delivery: str = "") -> list:
+        session_history_delivery: str = "", user_id: str = "", user_name: str = "") -> list:
         """Bind an API turn with push disabled and history delivery default-denied.
 
         Only routes whose continuation reads SessionDB may pass "1". An omitted
@@ -4112,7 +4132,8 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
             platform="api_server", chat_id=chat_id, session_key=session_key, session_id=session_id,
             profile=profile, browser_control_principal=browser_control_principal,
             browser_control_transport_family=browser_control_transport_family,
-            async_delivery=False, cron_session="", session_history_delivery=session_history_delivery)
+            async_delivery=False, cron_session="", session_history_delivery=session_history_delivery,
+            user_id=user_id, user_name=user_name)
 
     def _turn_runtime_metadata(
         self, agent: Any, *, route: Optional[dict[str, Any]], requested_runtime: Optional[dict[str, Any]],
@@ -4217,16 +4238,19 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
         request_profile = _api_request_profile.get()
         request_browser_control_principal = _api_request_browser_control_principal.get()
         request_browser_control_transport_family = _api_request_browser_control_transport_family.get()
+        platform_context = current_platform_context()
 
         def _run():
             from gateway.session_context import clear_session_vars
-            with self._profile_scope(request_profile):
+            # Platform context first: the profile scope overlays its model key on entry.
+            with bound_platform_context(platform_context), self._profile_scope(request_profile):
                 tokens = self._bind_api_server_session(
                     chat_id=session_id or "", session_key=gateway_session_key or session_id or "",
                     session_id=session_id or "", profile=request_profile or "",
                     browser_control_principal=request_browser_control_principal,
                     browser_control_transport_family=request_browser_control_transport_family,
-                    session_history_delivery=session_history_delivery)
+                    session_history_delivery=session_history_delivery,
+                    user_id=platform_context.user_id, user_name=platform_context.user_name)
                 agent = None
                 from agent.notification_presentation import notification_turn
                 from gateway.warning_notifications import diagnostic_turn_muted

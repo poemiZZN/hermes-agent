@@ -1805,6 +1805,9 @@ def _profile_runtime_scope(
         else:
             from agent.secret_scope import build_profile_secret_scope  # caller already hydrated off-loop
             secrets = build_profile_secret_scope(Path(profile_home))
+        # A caller's own model key (Scriptmaker) stands in for the profile's for this turn.
+        from gateway.storyboard_platform_context import overlay_platform_model_key
+        secrets = overlay_platform_model_key(secrets)
         secret_token = set_secret_scope(secrets, profile_home=str(profile_home))
         # Install the routed profile's COMPLETE terminal policy, never ambient TERMINAL_* a prior turn set.
         # Without it terminal_tool reads the process-global TERMINAL_* vars a previous profile's turn may have
