@@ -1,0 +1,1223 @@
+"""Storyboard platform API tool with session-scoped internal auth."""
+
+from __future__ import annotations
+
+import base64
+import json
+import mimetypes
+import os
+import re
+import ssl
+import urllib.error
+import urllib.parse
+import urllib.request
+import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextvars import copy_context
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, Tuple
+
+from hermes_constants import get_hermes_home
+from tools.registry import tool_error, tool_result
+
+
+_ENDPOINT_RE = re.compile(r"^/api/[A-Za-z0-9_./:-]+$")
+_BLOCKED_ENDPOINT_PREFIXES = ("/api/auth", "/api/admin", "/api/hermes/auth")
+_DEFAULT_TIMEOUT_SECONDS = 120
+_MAX_CANVAS_IMAGE_PROMPTS = 10
+_MAX_QUESTION_OPTIONS = 20
+_CHARACTER_SHEET_RESOLUTIONS = {"1k": "1K", "2k": "2K"}
+_CANVAS_IMAGE_EXTENSION_RE = re.compile(r"\.(?:png|jpe?g|webp|gif|bmp)$", re.IGNORECASE)
+_CANVAS_IMAGE_VERSION_RE = re.compile(r"^(?P<stem>.+)_v(?P<version>[1-9]\d*)$", re.IGNORECASE)
+
+
+class TokenUnavailable(RuntimeError):
+    pass
+
+
+class SilentTokenUnavailable(RuntimeError):
+    pass
+
+
+def _canvas_image_keyword(prompt: str, index: int) -> str:
+    cleaned = re.sub(r"[\s\\/:*?\"<>|,，。.!！?？;；:：、()（）\[\]{}]+", "", prompt)
+    cleaned = re.sub(r"^(?:请帮我|帮我|请)", "", cleaned)
+    cleaned = re.sub(r"^(?:生成|创建|制作|画)", "", cleaned)
+    cleaned = re.sub(r"^(?:一张|一个|一幅)", "", cleaned)
+    cleaned = re.sub(r"(?:图片|图像|照片)$", "", cleaned)
+    return cleaned[:16] or f"image{index + 1}"
+
+
+def _normalize_canvas_image_file_names(raw_names: Any, prompts: list[str]) -> list[str]:
+    if isinstance(raw_names, list):
+        candidates = [str(item or "").strip() for item in raw_names]
+        if candidates and len(candidates) != len(prompts):
+            raise ValueError("file_names must contain exactly one item for every prompt")
+    elif isinstance(raw_names, str) and raw_names.strip():
+        candidates = [raw_names.strip()]
+        if len(prompts) != 1:
+            raise ValueError("file_names must be an array with one item for every prompt")
+    else:
+        candidates = []
+
+    used: set[str] = set()
+    normalized_names: list[str] = []
+    for index, prompt in enumerate(prompts):
+        raw_name = candidates[index] if index < len(candidates) else ""
+        raw_name = raw_name.replace("\\", "/").split("/")[-1]
+        raw_name = _CANVAS_IMAGE_EXTENSION_RE.sub("", raw_name).strip()
+        safe_name = re.sub(r"[\x00-\x1f<>:\"/\\|?*]+", "_", raw_name)
+        safe_name = re.sub(r"\s+", "_", safe_name)
+        safe_name = re.sub(r"_+", "_", safe_name).strip("._-")
+        if not safe_name:
+            safe_name = f"img_{_canvas_image_keyword(prompt, index)}_v1"
+        elif not safe_name.lower().startswith("img_"):
+            safe_name = f"img_{safe_name}"
+        if not _CANVAS_IMAGE_VERSION_RE.match(safe_name):
+            safe_name = f"{safe_name}_v1"
+
+        match = _CANVAS_IMAGE_VERSION_RE.match(safe_name)
+        stem = (match.group("stem") if match else safe_name)[:72].rstrip("._-")
+        version = int(match.group("version")) if match else 1
+        unique_name = f"{stem}_v{version}"
+        while unique_name.casefold() in used:
+            version += 1
+            unique_name = f"{stem}_v{version}"
+        used.add(unique_name.casefold())
+        normalized_names.append(unique_name)
+    return normalized_names
+
+
+def _canvas_image_cos_directory(script_name: str, provider: str, provider_subject: str) -> str:
+    session_cos_path = _get_platform_value("storyboard_cos_path").strip()
+    if session_cos_path:
+        parts = [
+            part.strip()
+            for part in session_cos_path.replace("\\", "/").split("/")
+            if part.strip() and part.strip() not in {".", ".."}
+        ]
+        if parts:
+            return f"/{'/'.join(parts)}/"
+
+    def safe_segment(value: str, fallback: str) -> str:
+        segment = re.sub(r"[^\w.-]+", "_", value, flags=re.UNICODE).strip("._-")
+        return segment[:80] or fallback
+
+    script_segment = safe_segment(script_name, "default_script")
+    identity_segment = safe_segment(
+        f"{provider}_{provider_subject}" if provider_subject else provider,
+        "default_user",
+    )
+    return f"/canvas/{script_segment}/{identity_segment}/"
+
+
+def _get_session_value(name: str, default: str = "") -> str:
+    try:
+        from gateway.session_context import get_session_env
+
+        return get_session_env(name, default) or default
+    except Exception:
+        return os.getenv(name, default)
+
+
+def _get_platform_value(field: str) -> str:
+    """One field of the caller's platform context, bound by the API server for this run.
+
+    Deliberately not a HERMES_SESSION_* variable and with no os.environ fallback:
+    those variables are copied into terminal subprocesses, which the caller's
+    platform token must never reach.
+    """
+    try:
+        from gateway.storyboard_platform_context import current_platform_context
+    except Exception:
+        return ""
+    return str(getattr(current_platform_context(), field, "") or "")
+
+
+def _current_identity() -> Tuple[str, str]:
+    provider = _get_session_value("HERMES_SESSION_PLATFORM", "").strip()
+    provider_subject = _get_session_value("HERMES_SESSION_USER_ID", "").strip()
+    if not provider_subject:
+        session_key = _get_session_value("HERMES_SESSION_KEY", "").strip()
+        match = re.search(r"(?:^|:)user:(\d+)(?:$|:)", session_key)
+        if match and (not provider or provider == "api_server"):
+            provider = provider or "api_server"
+            provider_subject = match.group(1)
+    return provider, provider_subject
+
+
+def _is_platform_embedded_identity(provider: str | None = None) -> bool:
+    current_provider = (provider if provider is not None else _current_identity()[0]).strip().lower()
+    return current_provider == "api_server"
+
+
+def _setting(name: str, default: str = "") -> str:
+    value = os.getenv(name, "").strip()
+    if value:
+        return value
+    env_path = get_hermes_home() / ".env"
+    try:
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#") or "=" not in stripped:
+                continue
+            key, raw = stripped.split("=", 1)
+            if key.strip() != name:
+                continue
+            value = raw.strip().strip('"').strip("'")
+            if value:
+                return value
+    except Exception:
+        pass
+    return default
+
+
+def _configured_api_base(default: str = "http://localhost:3004") -> str:
+    return (
+        _setting("STORYBOARD_API_BASE")
+        or _setting("PUBLIC_BASE_URL")
+        or _setting("HERMES_STORYBOARD_API_BASE")
+        or default
+    ).rstrip("/")
+
+
+def _safe_segment(value: str) -> str:
+    safe = re.sub(r"[^A-Za-z0-9_.-]", "_", str(value or ""))[:120]
+    return safe or "unknown"
+
+
+def _cache_path(provider: str, provider_subject: str) -> Path:
+    root = _setting("HERMES_STORYBOARD_TOKEN_CACHE_DIR")
+    base = Path(root) if root else get_hermes_home() / "cache" / "storyboard-platform-tokens"
+    return base / _safe_segment(provider) / f"{_safe_segment(provider_subject)}.json"
+
+
+def _load_token() -> Tuple[str, str]:
+    provider, provider_subject = _current_identity()
+    if not provider or not provider_subject:
+        raise TokenUnavailable("Missing Hermes session identity for storyboard_api")
+
+    session_token = _get_platform_value("storyboard_platform_token").strip()
+    if session_token and _is_platform_embedded_identity(provider):
+        return session_token, _configured_api_base()
+
+    path = _cache_path(provider, provider_subject)
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise TokenUnavailable("Storyboard platform token is not available for this session") from exc
+    except Exception as exc:
+        raise TokenUnavailable("Storyboard platform token cache is unreadable") from exc
+
+    if str(payload.get("provider") or "") != provider:
+        raise TokenUnavailable("Storyboard platform token cache provider mismatch")
+    if str(payload.get("providerSubject") or "") != provider_subject:
+        raise TokenUnavailable("Storyboard platform token cache subject mismatch")
+
+    token = str(payload.get("accessToken") or "").strip()
+    if not token:
+        raise TokenUnavailable("Storyboard platform token cache has no access token")
+
+    expires_at = str(payload.get("expiresAt") or "").strip()
+    if expires_at:
+        try:
+            expires_dt = datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
+            if expires_dt.tzinfo is None:
+                expires_dt = expires_dt.replace(tzinfo=timezone.utc)
+            if expires_dt <= datetime.now(timezone.utc):
+                raise TokenUnavailable("Storyboard platform token is expired for this session")
+        except TokenUnavailable:
+            raise
+        except Exception:
+            pass
+
+    return token, str(payload.get("apiBase") or _configured_api_base()).strip().rstrip("/")
+
+
+def _write_token_cache(payload: Dict[str, Any], api_base: str) -> Tuple[str, str]:
+    provider, provider_subject = _current_identity()
+    token = str(payload.get("accessToken") or "").strip()
+    if not provider or not provider_subject:
+        raise SilentTokenUnavailable("Missing Hermes session identity for token cache")
+    if not token:
+        raise SilentTokenUnavailable("Silent token response has no access token")
+    cache_payload = {
+        "provider": provider,
+        "providerSubject": provider_subject,
+        "accessToken": token,
+        "refreshToken": str(payload.get("refreshToken") or ""),
+        "expiresAt": str(payload.get("expiresAt") or ""),
+        "refreshExpiresAt": str(payload.get("refreshExpiresAt") or ""),
+        "apiBase": api_base.rstrip("/"),
+        "source": "storyboard-api-tool-silent-issue",
+        "updatedAt": datetime.now(timezone.utc).isoformat(),
+    }
+    path = _cache_path(provider, provider_subject)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(cache_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return token, api_base.rstrip("/")
+
+
+def _validate_endpoint(endpoint: str) -> str:
+    endpoint = str(endpoint or "").strip()
+    if not endpoint.startswith("/"):
+        endpoint = f"/{endpoint}"
+    if not _ENDPOINT_RE.match(endpoint):
+        raise ValueError("endpoint must be a safe /api/... path")
+    if any(endpoint.startswith(prefix) for prefix in _BLOCKED_ENDPOINT_PREFIXES):
+        raise ValueError("endpoint is not allowed for storyboard_api")
+    return endpoint
+
+
+def _json_bytes(value: Any) -> bytes:
+    return json.dumps(value if value is not None else {}, ensure_ascii=False).encode("utf-8")
+
+
+def _build_url(api_base: str, endpoint: str, query: Dict[str, Any] | None) -> str:
+    url = f"{api_base.rstrip('/')}{endpoint}"
+    if query:
+        params = {str(k): str(v) for k, v in query.items() if v is not None and isinstance(k, str)}
+        if params:
+            url = f"{url}?{urllib.parse.urlencode(params)}"
+    return url
+
+
+def _post_json(api_base: str, endpoint: str, body: Dict[str, Any], headers: Dict[str, str], timeout: int) -> Tuple[int, Any]:
+    request = urllib.request.Request(
+        f"{api_base.rstrip('/')}{endpoint}",
+        data=_json_bytes(body),
+        headers={**headers, "Content-Type": "application/json", "Accept": "application/json"},
+        method="POST",
+    )
+    try:
+        context = ssl.create_default_context()
+        with urllib.request.urlopen(request, timeout=timeout, context=context) as response:
+            raw = response.read()
+            status = int(response.status)
+            content_type = response.headers.get("Content-Type", "")
+    except urllib.error.HTTPError as exc:
+        raw = exc.read()
+        status = int(exc.code)
+        content_type = exc.headers.get("Content-Type", "") if exc.headers else ""
+    text = raw.decode("utf-8", errors="replace")
+    if "json" in content_type.lower() or text.strip().startswith(("{", "[")):
+        try:
+            return status, json.loads(text)
+        except Exception:
+            pass
+    return status, text
+
+
+def _basic_auth_header() -> Dict[str, str]:
+    client_id = _setting("HERMES_AGENT_CLIENT_ID")
+    client_secret = _setting("HERMES_AGENT_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        raise SilentTokenUnavailable("Hermes agent client credentials are not configured")
+    basic = base64.b64encode(f"{client_id}:{client_secret}".encode("utf-8")).decode("ascii")
+    return {"Authorization": f"Basic {basic}"}
+
+
+def _issue_token_for_bound_identity(api_base: str | None = None, timeout: int = _DEFAULT_TIMEOUT_SECONDS) -> Tuple[str, str]:
+    provider, provider_subject = _current_identity()
+    if not provider or not provider_subject:
+        raise SilentTokenUnavailable("Missing Hermes session identity for silent token issuance")
+    if _is_platform_embedded_identity(provider):
+        raise SilentTokenUnavailable("Platform API server sessions must use the platform-injected token")
+    base = (api_base or _configured_api_base()).rstrip("/")
+    status, data = _post_json(
+        base,
+        "/api/hermes/auth/token",
+        {"grant_type": "external_identity", "provider": provider, "providerSubject": provider_subject, "scopes": ["platform:api"]},
+        _basic_auth_header(),
+        timeout,
+    )
+    if 200 <= status < 300 and isinstance(data, dict) and data.get("accessToken"):
+        return _write_token_cache(data, base)
+    error = data.get("error") or data.get("message") if isinstance(data, dict) else str(data)
+    raise SilentTokenUnavailable(error or f"Silent token issuance failed: HTTP {status}")
+
+
+def _platform_session_token_unavailable(reason: str) -> str:
+    return tool_error(
+        "Platform session token is unavailable for storyboard_api. Retry from the logged-in platform page; if it persists, check storyboard web token injection.",
+        success=False,
+        status="platform_session_token_unavailable",
+        needsLogin=False,
+        retryable=True,
+        reason=reason,
+    )
+
+
+def _login_link_result(reason: str, api_base: str | None = None, timeout: int = _DEFAULT_TIMEOUT_SECONDS) -> str:
+    provider, provider_subject = _current_identity()
+    if _is_platform_embedded_identity(provider):
+        return _platform_session_token_unavailable(reason)
+    if not provider or not provider_subject:
+        return tool_error("Current Hermes session identity is missing, so a storyboard login link cannot be created.", success=False, needsLogin=True)
+    try:
+        basic_header = _basic_auth_header()
+    except SilentTokenUnavailable:
+        return tool_error("Storyboard login link cannot be created because Hermes agent client credentials are not configured.", success=False, needsLogin=True)
+    base = (api_base or _configured_api_base()).rstrip("/")
+    status, data = _post_json(
+        base,
+        "/api/hermes/auth/link",
+        {"provider": provider, "providerSubject": provider_subject, "scopes": ["platform:api"]},
+        basic_header,
+        timeout,
+    )
+    if 200 <= status < 300 and isinstance(data, dict) and data.get("loginUrl"):
+        return tool_result(
+            success=True,
+            status="login_required",
+            needsLogin=True,
+            loginUrl=data.get("loginUrl"),
+            message="授权链接已创建。请让用户打开链接登录并确认授权，完成后再继续原任务。",
+            reason=reason,
+        )
+    error = data.get("error") or data.get("message") if isinstance(data, dict) else str(data)
+    return tool_error(f"Storyboard login link creation failed: {error or f'HTTP {status}'}", success=False, needsLogin=True)
+
+
+def _encode_multipart(form: Dict[str, Any], file_field: str, file_path: str) -> Tuple[bytes, str]:
+    boundary = f"----hermes-storyboard-{uuid.uuid4().hex}"
+    chunks: list[bytes] = []
+
+    def add_text(name: str, value: Any) -> None:
+        chunks.append(f"--{boundary}\r\n".encode("ascii"))
+        chunks.append(f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode("utf-8"))
+        chunks.append(str(value if value is not None else "").encode("utf-8"))
+        chunks.append(b"\r\n")
+
+    for key, value in (form or {}).items():
+        if isinstance(key, str):
+            add_text(key, value)
+
+    if file_path:
+        path = Path(file_path).expanduser()
+        if not path.is_file():
+            raise ValueError("file_path does not exist or is not a file")
+        name = file_field or "file"
+        content_type = mimetypes.guess_type(str(path))[0] or "application/octet-stream"
+        chunks.append(f"--{boundary}\r\n".encode("ascii"))
+        chunks.append((f'Content-Disposition: form-data; name="{name}"; filename="{path.name}"\r\nContent-Type: {content_type}\r\n\r\n').encode("utf-8"))
+        chunks.append(path.read_bytes())
+        chunks.append(b"\r\n")
+
+    chunks.append(f"--{boundary}--\r\n".encode("ascii"))
+    return b"".join(chunks), f"multipart/form-data; boundary={boundary}"
+
+
+def _open_platform_request(url: str, data: bytes | None, headers: Dict[str, str], method: str, timeout: int) -> Tuple[int, str, str]:
+    request = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        context = ssl.create_default_context()
+        with urllib.request.urlopen(request, timeout=timeout, context=context) as response:
+            raw = response.read()
+            status = int(response.status)
+            content_type = response.headers.get("Content-Type", "")
+    except urllib.error.HTTPError as exc:
+        raw = exc.read()
+        status = int(exc.code)
+        content_type = exc.headers.get("Content-Type", "") if exc.headers else ""
+    return status, content_type, raw.decode("utf-8", errors="replace")
+
+
+def _parse_response_text(text: str, content_type: str) -> Any:
+    if "json" in content_type.lower() or text.strip().startswith(("{", "[")):
+        try:
+            return json.loads(text)
+        except Exception:
+            return text
+    return text
+
+
+def _request_json(args: Dict[str, Any], **kwargs) -> str:
+    endpoint = _validate_endpoint(args.get("endpoint", ""))
+    method = str(args.get("method") or ("GET" if endpoint in {"/api/workspaces", "/api/scripts"} else "POST")).upper()
+    if method not in {"GET", "POST", "PUT", "PATCH", "DELETE"}:
+        return tool_error("method must be GET, POST, PUT, PATCH, or DELETE")
+    timeout = max(1, min(int(args.get("timeout_seconds") or _DEFAULT_TIMEOUT_SECONDS), 300))
+
+    try:
+        token, api_base = _load_token()
+    except TokenUnavailable as exc:
+        try:
+            token, api_base = _issue_token_for_bound_identity(timeout=timeout)
+        except SilentTokenUnavailable as silent_exc:
+            return _login_link_result(f"{exc}; silent token issuance failed: {silent_exc}", timeout=timeout)
+
+    query = args.get("query") if isinstance(args.get("query"), dict) else None
+    url = _build_url(api_base, endpoint, query)
+    headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+    data = None
+    if args.get("multipart"):
+        body, content_type = _encode_multipart(
+            form=args.get("form") if isinstance(args.get("form"), dict) else {},
+            file_field=str(args.get("file_field") or "file"),
+            file_path=str(args.get("file_path") or ""),
+        )
+        headers["Content-Type"] = content_type
+        data = body
+    elif method != "GET":
+        headers["Content-Type"] = "application/json"
+        data = _json_bytes(args.get("body") if isinstance(args.get("body"), dict) else {})
+
+    try:
+        status, content_type, text = _open_platform_request(url, data, headers, method, timeout)
+    except Exception as exc:
+        return tool_error(str(exc), success=False)
+
+    if status == 401:
+        try:
+            token, api_base = _issue_token_for_bound_identity(api_base=api_base, timeout=timeout)
+            url = _build_url(api_base, endpoint, query)
+            headers["Authorization"] = f"Bearer {token}"
+            status, content_type, text = _open_platform_request(url, data, headers, method, timeout)
+        except SilentTokenUnavailable as silent_exc:
+            return _login_link_result(f"Storyboard platform returned HTTP {status}; silent token issuance failed: {silent_exc}", api_base=api_base, timeout=timeout)
+        except Exception as exc:
+            return tool_error(str(exc), success=False)
+
+    parsed = _parse_response_text(text, content_type)
+    result = {"success": 200 <= status < 300, "status": status, "endpoint": endpoint, "data": parsed}
+    if status == 401:
+        return _login_link_result(f"Storyboard platform returned HTTP {status}", api_base=api_base, timeout=timeout)
+    if not result["success"] and isinstance(parsed, dict):
+        result["error"] = parsed.get("error") or parsed.get("message") or f"HTTP {status}"
+    elif not result["success"]:
+        result["error"] = f"HTTP {status}"
+    return tool_result(result)
+
+
+def _parse_tool_result(value: str) -> Dict[str, Any]:
+    try:
+        parsed = json.loads(value)
+    except Exception:
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _resolve_script_name(args: Dict[str, Any]) -> str:
+    provider, _ = _current_identity()
+    session_script_name = _get_platform_value("storyboard_script_name").strip()
+    requested_script_name = str(args.get("scriptName") or args.get("script_name") or "").strip()
+    if _is_platform_embedded_identity(provider):
+        return session_script_name
+    return requested_script_name
+
+
+def _character_three_view_generate(args: Dict[str, Any], **kwargs) -> str:
+    """Validate a full-body reference and submit one character-sheet task."""
+    script_name = _resolve_script_name(args)
+    source_url = str(args.get("source_image_url") or args.get("sourceImageUrl") or "").strip()
+    source_name = str(args.get("source_image_name") or args.get("sourceImageName") or "人物全身图.png").strip()
+    resolution_key = str(args.get("resolution") or "").strip().lower()
+
+    if not script_name:
+        return tool_error("Current platform scriptName is unavailable for this session", success=False)
+    if not source_url:
+        return tool_error("source_image_url is required", success=False)
+    if not re.match(r"^https?://", source_url, re.IGNORECASE):
+        return tool_error("source_image_url must be an accessible http(s) image URL", success=False)
+    if resolution_key not in _CHARACTER_SHEET_RESOLUTIONS:
+        return tool_error("resolution must be 1K or 2K", success=False)
+
+    validation_result = _request_json(
+        {
+            "endpoint": "/api/canvas/character-sheet/validate-source",
+            "method": "POST",
+            "body": {"scriptName": script_name, "image_url": source_url},
+        }
+    )
+    validation_payload = _parse_tool_result(validation_result)
+    if validation_payload.get("needsLogin") or not validation_payload.get("success"):
+        return validation_result
+
+    validation_data = validation_payload.get("data")
+    if not isinstance(validation_data, dict) or validation_data.get("is_full_body") is not True:
+        return tool_error("请换一张人物全身图后再生成三视图。", success=False, status="invalid_source_image")
+
+    return _request_json(
+        {
+            "endpoint": "/api/canvas/character-sheet/generate",
+            "method": "POST",
+            "body": {
+                "scriptName": script_name,
+                "resolution": _CHARACTER_SHEET_RESOLUTIONS[resolution_key],
+                "source_image": {"url": source_url, "name": source_name or "人物全身图.png"},
+            },
+        }
+    )
+
+
+STORYBOARD_API_SCHEMA = {
+    "name": "storyboard_api",
+    "description": "Call storyboard platform API endpoints using internal session auth. Do not pass or ask for tokens.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "endpoint": {"type": "string", "description": "Safe platform endpoint path, e.g. /api/storyboard/text."},
+            "method": {"type": "string", "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]},
+            "body": {"type": "object", "description": "JSON request body."},
+            "query": {"type": "object", "description": "Optional query parameters."},
+            "multipart": {"type": "boolean", "description": "Use multipart/form-data."},
+            "form": {"type": "object", "description": "Multipart text fields."},
+            "file_field": {"type": "string", "description": "Multipart file field name."},
+            "file_path": {"type": "string", "description": "Local file path for upload."},
+            "timeout_seconds": {"type": "integer", "description": "Request timeout from 1 to 300 seconds."},
+        },
+        "required": ["endpoint"],
+    },
+}
+
+
+CHARACTER_THREE_VIEW_GENERATE_SCHEMA = {
+    "name": "character_three_view_generate",
+    "description": (
+        "Create a character reference sheet from one full-body character image through the Storyboard platform. "
+        "The tool validates the source image, then submits one backend aggregation task that generates the combined "
+        "character sheet, portrait, and turnaround view. Use only when the user explicitly asks for a character "
+        "three-view, character reference sheet, or 人设三视图. Do not use canvas_image_generate for this workflow. "
+        "After a successful submission, do not mention task IDs, job IDs, request IDs, or model IDs in the assistant reply."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "scriptName": {
+                "type": "string",
+                "description": "Optional script name. API-server embedded sessions use the current page scriptName instead.",
+            },
+            "source_image_url": {
+                "type": "string",
+                "description": "Accessible HTTP(S) URL of one clear, single-person full-body reference image.",
+            },
+            "source_image_name": {
+                "type": "string",
+                "description": "Optional display name for the source image. Defaults to 人物全身图.png.",
+            },
+            "resolution": {
+                "type": "string",
+                "enum": ["1K", "2K"],
+                "description": "Required output resolution for the character sheet.",
+            },
+        },
+        "required": ["source_image_url", "resolution"],
+    },
+}
+
+
+def _canvas_image_generate(args: Dict[str, Any], **kwargs) -> str:
+    provider, provider_subject = _current_identity()
+    script_name = _resolve_script_name(args)
+    raw_prompts = args.get("prompt")
+    if isinstance(raw_prompts, list):
+        prompts = [str(item or "").strip() for item in raw_prompts]
+        prompts = [item for item in prompts if item]
+    else:
+        legacy_prompt = str(raw_prompts or "").strip()
+        prompts = [legacy_prompt] if legacy_prompt else []
+    if not script_name:
+        return tool_error("scriptName is required", success=False)
+    if not prompts:
+        return tool_error("prompt must contain at least one non-empty string", success=False)
+    if len(prompts) > _MAX_CANVAS_IMAGE_PROMPTS:
+        return tool_error(
+            f"prompt supports at most {_MAX_CANVAS_IMAGE_PROMPTS} items",
+            success=False,
+        )
+
+    try:
+        file_names = _normalize_canvas_image_file_names(args.get("file_names"), prompts)
+    except ValueError as exc:
+        return tool_error(str(exc), success=False)
+    cos_directory = _canvas_image_cos_directory(script_name, provider, provider_subject)
+
+    reference_images = args.get("reference_images")
+    if not isinstance(reference_images, list):
+        reference_images = []
+
+    timeout = max(1, min(int(args.get("timeout_seconds") or _DEFAULT_TIMEOUT_SECONDS), 300))
+    try:
+        _load_token()
+    except TokenUnavailable as exc:
+        try:
+            _issue_token_for_bound_identity(timeout=timeout)
+        except SilentTokenUnavailable as silent_exc:
+            return _login_link_result(
+                f"{exc}; silent token issuance failed: {silent_exc}",
+                timeout=timeout,
+            )
+
+    common_body = {
+        "scriptName": script_name,
+        "model": str(args.get("model") or "gpt-2").strip() or "gpt-2",
+        "ratio": str(args.get("ratio") or "3:4").strip() or "3:4",
+        "resolution": str(args.get("resolution") or "1K").strip() or "1K",
+        "quality": "high",
+        "output_format": "png",
+        "n": 1,
+        "reference_images": reference_images,
+    }
+
+    def submit_prompt(index: int, prompt: str) -> Dict[str, Any]:
+        file_name = file_names[index]
+        raw_result = _request_json(
+            {
+                "endpoint": "/api/canvas/generate",
+                "method": "POST",
+                "timeout_seconds": timeout,
+                "body": {
+                    **common_body,
+                    "prompt": prompt,
+                    "cos_path": f"{cos_directory}{file_name}.png",
+                },
+            }
+        )
+        try:
+            parsed = json.loads(raw_result)
+        except Exception:
+            parsed = {"success": False, "error": str(raw_result or "Invalid tool result")}
+        if not isinstance(parsed, dict):
+            parsed = {"success": False, "data": parsed}
+        return {"index": index, "prompt": prompt, "file_name": file_name, **parsed}
+
+    results: list[Dict[str, Any] | None] = [None] * len(prompts)
+    with ThreadPoolExecutor(max_workers=len(prompts), thread_name_prefix="canvas-image") as executor:
+        futures = {
+            executor.submit(copy_context().run, submit_prompt, index, prompt): index
+            for index, prompt in enumerate(prompts)
+        }
+        for future in as_completed(futures):
+            index = futures[future]
+            try:
+                results[index] = future.result()
+            except Exception as exc:
+                results[index] = {
+                    "index": index,
+                    "prompt": prompts[index],
+                    "file_name": file_names[index],
+                    "success": False,
+                    "error": str(exc),
+                }
+
+    completed_results = [item for item in results if item is not None]
+    success_count = sum(
+        1 for item in completed_results
+        if item.get("success") and not item.get("needsLogin")
+    )
+    failed_count = len(completed_results) - success_count
+    batch_result = {
+        "success": success_count == len(prompts),
+        "status": "submitted" if not failed_count else ("partial" if success_count else "failed"),
+        "requested_count": len(prompts),
+        "submitted_count": success_count,
+        "failed_count": failed_count,
+        "results": completed_results,
+    }
+    login_result = next((item for item in completed_results if item.get("needsLogin")), None)
+    if login_result:
+        batch_result.update({
+            "needsLogin": True,
+            "loginUrl": login_result.get("loginUrl"),
+            "message": login_result.get("message"),
+        })
+    return tool_result(batch_result)
+
+
+def _normalize_canvas_video_reference_assets(raw_assets: Any) -> list[Dict[str, Any]]:
+    if not isinstance(raw_assets, list):
+        return []
+    normalized: list[Dict[str, Any]] = []
+    for asset in raw_assets:
+        if isinstance(asset, dict):
+            normalized.append(asset)
+            continue
+        if isinstance(asset, str) and asset.strip():
+            normalized.append({"url": asset.strip()})
+    return normalized
+
+
+def _canvas_video_generate(args: Dict[str, Any], **kwargs) -> str:
+    """Submit one asynchronous canvas video task without waiting for completion."""
+    script_name = _resolve_script_name(args)
+    prompt = str(args.get("prompt") or "").strip()
+    model = str(args.get("model") or "sd2").strip() or "sd2"
+    multi_prompt = args.get("multi_prompt")
+    multi_prompt = multi_prompt if isinstance(multi_prompt, list) else []
+
+    if not script_name:
+        return tool_error("scriptName is required", success=False)
+    if not prompt and not multi_prompt:
+        return tool_error(
+            "prompt or multi_prompt must contain video generation content",
+            success=False,
+        )
+
+    try:
+        duration = int(args.get("duration") or 4)
+    except (TypeError, ValueError):
+        return tool_error("duration must be an integer", success=False)
+    if duration <= 0:
+        return tool_error("duration must be greater than 0", success=False)
+    normalized_model = model.lower()
+    if (
+        normalized_model == "minimax-h3"
+        or normalized_model.startswith("minimax-h3-")
+    ) and duration != 15:
+        return tool_error(
+            "MiniMax H3 generation requires duration=15 for each segment",
+            success=False,
+        )
+
+    try:
+        timeout = max(
+            1,
+            min(int(args.get("timeout_seconds") or _DEFAULT_TIMEOUT_SECONDS), 300),
+        )
+    except (TypeError, ValueError):
+        return tool_error("timeout_seconds must be an integer", success=False)
+
+    body: Dict[str, Any] = {
+        "scriptName": script_name,
+        "prompt": prompt,
+        "model": model,
+        "ratio": str(args.get("ratio") or "16:9").strip() or "16:9",
+        "duration": duration,
+        "reference_images": _normalize_canvas_video_reference_assets(
+            args.get("reference_images")
+        ),
+        "reference_videos": _normalize_canvas_video_reference_assets(
+            args.get("reference_videos")
+        ),
+        "reference_audios": _normalize_canvas_video_reference_assets(
+            args.get("reference_audios")
+        ),
+        "reference_elements": (
+            args.get("reference_elements")
+            if isinstance(args.get("reference_elements"), list)
+            else []
+        ),
+    }
+
+    # Keep this an explicit allow-list. In particular, callbackUrl is deliberately
+    # not accepted from model arguments because the platform owns callback routing.
+    optional_fields = (
+        "resolution",
+        "sound",
+        "minimax_h3_acceleration",
+        "prompt_extend",
+        "refer_type",
+        "keep_original_sound",
+        "multi_shot",
+        "shot_type",
+        "multi_prompt",
+    )
+    for field in optional_fields:
+        if args.get(field) is not None:
+            body[field] = args[field]
+
+    raw_result = _request_json(
+        {
+            "endpoint": "/api/canvas/generate-video",
+            "method": "POST",
+            "timeout_seconds": timeout,
+            "body": body,
+        }
+    )
+    result = _parse_tool_result(raw_result)
+    if result.get("needsLogin") or result.get("success") is not True:
+        return raw_result
+
+    payload = result.get("data")
+    if not isinstance(payload, dict):
+        return raw_result
+    if payload.get("success") is not True:
+        return tool_error(
+            str(payload.get("error") or "Video task submission failed"),
+            success=False,
+        )
+
+    # The endpoint response also includes upstream payloads and a full log record.
+    # Returning only task-tracking fields keeps the model context small while the
+    # authenticated web UI follows the task through the status endpoint.
+    task_id = str(payload.get("task_id") or "").strip()
+    if not task_id:
+        return tool_error("Video task submission returned no task ID", success=False)
+
+    return tool_result(
+        {
+            "success": True,
+            "submitted": True,
+            "status": str(payload.get("status") or "pending"),
+            "task_id": task_id,
+            "callback_mode": bool(payload.get("callback_mode")),
+            "event_stream": bool(payload.get("event_stream")),
+            "message": "视频任务已提交，平台将继续跟踪生成结果。",
+        }
+    )
+
+
+def _ask_question(args: Dict[str, Any], **kwargs) -> str:
+    """Return a structured decision request for the Storyboard chat UI."""
+    del kwargs
+    question = str(args.get("question") or "").strip()
+    if not question:
+        return tool_error("question is required", success=False)
+
+    selection_type = str(args.get("selection_type") or "single").strip().lower()
+    if selection_type not in {"single", "multiple"}:
+        return tool_error(
+            "selection_type must be 'single' or 'multiple'",
+            success=False,
+        )
+
+    raw_options = args.get("options")
+    if not isinstance(raw_options, list) or not raw_options:
+        return tool_error("options must be a non-empty array", success=False)
+    if len(raw_options) > _MAX_QUESTION_OPTIONS:
+        return tool_error(
+            f"options supports at most {_MAX_QUESTION_OPTIONS} items",
+            success=False,
+        )
+
+    options: list[dict[str, str]] = []
+    seen_values: set[str] = set()
+    for index, raw_option in enumerate(raw_options):
+        if isinstance(raw_option, str):
+            label = raw_option.strip()
+            value = label
+            description = ""
+        elif isinstance(raw_option, dict):
+            label = str(
+                raw_option.get("label")
+                or raw_option.get("title")
+                or raw_option.get("value")
+                or ""
+            ).strip()
+            value = str(raw_option.get("value") or label).strip()
+            description = str(
+                raw_option.get("description") or raw_option.get("help") or ""
+            ).strip()
+        else:
+            return tool_error(
+                f"options[{index}] must be a string or object",
+                success=False,
+            )
+        if not label or not value:
+            return tool_error(
+                f"options[{index}] requires a non-empty label and value",
+                success=False,
+            )
+        if value in seen_values:
+            return tool_error(
+                f"options[{index}] duplicates value {value!r}",
+                success=False,
+            )
+        seen_values.add(value)
+        options.append(
+            {
+                "label": label[:200],
+                "value": value[:200],
+                "description": description[:500],
+            }
+        )
+
+    return tool_result(
+        {
+            "success": True,
+            "status": "awaiting_user_input",
+            "ui": {
+                "kind": "question",
+                "question": question[:2000],
+                "selection_type": selection_type,
+                "options": options,
+                "allow_other": args.get("allow_other") is not False,
+                "allow_skip": args.get("allow_skip") is not False,
+                "other_label": str(args.get("other_label") or "其他（可自行填写）")[:100],
+                "placeholder": str(args.get("placeholder") or "输入自定义指令")[:200],
+                "submit_label": str(args.get("submit_label") or "提交")[:40],
+                "skip_label": str(args.get("skip_label") or "跳过")[:40],
+            },
+            "message": (
+                "The question card is waiting for the user's decision. Stop this turn "
+                "without choosing on the user's behalf. The platform will inject the "
+                "submitted or skipped decision in the next turn."
+            ),
+        }
+    )
+
+
+CANVAS_IMAGE_GENERATE_SCHEMA = {
+    "name": "canvas_image_generate",
+    "description": (
+        "Generate one or more images through the storyboard platform /api/canvas/generate "
+        "endpoint using internal session auth. The model only passes business "
+        "parameters. Use this instead of image_generate/FAL for storyboard "
+        "platform image generation. quality is fixed to high, output_format "
+        "to png, and n to 1 per prompt. Submit one concurrent platform request "
+        "for every prompt array item. file_names maps one-to-one to prompt and each "
+        "name is normalized to img_{keywords}_v{version}. In API-server embedded sessions, the current "
+        "page scriptName is injected by the platform and overrides any "
+        "model-provided scriptName. After a successful submission, never "
+        "mention task IDs, job IDs, request IDs, or model IDs in the assistant "
+        "reply; the platform UI tracks and renders task results separately."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "scriptName": {
+                "type": "string",
+                "description": "Optional script name. API-server embedded sessions use the current page scriptName instead.",
+            },
+            "prompt": {
+                "type": "array",
+                "description": "One image generation prompt per requested image. All items are submitted concurrently.",
+                "items": {"type": "string", "minLength": 1},
+                "minItems": 1,
+                "maxItems": _MAX_CANVAS_IMAGE_PROMPTS,
+            },
+            "file_names": {
+                "type": "array",
+                "description": (
+                    "One unique filename base per prompt, in the same order and with the same item count. "
+                    "Extract one or two short keywords from each prompt and use img_{keywords}_v{version}, "
+                    "for example img_戴墨镜的猫_v1. Do not include directories or extensions."
+                ),
+                "items": {"type": "string", "minLength": 1},
+                "minItems": 1,
+                "maxItems": _MAX_CANVAS_IMAGE_PROMPTS,
+            },
+            "model": {
+                "type": "string",
+                "description": "Image model. Defaults to gpt-2.",
+            },
+            "ratio": {
+                "type": "string",
+                "description": "Aspect ratio. Defaults to 3:4.",
+            },
+            "resolution": {
+                "type": "string",
+                "description": "Image resolution. Defaults to 1K.",
+            },
+            "reference_images": {
+                "type": "array",
+                "description": "Optional reference image assets/URLs. Defaults to an empty list.",
+                "items": {},
+            },
+            "timeout_seconds": {
+                "type": "integer",
+                "description": "Request timeout from 1 to 300 seconds.",
+            },
+        },
+        "required": ["prompt", "file_names"],
+    },
+}
+
+
+CANVAS_VIDEO_GENERATE_SCHEMA = {
+    "name": "canvas_video_generate",
+    "description": (
+        "Submit one asynchronous video generation task through the storyboard platform "
+        "/api/canvas/generate-video endpoint using internal session auth. Use this for "
+        "storyboard platform video generation instead of generic video tools. The platform "
+        "tracks the task after submission. In API-server embedded sessions, the current page "
+        "scriptName overrides any model-provided value. After successful submission, never "
+        "mention task IDs, route IDs, upstream IDs, or model IDs in the assistant reply."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "scriptName": {
+                "type": "string",
+                "description": "Optional script name. Embedded sessions use the current page scriptName.",
+            },
+            "prompt": {
+                "type": "string",
+                "description": "Video generation prompt. May be empty only when multi_prompt supplies the content.",
+            },
+            "model": {
+                "type": "string",
+                "description": "Storyboard platform video model ID. Defaults to sd2.",
+            },
+            "ratio": {
+                "type": "string",
+                "description": "Requested aspect ratio, for example 16:9 or 9:16. Defaults to 16:9.",
+            },
+            "duration": {
+                "type": "integer",
+                "minimum": 1,
+                "description": (
+                    "Requested duration in seconds. MiniMax H3 and its variants require "
+                    "duration=15 for every independently submitted segment. Other "
+                    "model-specific limits are validated by the platform."
+                ),
+            },
+            "resolution": {
+                "type": "string",
+                "description": "Optional model-specific resolution such as 480p, 720p, or 1080p.",
+            },
+            "sound": {
+                "type": "boolean",
+                "description": "Generate sound when the selected model supports it.",
+            },
+            "minimax_h3_acceleration": {
+                "type": "boolean",
+                "description": "Optional MiniMax H3 acceleration switch.",
+            },
+            "prompt_extend": {
+                "type": "boolean",
+                "description": "Optional Wan prompt extension switch.",
+            },
+            "refer_type": {
+                "type": "string",
+                "description": "Optional Kling reference mode.",
+            },
+            "keep_original_sound": {
+                "type": "string",
+                "description": "Optional Kling original-sound setting.",
+            },
+            "multi_shot": {
+                "type": "boolean",
+                "description": "Enable a model-specific multi-shot request.",
+            },
+            "shot_type": {
+                "type": "string",
+                "description": "Optional model-specific shot type.",
+            },
+            "multi_prompt": {
+                "type": "array",
+                "description": "Optional model-specific multi-shot prompt objects.",
+                "items": {"type": "object"},
+            },
+            "reference_images": {
+                "type": "array",
+                "description": "Optional reference image asset objects or URLs.",
+                "items": {},
+            },
+            "reference_videos": {
+                "type": "array",
+                "description": "Optional reference video asset objects or URLs.",
+                "items": {},
+            },
+            "reference_audios": {
+                "type": "array",
+                "description": "Optional reference audio asset objects or URLs.",
+                "items": {},
+            },
+            "reference_elements": {
+                "type": "array",
+                "description": "Optional Kling element references.",
+                "items": {},
+            },
+            "timeout_seconds": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 300,
+                "description": "Submission request timeout. This does not wait for video completion.",
+            },
+        },
+        "anyOf": [
+            {"required": ["prompt"]},
+            {"required": ["multi_prompt"]},
+        ],
+    },
+}
+
+
+ASK_QUESTION_SCHEMA = {
+    "name": "ask_question",
+    "description": (
+        "Ask the user one clear decision question in an interactive Storyboard card. "
+        "Use single selection for mutually exclusive alternatives and multiple selection "
+        "for optional features that may be combined. The card includes an optional custom "
+        "write-in field plus Submit and Skip actions. Call this instead of asking a plain-text "
+        "choice question when work cannot safely continue without the user's preference. "
+        "After the tool returns awaiting_user_input, stop the turn and never select an option "
+        "for the user; the platform resumes the same conversation after the response."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "minLength": 1,
+                "description": "A concise explanation of the decision or disagreement that must be resolved.",
+            },
+            "selection_type": {
+                "type": "string",
+                "enum": ["single", "multiple"],
+                "description": "single renders radio buttons; multiple renders checkboxes.",
+            },
+            "options": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": _MAX_QUESTION_OPTIONS,
+                "description": "Preset choices shown in the question card.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "label": {"type": "string", "minLength": 1},
+                        "value": {"type": "string", "minLength": 1},
+                        "description": {"type": "string"},
+                    },
+                    "required": ["label", "value"],
+                },
+            },
+            "allow_other": {
+                "type": "boolean",
+                "description": "Whether to show the custom write-in field. Defaults to true.",
+            },
+            "allow_skip": {
+                "type": "boolean",
+                "description": "Whether to show the Skip action. Defaults to true.",
+            },
+            "other_label": {"type": "string"},
+            "placeholder": {"type": "string"},
+            "submit_label": {"type": "string"},
+            "skip_label": {"type": "string"},
+        },
+        "required": ["question", "selection_type", "options"],
+    },
+}
+
+
+# Registered by the storyboard-platform plugin (``__init__.register``).
+TOOLS = (
+    {
+        "name": "storyboard_api",
+        "schema": STORYBOARD_API_SCHEMA,
+        "handler": _request_json,
+        "emoji": "SB",
+        "max_result_size_chars": 12000,
+    },
+    {
+        "name": "canvas_image_generate",
+        "schema": CANVAS_IMAGE_GENERATE_SCHEMA,
+        "handler": _canvas_image_generate,
+        "emoji": "IMG",
+        "max_result_size_chars": 12000,
+    },
+    {
+        "name": "ask_question",
+        "schema": ASK_QUESTION_SCHEMA,
+        "handler": _ask_question,
+        "emoji": "ASK",
+        "max_result_size_chars": 12000,
+    },
+    {
+        "name": "canvas_video_generate",
+        "schema": CANVAS_VIDEO_GENERATE_SCHEMA,
+        "handler": _canvas_video_generate,
+        "emoji": "VID",
+        "max_result_size_chars": 12000,
+    },
+    {
+        "name": "character_three_view_generate",
+        "schema": CHARACTER_THREE_VIEW_GENERATE_SCHEMA,
+        "handler": _character_three_view_generate,
+        "emoji": "ART",
+        "max_result_size_chars": 12000,
+    },
+)

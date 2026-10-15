@@ -2831,11 +2831,19 @@ def get_env_prefer_dotenv(key: str) -> str:
     An unresolved ``op://`` reference in .env yields to the already-resolved
     value from the active secret scope (set by apply_onepassword_secrets());
     otherwise every provider auth attempt would receive a URL instead of a key.
+
+    An installed scope wins outright. Under multiplexing it is authoritative and
+    built from this same .env, so an ordinary key reads the same either way;
+    only the scope can carry a credential bound to one request (the caller's
+    own model key), which reading .env first made unreachable whenever the
+    profile had a key of its own, billing the profile without a trace.
     """
+    from agent.secret_scope import current_secret_scope
+
     env_file = load_env()
     raw = env_file.get(key, "").strip()
     scoped_value = (_get_secret(key, "") or "").strip()
-    if raw.startswith("op://") and scoped_value:
+    if scoped_value and (raw.startswith("op://") or current_secret_scope() is not None):
         return scoped_value
     return raw or scoped_value
 

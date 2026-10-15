@@ -1,0 +1,26 @@
+name: scriptmaker-platform
+version: 1.0.0
+description: >-
+  Scriptmaker platform tools for the scriptmaker profile. Every tool executes
+  on the Scriptmaker platform through the turn-scoped callback endpoint.
+author: storyboard-web
+provides_tools:
+  - ask_choice
+  - list_projects
+  - select_project
+  - get_project_status
+  - read_attachment
+  - write_attachment_draft
+  - prepare_script_generation
+  - confirm_script_generation
+  - read_script_artifact
+  - propose_artifact_edit
+  - confirm_artifact_edit
+  - pause_task
+  - resume_task
+  - retry_task
+  - terminate_task
+  - export_project
+  - run_project_doctor
+  - open_feature
+  - read_market_reports
