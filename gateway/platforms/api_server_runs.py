@@ -26,6 +26,7 @@ except ImportError:
 
 from gateway.platforms.api_server_room_grants import _json_error, _room_grant_error_response
 from gateway.platforms.api_server_run_idempotency import TERMINAL_STATUSES
+from gateway.storyboard_platform_context import bound_platform_context, current_platform_context
 
 
 logger = logging.getLogger("gateway.platforms.api_server")
@@ -541,6 +542,7 @@ class _RunLaunch:
     turn_author: Optional[dict[str, Any]] = None  # memory-attribution label only; grants nothing
     admission: Any = None
     walked_from: Optional[str] = None  # the swept stored session the chain moved past (``bind_api_steps``)
+    platform_context: Any = None  # Storyboard/Scriptmaker request context, re-bound in the worker
 
     @property
     def approval_session_key(self) -> str:
@@ -828,7 +830,8 @@ async def _handle_runs(self, request: web.Request, *, _api_server) -> web.Respon
         request_profile=_api_server._api_request_profile.get(),
         browser_control_principal=_api_server._api_request_browser_control_principal.get(),
         browser_control_transport_family=_api_server._api_request_browser_control_transport_family.get(),
-        turn_author=turn_author, walked_from=walked_from if session_id == stored_session_id else None)
+        turn_author=turn_author, walked_from=walked_from if session_id == stored_session_id else None,
+        platform_context=current_platform_context())
     # A canonical Bot Chat that a Desktop holds live is that Desktop's to run: executing here would
     # be a second writer beside its lease (#114959). The owner's mailbox takes the turn and its
     # receipt drives this run's status, so `peer run` keeps its run_id and `peer status` still works.
@@ -903,7 +906,8 @@ def _run_agent_sync(self, run: _RunLaunch, agent, approval_notify, *, _api_serve
     effective_task_id = session_id or run.run_id
     # (token, reset) pairs unwound in the finally block; bound only once each step succeeds.
     resets: list[tuple[Any, Callable]] = []
-    with self._profile_scope(run.request_profile):
+    # Platform context first: the profile scope overlays its model key on entry.
+    with bound_platform_context(run.platform_context), self._profile_scope(run.request_profile):
         try:
             # Contextvars, not process env: concurrent runs must not share identity.
             resets.append((set_current_session_key(run.approval_session_key), reset_current_session_key))
@@ -923,7 +927,9 @@ def _run_agent_sync(self, run: _RunLaunch, agent, approval_notify, *, _api_serve
                 # so it stays default-denied until a merge contract exists for that chain;
                 # likewise a caller-supplied conversation_history is authoritative for the
                 # turn and never reads the delivery row, so it is denied the same way.
-                session_history_delivery="1" if run.session_history_delivery else "")
+                session_history_delivery="1" if run.session_history_delivery else "",
+                user_id=getattr(run.platform_context, "user_id", ""),
+                user_name=getattr(run.platform_context, "user_name", ""))
             if session_tokens:
                 resets.append((session_tokens, clear_session_vars))
             if run.agent_kwargs["room_dispatch"] is not None:

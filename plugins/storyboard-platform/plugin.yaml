@@ -1,0 +1,14 @@
+name: storyboard-platform
+version: 1.0.0
+description: >-
+  Storyboard platform tools for the storyboard profile: platform API access,
+  canvas image and video generation, character three-view sheets, structured
+  user questions and video analysis.
+author: storyboard-web
+provides_tools:
+  - storyboard_api
+  - canvas_image_generate
+  - ask_question
+  - canvas_video_generate
+  - character_three_view_generate
+  - zenmux_video_analyze

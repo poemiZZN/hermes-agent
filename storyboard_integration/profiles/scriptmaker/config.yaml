@@ -1,0 +1,148 @@
+toolsets:
+  - hermes-cli
+
+platform_toolsets:
+  api_server:
+    - skills
+    - memory
+    - scriptmaker
+    - web
+
+# 平台工具由 Fork 自带的 scriptmaker-platform 插件提供，只在本 profile 启用。Hermes
+# 按 profile 分别加载插件、分别登记工具，storyboard 和默认 profile 不会导入它。
+plugins:
+  enabled:
+    - scriptmaker-platform
+
+# 插件 Toolset 默认对 profile 的每个平台都开启，除非在该平台的 known 列表里且没被
+# 选中。平台工具离不开只有 API Server 才能给的轮次票据；本地 CLI（含 /skills 审批
+# 会话）、cron、ACP 在这里显式关掉，与内置 Toolset 时期的行为一致。
+known_plugin_toolsets:
+  cli:
+    - scriptmaker
+  cron:
+    - scriptmaker
+  acp:
+    - scriptmaker
+
+# session_search 能列出、全文搜索本 profile 的所有会话——也就是所有平台用户的
+# 对话，带 profile 参数还能读其他 profile。平台自己按用户保存对话，Hermes 不需要
+# 跨会话回忆，所以关掉。
+#
+# 只从上面的 platform_toolsets 删掉不够：安装器合并配置时列表只补缺不删，现场
+# 已有的 session_search 会留着。disabled_toolsets 在 _get_platform_tools 里最后
+# 执行、压过 platform_toolsets，而列表合并会把新项补进现场，所以写在这里才生效。
+agent:
+  disabled_toolsets:
+    - storyboard
+    - session_search
+
+# 模型必须经过 New API：平台按用户计费靠的是 X-Hermes-Platform-Model-Key 里
+# 该用户自己的 New API 令牌，只有请求真正打到 New API 才会记到这个令牌上。
+# 此前现场 profile 直连阿里云 DashScope，12 个会话全部记在共享账号上，
+# New API 一条记录也没有。
+#
+# 有用户令牌的一轮，api_server 直接用它替换 api_key 并丢弃凭据池和 fallback
+# （见 corePatch），不会回落到下面这个共享令牌。SCRIPTMAKER_MODEL_API_KEY
+# 只服务没有带用户令牌的调用（平台关掉一用户一 Key 时）。
+model:
+  # 平台发来的 model 字段在 /v1/responses 上会被忽略（没开 direct_model_requests，
+  # 也没有 model_routes），实际计费的模型只看这里。New API 需在 default 分组
+  # （用户令牌所在分组）为该模型配置渠道，否则每一轮都会 503 model_not_found。
+  default: deepseek-v4-pro-idea
+  provider: custom
+  base_url: http://127.0.0.1:3000/v1
+  api_key: ${SCRIPTMAKER_MODEL_API_KEY}
+  api_mode: chat_completions
+
+# 通用方法复盘：打开后台复盘，但只沉淀技能，而且每次写技能都先进人工审批队列。
+#
+# - 本 profile 由所有平台用户共用。内置记忆 MEMORY.md / USER.md 按 profile 共享，
+#   9/2 出过跨用户泄漏，所以记忆保持关闭；用户级偏好由平台按 user_id 自己存。
+#   记忆关闭后复盘只剩技能这一条路，复盘 fork 也拿不到 memory 工具。
+# - 自带的技能复盘提示词要求把"这位用户"的风格偏好写进 SKILL.md，在共享 profile
+#   上会把一个人的口味变成所有人的规则，所以用 skill_prompt 换成多用户版本
+#   （需要 corePatch v12 及以上，旧 fork 会忽略这个键、退回自带提示词）。
+# - 复盘走单独的模型和平台自己的 New API 令牌。模型与 model.default 不同才算
+#   routed；routed 的复盘不继承平台系统提示（里面有会话上下文和用户的长期偏好），
+#   费用也不会记到触发它的那个用户头上。model 必须保持与 model.default 不同。
+# - api_server 每个请求新建 agent，工具调用计数按单轮算。2026-09-23 统计线上
+#   142 轮，没有一轮达到默认阈值 10；阈值 3 约覆盖 9% 的轮次。
+# - write_approval 让前台和后台的技能写入都先进 pending/skills/。管理员在
+#   `hermes -p scriptmaker` 里用 /skills pending、diff、approve、reject 审批；
+#   没人审批时提案只会堆着，不会生效。
+auxiliary:
+  background_review:
+    enabled: true
+    provider: custom
+    base_url: http://127.0.0.1:3000/v1
+    model: deepseek-v4-pro-hermes
+    api_key: ${SCRIPTMAKER_REVIEW_API_KEY}
+    skill_prompt: |
+      复盘上面的对话，决定是否更新技能库。这是多个用户共用的剧本平台：技能库对所有用户生效，
+      所以只能沉淀与具体用户无关、在这次对话里被验证有效的通用方法。你的每一次写入都会先进入
+      人工审核队列，管理员通过后才生效。
+
+      可以沉淀：
+      - 平台工具的正确用法和调用顺序（如 ask_choice、prepare_script_generation、
+        read_script_artifact），以及这次发现的坑和确实有效的修正办法；
+      - 检索同类作品、整理题材写法的有效方法；
+      - 跨项目通用的剧本创作技巧（结构、节奏、钩子等）。
+
+      不得写入：
+      - 任何用户的个人偏好、文风要求或合作习惯（这些由平台按用户单独保存）；
+      - 具体的故事、角色名、剧情、世界观设定、用户原话、附件内容；
+      - 用户身份信息、账号、密钥、平台内部数据；
+      - 环境或网络导致的一次性失败，以及"某工具不能用"之类的否定结论。
+
+      优先修改已有的、由复盘创建的通用技能，只有确实没有覆盖时才新建技能，名称必须是
+      类别级别，不能指向具体项目或用户。发布版本自带的技能和用户拥有的技能不要修改。
+      修改已有技能前先用 skill_view 读取它。
+
+      大多数对话不需要更新技能。没有可沉淀的通用方法时，只回复 "Nothing to save." 并结束。
+
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+  nudge_interval: 0
+
+skills:
+  write_approval: true
+  creation_nudge_interval: 4
+
+# 本 profile 的 15 个平台工具（ask_choice、prepare_script_generation 等）默认会被
+# tool_search 延迟披露：它们不在模型可见的工具数组里，模型必须先花一轮
+# tool_describe 取 schema 才能调用。2026-09-22 实测一次这样的取 schema 往返要多花
+# 约 25k 输入 token 和 27 秒，而把全部延迟 schema 常驻只要约 1.7k token —— 净省。
+#
+# 注意 should_activate() 的语义：只要存在任何可延迟工具就会激活桥接，threshold_pct
+# 只控制清单预算、不控制激活。所以"只把某几个工具提升为常驻"在配置层面做不到，
+# 只能整体关掉，或改 fork 往 toolsets._HERMES_CORE_TOOLS 里加。
+#
+# web_search / web_extract 本来就在 _HERMES_CORE_TOOLS 里，任何时候都不会被延迟，
+# 不受这一项影响。
+tools:
+  tool_search:
+    enabled: "off"
+
+# scriptmaker 启用了 web toolset，后端必须随之带上：Hermes 的默认值是
+# backend: "" + provider_tier: {}，会落回 keyless 环，而环里的 exa 和 firecrawl
+# 在本构建上是坏的，全新安装的第一次搜索就会失败。
+#
+# 多路复用下每个 profile 的 config.yaml 相互独立，根目录 ~/.hermes/config.yaml
+# 的 web 段不会被继承 —— 这里必须自带一份。
+#
+# tavily 在本构建里没有 provider，历史全局配置 backend: tavily 是死配置。
+# 2026-09-22 实测：keyless 四家里只有 parallel 和 keenable 可用（exa 返回
+# Unrecognized MCP response shape，firecrawl 403）。search_with_failover() 只在
+# 限流类错误时才换下一家，所以环的起点必须钉死。端点恢复后可重新评估这几行。
+web:
+  backend: parallel
+  search_backend: parallel
+  extract_backend: parallel
+  keyless_fallback: true
+  provider_tier:
+    parallel: free      # 强制 keyless（无 key 也走公共端点），并 pin 为环起点
+    keenable: free      # 限流时的故障转移目标
+    exa: paid           # 端点已坏，用 paid 把它排除出 keyless 环
+    firecrawl: paid     # 同上（403）

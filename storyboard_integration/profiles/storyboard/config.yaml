@@ -1,0 +1,45 @@
+toolsets:
+  - hermes-cli
+
+platform_toolsets:
+  api_server:
+    - skills
+    - memory
+    - storyboard
+  wecom:
+    - skills
+    - memory
+    - storyboard
+  wecom_callback:
+    - skills
+    - memory
+    - storyboard
+
+# 平台工具由 Fork 自带的 storyboard-platform 插件提供，只在本 profile 启用。Hermes
+# 按 profile 分别加载插件、分别登记工具，scriptmaker 和默认 profile 不会导入它。
+plugins:
+  enabled:
+    - storyboard-platform
+
+# 插件 Toolset 默认对 profile 的每个平台都开启，除非在该平台的 known 列表里且没被
+# 选中。平台工具只服务上面三个入口；本地 CLI、cron、ACP 会话没有平台身份，在这里
+# 显式关掉，与内置 Toolset 时期的行为一致。
+known_plugin_toolsets:
+  cli:
+    - storyboard
+  cron:
+    - storyboard
+  acp:
+    - storyboard
+
+# session_search 能列出、全文搜索本 profile 的所有会话——平台用户和企业微信用户
+# 的对话都在里面，带 profile 参数还能读其他 profile。它不区分用户，所以三个入口
+# 都关掉。
+#
+# 只从上面的 platform_toolsets 删掉不够：安装器合并配置时列表只补缺不删，现场
+# 已有的 session_search 会留着。disabled_toolsets 在 _get_platform_tools 里最后
+# 执行、压过 platform_toolsets，而列表合并会把新项补进现场，所以写在这里才生效。
+agent:
+  disabled_toolsets:
+    - scriptmaker
+    - session_search
