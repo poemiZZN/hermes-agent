@@ -199,6 +199,10 @@ def _is_skill_disabled(*names: str, platform: str | None = None) -> bool:
     """Any of *names* disabled in config (one config load)? Platform precedence: explicit arg,
     ``HERMES_PLATFORM``, session ``HERMES_SESSION_PLATFORM``. A globally-disabled skill stays disabled on every platform
     (keep in sync with agent.skill_utils.get_disabled_skill_names)."""
+    from gateway.storyboard_platform_context import current_platform_disabled_skills
+
+    if not current_platform_disabled_skills().isdisjoint(names):
+        return True
     try:
         from hermes_cli.config import load_config
         skills_cfg = load_config().get("skills", {})

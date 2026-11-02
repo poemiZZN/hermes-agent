@@ -4,8 +4,8 @@
   "hermesVersion": "0.22.4",
   "upstreamCommit": "4d04303818b61bf3aa09278af48356315515965b",
   "integrationBranch": "storyboard-integration-0.22.4",
-  "releaseTag": "storyboard-hermes-v0.22.4-1",
-  "preparedAt": "2026-10-22T10:12:34.854290+00:00",
+  "releaseTag": "storyboard-hermes-v0.22.4-2",
+  "preparedAt": "2026-11-02T02:29:16.963501+00:00",
   "plugins": [
     "storyboard-platform",
     "scriptmaker-platform"
@@ -79,6 +79,10 @@
       "sha256": "15a139ae6af2debf3adf9706a7e22466d6c06de7d787ed41cbceb6d7d1d7bce5"
     },
     {
+      "path": "agent/skill_utils.py",
+      "sha256": "d29bcbeb81ef82a698b8d6c98bbc5ec7997dacf55de697d3a692c5ef73d37bd9"
+    },
+    {
       "path": "gateway/platforms/api_server.py",
       "sha256": "d2bb5051d37d508438706d835807cda43121e130605f260895874748595ac8b7"
     },
@@ -96,7 +100,7 @@
     },
     {
       "path": "gateway/storyboard_platform_context.py",
-      "sha256": "fd7d9859a36e9855208d14fcfe18d6e0e2f671895c1329a61efe477bda570d50"
+      "sha256": "560a14887df84e26e778bc5ea17fe115007c9dba7554e076e536cb124a4d9472"
     },
     {
       "path": "hermes_cli/config.py",
@@ -260,7 +264,7 @@
     },
     {
       "path": "storyboard_integration/profiles/storyboard/distribution.yaml",
-      "sha256": "1cb842046b163b1a2d80e5be24b2fb77a603b7229a2611f8b78a5b30ef15adcf"
+      "sha256": "75fd90214578aacf247974c0ea2c300c41f6e665e3ca0033940f671037faa042"
     },
     {
       "path": "storyboard_integration/profiles/storyboard/skills/art-asset-production/references/character-assets.md",
@@ -497,6 +501,10 @@
     {
       "path": "tests/tools/test_stdio_running_venv_path.py",
       "sha256": "f8e5a84ce093e3b0ea8cd73e3e0b965ba74ae9b5c9ceff84f83a02a5147f29d0"
+    },
+    {
+      "path": "tools/skills_tool.py",
+      "sha256": "c7a58e0e57943badd9010436ef344bde8fd8b84779a1222d88e73c4bae57a2a6"
     }
   ]
 }

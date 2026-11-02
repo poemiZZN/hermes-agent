@@ -278,16 +278,16 @@ ESSENTIAL_SKILLS: frozenset = frozenset({"hermes-agent"})
 def get_disabled_skill_names(platform: str | None = None) -> set[str]:
     """Disabled skill names from config.yaml: global list ∪ platform list
     (*platform* defaults to ``HERMES_PLATFORM`` / ``HERMES_SESSION_PLATFORM``)."""
-    skills_cfg = _skills_cfg()
-    if skills_cfg is None:
-        return set()
+    from gateway.storyboard_platform_context import current_platform_disabled_skills
+
+    skills_cfg = _skills_cfg() or {}
     from gateway.session_context import get_session_env
     resolved_platform = platform or os.getenv("HERMES_PLATFORM") or get_session_env("HERMES_SESSION_PLATFORM")
     disabled = _normalize_string_set(skills_cfg.get("disabled"))
     platform_disabled = (skills_cfg.get("platform_disabled") or {}).get(resolved_platform) if resolved_platform else None
     if platform_disabled is not None:
         disabled |= _normalize_string_set(platform_disabled)
-    return disabled - ESSENTIAL_SKILLS
+    return (disabled | set(current_platform_disabled_skills())) - ESSENTIAL_SKILLS
 
 
 def parse_config_string_list(value) -> list[str]:

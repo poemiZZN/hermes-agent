@@ -11,6 +11,7 @@ X-Hermes-Session-User-Name            both         user_name
 X-Platform-Token                      both         storyboard_platform_token
 X-Hermes-Storyboard-Script-Name-B64   storyboard   storyboard_script_name
 X-Hermes-Storyboard-Cos-Path-B64      storyboard   storyboard_cos_path
+X-Hermes-Storyboard-Entry-Point       storyboard   storyboard_entry_point
 X-Hermes-Platform-Turn-Ticket         scriptmaker  platform_turn_ticket
 X-Hermes-Platform-Api-Base            scriptmaker  platform_api_base
 X-Hermes-Platform-Model-Key           scriptmaker  platform_model_key
@@ -56,6 +57,7 @@ class PlatformContext:
     storyboard_platform_token: str = field(default="", repr=False)
     storyboard_script_name: str = ""
     storyboard_cos_path: str = ""
+    storyboard_entry_point: str = ""
     platform_turn_ticket: str = field(default="", repr=False)
     platform_api_base: str = ""
     platform_model_key: str = field(default="", repr=False)
@@ -117,6 +119,7 @@ def parse_platform_headers(headers: Mapping[str, str], profile: Optional[str]) -
     platform_token = header("X-Platform-Token")
     encoded_script_name = header("X-Hermes-Storyboard-Script-Name-B64")
     encoded_cos_path = header("X-Hermes-Storyboard-Cos-Path-B64")
+    entry_point = header("X-Hermes-Storyboard-Entry-Point")
     turn_ticket = header("X-Hermes-Platform-Turn-Ticket")
     api_base = header("X-Hermes-Platform-Api-Base")
 
@@ -132,6 +135,13 @@ def parse_platform_headers(headers: Mapping[str, str], profile: Optional[str]) -
         if len(value) > limit or _CONTROL_CHARS.search(value):
             raise PlatformContextError(f"Invalid {label}", "invalid_session_context")
 
+    if entry_point:
+        if profile != STORYBOARD_PROFILE:
+            raise PlatformContextError(
+                "Storyboard entry point is not valid for this profile", "profile_context_mismatch")
+        if entry_point not in {"agent-chat-workspace", "storyboard-tool"}:
+            raise PlatformContextError("Invalid storyboard entry point", "invalid_session_context")
+
     if profile == STORYBOARD_PROFILE and (turn_ticket or api_base):
         raise PlatformContextError(
             "Scriptmaker context is not valid for storyboard profile", "profile_context_mismatch")
@@ -145,6 +155,7 @@ def parse_platform_headers(headers: Mapping[str, str], profile: Optional[str]) -
         storyboard_platform_token=platform_token,
         storyboard_script_name=_decode_b64(encoded_script_name, 512, "Invalid storyboard script name"),
         storyboard_cos_path=_decode_b64(encoded_cos_path, 2048, "Invalid storyboard COS path"),
+        storyboard_entry_point=entry_point,
         platform_turn_ticket=turn_ticket,
         platform_api_base=api_base,
         platform_model_key=model_key,
@@ -163,6 +174,13 @@ def current_platform_context() -> PlatformContext:
 def current_platform_model_key() -> str:
     """The caller's own upstream model key for this request, or "" when none was sent."""
     return _PLATFORM_CONTEXT.get().platform_model_key
+
+
+def current_platform_disabled_skills() -> frozenset[str]:
+    """Request-local catalog/load policy; never changes profile or process config."""
+    if _PLATFORM_CONTEXT.get().storyboard_entry_point == "agent-chat-workspace":
+        return frozenset({"storyboard-script-generator"})
+    return frozenset()
 
 
 def bind_platform_context(context: Optional[PlatformContext]) -> Token:
